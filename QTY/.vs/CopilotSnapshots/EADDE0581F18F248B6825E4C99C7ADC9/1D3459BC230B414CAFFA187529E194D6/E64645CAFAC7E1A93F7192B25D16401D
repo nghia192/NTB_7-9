@@ -1,0 +1,187 @@
+﻿using System;
+using System.Data;
+using System.Data.SqlClient;
+
+namespace NtbSoft.ERP.Model.ThuVien
+{
+    public class SYS_LanguageModel
+    {
+        public DataTable Get(string action, string para1 = "", string para2 = "", string para3 = "")
+        {
+            SqlConnection conn = null;
+            try
+            {
+                conn = NtbSoft.ERP.Libs.SqlHelper.GetConnection();
+                SqlCommand cmd = new SqlCommand("SP_SYS_LanguageResource", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Action", action);
+                cmd.Parameters.AddWithValue("@para1", para1 ?? "");
+                cmd.Parameters.AddWithValue("@para2", para2 ?? "");
+                cmd.Parameters.AddWithValue("@para3", para3 ?? "");
+                using (SqlDataAdapter adt = new SqlDataAdapter(cmd))
+                {
+                    DataTable ds = new DataTable();
+                    adt.Fill(ds);
+                    ds.TableName = "Result";
+                    return ds;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally { if (conn != null) { conn.Close(); conn.Dispose(); } }
+        }
+
+        // Backwards-compatible Post: executes SP and returns first cell if present
+        public string Post(string action, string type, DataTable data)
+        {
+            var dt = PostDataTable(action, type, data, false);
+            if (dt != null && dt.Rows.Count > 0 && dt.Columns.Count > 0)
+                return dt.Rows[0][0].ToString();
+            return "True";
+        }
+
+        // Execute stored-proc and return DataTable. Supports allowOverwrite flag via @AllowOverwrite param
+        public DataTable PostDataTable(string action, string type, DataTable data, bool allowOverwrite = false)
+        {
+            SqlConnection conn = null;
+            try
+            {
+                conn = NtbSoft.ERP.Libs.SqlHelper.GetConnection();
+                SqlCommand cmd = new SqlCommand("SP_SYS_LanguageResource", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Action", action);
+                cmd.Parameters.AddWithValue("@para1", "");
+                cmd.Parameters.AddWithValue("@para2", "");
+                cmd.Parameters.AddWithValue("@para3", "");
+                cmd.Parameters.AddWithValue("@AllowOverwrite", allowOverwrite);
+                if (!string.IsNullOrEmpty(type) && data != null)
+                    cmd.Parameters.AddWithValue(type, data);
+
+                using (SqlDataAdapter adt = new SqlDataAdapter(cmd))
+                {
+                    DataTable ds = new DataTable();
+                    adt.Fill(ds);
+                    ds.TableName = "Result";
+                    return ds;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally { if (conn != null) { conn.Close(); conn.Dispose(); } }
+        }
+
+        // Save language order via dedicated SP (expects a TVP parameter @OrderTable)
+        public string SaveOrder(DataTable tbl)
+        {
+            // Perform safe update of SYS_Language.SortOrder using the provided table.
+            // This avoids hard dependency on an external stored procedure existing.
+            SqlConnection conn = null;
+            SqlTransaction tx = null;
+            try
+            {
+                conn = NtbSoft.ERP.Libs.SqlHelper.GetConnection();
+                tx = conn.BeginTransaction();
+
+                using (SqlCommand cmd = new SqlCommand("", conn, tx))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.CommandText = "UPDATE dbo.SYS_Language SET SortOrder = @OrderIndex WHERE LanguageID = @LangCode";
+                    var pLang = cmd.Parameters.Add(new SqlParameter("@LangCode", System.Data.SqlDbType.NVarChar, 10));
+                    var pOrder = cmd.Parameters.Add(new SqlParameter("@OrderIndex", System.Data.SqlDbType.Int));
+
+                    foreach (DataRow r in tbl.Rows)
+                    {
+                        pLang.Value = r["LangCode"] ?? string.Empty;
+                        pOrder.Value = r["OrderIndex"] ?? 0;
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                tx.Commit();
+                return "True";
+            }
+            catch (SqlException ex)
+            {
+                try { tx?.Rollback(); } catch { }
+                throw new Exception(ex.Message);
+            }
+            finally { if (conn != null) { conn.Close(); conn.Dispose(); } }
+        }
+
+        // Save resource (row) order via dedicated SP (expects a TVP parameter @ResourceOrderTable)
+        public string SaveResourceOrder(DataTable tbl)
+        {
+            // Upsert into dbo.SYS_ResourceOrder for each resource key in the provided table.
+            SqlConnection conn = null;
+            SqlTransaction tx = null;
+            try
+            {
+                conn = NtbSoft.ERP.Libs.SqlHelper.GetConnection();
+                tx = conn.BeginTransaction();
+
+                using (SqlCommand cmd = new SqlCommand("", conn, tx))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.CommandText = @"
+IF EXISTS (SELECT 1 FROM dbo.SYS_ResourceOrder WHERE ResourceKey = @ResourceKey)
+    UPDATE dbo.SYS_ResourceOrder SET SortOrder = @OrderIndex WHERE ResourceKey = @ResourceKey;
+ELSE
+    INSERT INTO dbo.SYS_ResourceOrder (ResourceKey, SortOrder) VALUES (@ResourceKey, @OrderIndex);
+";
+                    var pKey = cmd.Parameters.Add(new SqlParameter("@ResourceKey", System.Data.SqlDbType.NVarChar, 500));
+                    var pOrder = cmd.Parameters.Add(new SqlParameter("@OrderIndex", System.Data.SqlDbType.Int));
+
+                    foreach (DataRow r in tbl.Rows)
+                    {
+                        pKey.Value = r["ResourceKey"] ?? string.Empty;
+                        pOrder.Value = r["OrderIndex"] ?? 0;
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                tx.Commit();
+                return "True";
+            }
+            catch (SqlException ex)
+            {
+                try { tx?.Rollback(); } catch { }
+                throw new Exception(ex.Message);
+            }
+            finally { if (conn != null) { conn.Close(); conn.Dispose(); } }
+        }
+
+        // Save language definition (supports overwrite confirmation)
+        public DataTable SaveLanguage(string langCode, string langName, string nativeName, bool allowOverwrite = false)
+        {
+            SqlConnection conn = null;
+            try
+            {
+                conn = NtbSoft.ERP.Libs.SqlHelper.GetConnection();
+                SqlCommand cmd = new SqlCommand("SP_SYS_LanguageResource", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Action", "SAVE_LANG");
+                cmd.Parameters.AddWithValue("@para1", langCode ?? "");
+                cmd.Parameters.AddWithValue("@para2", langName ?? "");
+                cmd.Parameters.AddWithValue("@para3", nativeName ?? "");
+                cmd.Parameters.AddWithValue("@AllowOverwrite", allowOverwrite);
+
+                using (SqlDataAdapter adt = new SqlDataAdapter(cmd))
+                {
+                    DataTable ds = new DataTable();
+                    adt.Fill(ds);
+                    ds.TableName = "Result";
+                    return ds;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally { if (conn != null) { conn.Close(); conn.Dispose(); } }
+        }
+    }
+}

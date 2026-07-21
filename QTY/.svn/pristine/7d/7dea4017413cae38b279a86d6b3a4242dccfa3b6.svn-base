@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Loại lỗi";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <title>@ViewData["Title"]</title>
+
+    <!-- ===== ICONS / FONTS ===== -->
+    <link href="~/css/thuviencss/fontawesome.pro.6.0.0.css" rel="stylesheet" />
+
+    <!-- ===== BOOTSTRAP ===== -->
+    <link href="~/css/thuviencss/bootstrap5.3.min.css" rel="stylesheet" />
+
+    <!-- ===== DEVEXTREME ===== -->
+    <link href="~/DevExtreme/dx.common.css" rel="stylesheet" />
+    <link href="~/DevExtreme/dx.light.css" rel="stylesheet" />
+
+    <!-- ===== CUSTOM THEME ===== -->
+    <link href="~/css/base/basic-styles.css" rel="stylesheet" />
+
+
+</head>
+<body>
+    <!-- ===== CONTENTS ===== -->
+    <div id="loailoiContent" class="p-3" style="height: 100vh;"></div>
+    <div id="LoaiLoiModuleToast"></div>
+    <div id="LoaiLoiModuleLoading"></div>
+    <div id="LoaiLoiModulephanloaimoduleLoading"></div>
+
+
+    <!-- ===== CORE JS ===== -->
+    <script src="~/Scripts/thuvienjs/jquery3_7_1.js"></script>
+
+    <!-- ===== CORE LIB ===== -->
+    <script src="~/DevExtreme/dx.all.js"></script>
+    <script src="~/Scripts/thuvienjs/FileSaver.min.js"></script>
+    <script src="~/Scripts/thuvienjs/exceljs.min.js"></script>
+
+    <!-- ===== FOUNDATION ===== -->
+    <script src="~/Scripts/BaseFoundation/foundation.js"></script>
+    <script src="~/Scripts/BaseFoundation/Api/Fetch.js"></script>
+
+    <script src="~/Scripts/BaseFoundation/Helpers/GenerateHelper.js"></script>
+    <script src="~/Scripts/BaseFoundation/Helpers/ParseHelper.js"></script>
+    <script src="~/Scripts/BaseFoundation/Helpers/ExcelHelper.js"></script>
+
+    <script src="~/Scripts/BaseFoundation/Components/Overlays/Loading.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Overlays/Dialog.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Overlays/Toast.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Actions/Button.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Data/Grid.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Editors/SearchLookup.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Editors/Checkbox.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Editors/Slider.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Editors/TextEdit.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Editors/Popover.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Layouts/Tab.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Layouts/Content.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Layouts/Card.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Layouts/Toolbar.js"></script>
+    <script src="~/Scripts/BaseFoundation/Components/Layouts/Splitter.js"></script>
+
+    <!-- ===== MAIN MODULE ===== -->
+    <script src="~/Scripts/Settings/LoiQA/Components/Grid.js"></script>
+    <script src="~/Scripts/Settings/LoiQA/Components/Popover.js"></script>
+
+    <script src="~/Scripts/Settings/LoiQA/LoaiLoi.js"></script>
+
+    <script>
+        $(async function () {
+
+            await BaseFoundation.create(
+                "LoaiLoiModule",
+                "#loailoiContent"
+            );
+
+        });
+    </script>
+</body>
+</html>

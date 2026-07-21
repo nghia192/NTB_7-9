@@ -1,0 +1,112 @@
+﻿using Newtonsoft.Json;
+using NtbSoft.ERP.Entity.SYSTEM;
+using NtbSoft.ERP.Model.ThuVien;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Web.Http;
+
+namespace NtbSoft.ERP.Web.Api.ThuVien
+{
+    [RoutePrefix("api/SYS_Language")]
+    public class SYS_LanguageController : ApiController
+    {
+        [HttpGet]
+        [Route("Get")]
+        public DataTable Get(string action, string para1 = "", string para2 = "", string para3 = "")
+        {
+            return new SYS_LanguageModel().Get(action, para1, para2, para3);
+        }
+
+        [HttpGet]
+        [Route("GetByLanguage")]
+        public DataTable GetByLanguage(string languageID)
+        {
+            return new SYS_LanguageModel().Get("GET_BY_LANG", languageID);
+        }
+
+        [HttpGet]
+        [Route("GetByKey")]
+        public DataTable GetByKey(string resourceKey)
+        {
+            return new SYS_LanguageModel().Get("SEARCH", resourceKey, "", "");
+        }
+
+        [HttpGet]
+        [Route("GetLanguages")]
+        public DataTable GetLanguages()
+        {
+            return new SYS_LanguageModel().Get("GET_LANGUAGES");
+        }
+
+        [HttpPost]
+        [Route("SaveLanguage")]
+        public string SaveLanguage(string langCode, string langName, string nativeName)
+        {
+            DataTable dt = new SYS_LanguageModel().Get("SAVE_LANG", langCode ?? "", langName ?? "", nativeName ?? "");
+            if (dt != null && dt.Rows.Count > 0)
+                return dt.Rows[0][0].ToString();
+            return "False";
+        }
+
+        [HttpPost]
+        [Route("SaveOrder")]
+        public string SaveOrder([FromBody] List<string> orderedLangCodes)
+        {
+            try
+            {
+                if (orderedLangCodes == null || orderedLangCodes.Count == 0) return "False";
+                // Build DataTable for TVP: LangCode, OrderIndex
+                var tbl = new DataTable();
+                tbl.Columns.Add("LangCode", typeof(string));
+                tbl.Columns.Add("OrderIndex", typeof(int));
+                for (int i = 0; i < orderedLangCodes.Count; i++)
+                {
+                    var row = tbl.NewRow();
+                    row["LangCode"] = orderedLangCodes[i] ?? "";
+                    row["OrderIndex"] = i + 1;
+                    tbl.Rows.Add(row);
+                }
+
+                return new SYS_LanguageModel().SaveOrder(tbl);
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        [HttpPost]
+        [Route("DeleteLanguage")]
+        public string DeleteLanguage(string langCode)
+        {
+            DataTable dt = new SYS_LanguageModel().Get("DELETE_LANG", langCode ?? "");
+            if (dt != null && dt.Rows.Count > 0)
+                return dt.Rows[0][0].ToString();
+            return "False";
+        }
+
+        [HttpPost]
+        [Route("Save")]
+        public string Save(List<LanguageResourceItem> lstSave)
+        {
+            string json = JsonConvert.SerializeObject(lstSave);
+            DataTable tbl = JsonConvert.DeserializeObject<DataTable>(json);
+            // Đảm bảo có đủ cột cho TVP, nếu thiếu thì thêm
+            if (!tbl.Columns.Contains("Module"))
+                tbl.Columns.Add("Module", typeof(string));
+            return new SYS_LanguageModel().Post("SAVE", "@TypeTable", tbl);
+        }
+
+        [HttpPost]
+        [Route("Delete")]
+        public string Delete(string resourceKey, string languageID)
+        {
+            DataTable dt = new SYS_LanguageModel().Get("DELETE", resourceKey, languageID);
+            if (dt != null && dt.Rows.Count > 0)
+                return dt.Rows[0][0].ToString();
+            return "False";
+        }
+    }
+}

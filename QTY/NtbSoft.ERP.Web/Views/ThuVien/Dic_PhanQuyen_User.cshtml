@@ -1,0 +1,882 @@
+﻿@{ Layout = null; }
+
+
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Phân quyền Hợp nhất </title>
+    <link href="~/css/thuviencss/fontawesome.pro.6.0.0.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/roboto.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/select2.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/toastr.min.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/bootstrap5.3.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: #f8f9fa;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Display face: dùng cho tiêu đề, tên đối tượng, nhãn nút hành động chính */
+        .font-display {
+            font-family: var(--font-display);
+            letter-spacing: -0.01em;
+        }
+
+        /* Mono face: dùng cho email, mã, badge dữ liệu cần căn chỉnh đều */
+        .font-mono {
+            font-family: var(--font-mono);
+            letter-spacing: 0.01em;
+        }
+
+        h1, h2, h3, h4, h5, h6,
+        .modal-title,
+        #create-btn-text,
+        .btn {
+            font-family: var(--font-display);
+        }
+
+        .nav-link,
+        #tab-roles-btn, #tab-users-btn {
+            font-family: var(--font-display);
+            letter-spacing: 0.02em;
+        }
+
+        /* Chỉnh lại tracking cho các nhãn uppercase để đỡ bí, đọc rõ hơn ở size nhỏ */
+        .text-uppercase,
+        .uppercase {
+            letter-spacing: 0.04em;
+        }
+
+        #obj-name {
+            letter-spacing: -0.015em;
+        }
+
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f3f5;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dee2e6;
+            border-radius: 10px;
+        }
+
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: #ced4da;
+            }
+
+        /* Highlighting active items in left panel */
+        .list-item-active {
+            background-color: #f0f3ff !important;
+            border-left: 4px solid #0d6efd !important;
+        }
+
+        /* Override standard borders to match premium theme */
+        .card,
+        .modal-content,
+        .btn,
+        .form-control,
+        .form-select {
+            border-radius: 6px;
+            font-size: 13px;
+            border: 1px solid #ccc !important;
+        }
+
+        .avatar-box {
+            width: 42px;
+            height: 42px;
+            background-color: #e9ecef;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border-radius: 12px;
+        }
+
+        /* Custom Toast CSS */
+        #toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1080;
+            min-width: 280px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="vh-100 d-flex flex-column overflow-hidden">
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="p-3 bg-dark text-white align-items-center rounded-3 border-0">
+        <div class="d-flex align-items-center">
+            <div class="toast-body d-flex align-items-center gap-2">
+                <i id="toast-icon" class="fa-solid fa-circle-check text-success fs-5"></i>
+                <span id="toast-message" class="fw-semibold small">Thao tác thành công!</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white ms-auto me-2" onclick="$('#toast').fadeOut()"></button>
+        </div>
+    </div>
+
+
+
+    <!-- MAIN INTERACTIVE CONTAINER -->
+    <div class="d-flex flex-grow-1 overflow-hidden">
+
+        <!-- PANEL TRÁI: QUAN LY DANH SACH -->
+        <aside class="bg-white border-end d-flex flex-column flex-shrink-0" style="width: 350px;">
+
+            <!-- Selector Tabs (Nhóm quyền vs Tài khoản) -->
+            <div class="p-3 bg-light border-bottom">
+                <div class="btn-group w-100 p-1 bg-secondary-subtle rounded-3" style="background-color:#fff !important">
+                    <button id="tab-roles-btn" class="btn btn-white text-primary btn-sm fw-bold shadow-sm border-0 py-2 flex-fill" onclick="switchLeftTab('roles')">
+                        <i class="fa-solid fa-shield-halved me-1.5"></i>NHÓM QUYỀN
+                    </button>
+                    <button id="tab-users-btn" class="btn btn-link text-muted btn-sm fw-bold border-0 py-2 flex-fill text-decoration-none" onclick="switchLeftTab('users')">
+                        <i class="fa-solid fa-user-group me-1.5"></i>TÀI KHOẢN
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search box -->
+            <div class="p-3 border-bottom bg-white">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="fa-solid fa-magnifying-glass text-muted fs-7"></i></span>
+                    <input type="text" id="left-search" placeholder="Tìm kiếm nhanh..." class="form-control bg-light border-0 py-2 small" style="font-size: 13px;" oninput="renderLeftList()">
+                </div>
+            </div>
+
+            <!-- Scrollable List Container -->
+            <div id="left-list-container"
+                 class="flex-grow-1 overflow-y-auto custom-scrollbar list-group list-group-flush">
+                <!-- Loaded dynamically by jQuery -->
+            </div>
+
+            <!-- Create New Action Button -->
+            <div class="p-3 bg-light border-top">
+                <button onclick="handleCreateBtn()" id="create-btn" class="btn btn-primary w-100 fw-bold py-2.5 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span id="create-btn-text">TẠO NHÓM MỚI</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- PANEL PHẢI: KHÔNG GIAN CAU HINH -->
+        <main class="flex-grow-1 bg-light d-flex flex-column overflow-hidden">
+
+            <!-- Target Information Header -->
+            <div class="bg-white p-4 border-bottom shadow-sm">
+                <div class="d-flex align-items-start gap-3">
+
+                    <!-- Avatar -->
+                    <div id="obj-avatar"
+                         class="avatar-box bg-primary-subtle text-primary border border-primary-subtle flex-shrink-0"
+                         style="width:55px;height:55px;font-size:1.35rem;">
+                        R
+                    </div>
+
+                    <!-- Nội dung -->
+                    <div class="flex-grow-1">
+
+                        <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+
+                            <h2 id="obj-name"
+                                class="font-display fs-5 fw-extrabold text-dark mb-0">
+                                Tên đối tượng
+                            </h2>
+
+                            <span id="obj-type"
+                                  class="badge bg-secondary-subtle text-secondary border px-2 py-1"
+                                  style="font-size:10px;letter-spacing:.5px;">
+                                Role
+                            </span>
+
+                        </div>
+
+                        <!-- Mô tả nhóm quyền -->
+                        <div id="obj-role-desc"
+                             class="text-muted small">
+                            Mô tả chi tiết quyền hạn...
+                        </div>
+
+                        <!-- Thông tin nhân viên -->
+                        <div id="obj-user-info"
+                             class="row g-2 mt-1 small"
+                             style="display:none;">
+
+                            <div class="col-md-6">
+                                <i class="fa-solid fa-id-card text-primary me-1"></i>
+                                <strong>MSNV:</strong>
+                                <span id="info-employee-code"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <i class="fa-solid fa-user text-primary me-1"></i>
+                                <strong>Username:</strong>
+                                <span id="info-username"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <i class="fa-solid fa-envelope text-primary me-1"></i>
+                                <strong>Email:</strong>
+                                <span id="info-email"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <i class="fa-solid fa-venus-mars text-primary me-1"></i>
+                                <strong>Giới tính:</strong>
+                                <span id="info-gender"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <i class="fa-solid fa-building text-primary me-1"></i>
+                                <strong>Phòng ban:</strong>
+                                <span id="info-department"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <i class="fa-solid fa-user-tie text-primary me-1"></i>
+                                <strong>Chức vụ:</strong>
+                                <span id="info-position"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <i class="fa-solid fa-user-shield text-primary me-1"></i>
+                                <strong>Nhóm quyền:</strong>
+                                <span id="info-role"></span>
+                            </div>
+
+                            <div class="col-md-6 d-none">
+                                <i class="fa-solid fa-circle-check text-success me-1"></i>
+                                <strong>Trạng thái:</strong>
+                                <span id="info-status"></span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Nhóm nút hành động: chỉ hiện khi đang xem TÀI KHOẢN -->
+                    <div id="user-action-buttons" class="d-flex flex-column gap-2 flex-shrink-0" style="display:none;">
+                        <button onclick="openEditUserModal()" class="btn btn-outline-primary btn-sm fw-bold px-3 text-nowrap">
+                            <i class="fa-solid fa-pen me-1.5"></i>Đổi thông tin
+                        </button>
+                        <button onclick="openChangePasswordModal()" class="btn btn-outline-warning btn-sm fw-bold px-3 text-nowrap">
+                            <i class="fa-solid fa-key me-1.5"></i>Đổi mật khẩu
+                        </button>
+                        <button onclick="handleDeleteUser()" class="btn btn-outline-danger btn-sm fw-bold px-3 text-nowrap">
+                            <i class="fa-solid fa-trash-can me-1.5"></i>Xóa tài khoản
+                        </button>
+                    </div>
+
+                    <!-- Nhóm nút hành động: chỉ hiện khi đang xem NHÓM QUYỀN -->
+                    <div id="role-action-buttons" class="d-flex flex-column gap-2 flex-shrink-0" style="display:none;">
+                        <button onclick="openEditRoleModal()" class="btn btn-outline-primary btn-sm fw-bold px-3 text-nowrap">
+                            <i class="fa-solid fa-pen me-1.5"></i>Đổi tên / Mô tả
+                        </button>
+                        <button onclick="handleDeleteRole()" class="btn btn-outline-danger btn-sm fw-bold px-3 text-nowrap">
+                            <i class="fa-solid fa-trash-can me-1.5"></i>Xóa nhóm
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Tab Switching Navigation for Line vs Modules -->
+            <div class="px-4 mt-2 flex-shrink-0">
+                <ul class="nav nav-tabs border-bottom" id="rightTabs" role="tablist">
+                    <li class="nav-item">
+                        <button id="rtab-modules-btn" onclick="switchRightTab('modules')" class="nav-link fw-semibold text-muted border-0 pb-2.5 d-flex align-items-center gap-2" style="background: transparent;">
+                            <i class="fa-solid fa-cubes"></i>PHÂN QUYỀN MODULE
+                        </button>
+                    </li>
+                    <li class="nav-item" id="tab-line-item">
+                        <button id="rtab-lines-btn" onclick="switchRightTab('lines')" class="nav-link active fw-bold text-primary border-0 border-bottom border-primary border-2 pb-2.5 d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-industry"></i>QUYỀN TRUY CẬP LINE
+                        </button>
+                    </li>
+
+                </ul>
+            </div>
+
+            <!-- Workspace Details Container -->
+            <div class="flex-grow-1 p-4 overflow-y-auto custom-scrollbar">
+
+                <!-- ACCOUNT LEVEL ONLY: OVERRIDE SYSTEM INDICATOR -->
+                <div id="user-override-panel" class="card border-warning bg-warning-subtle mb-4 shadow-sm"
+                     style="display: none;">
+                    <div class="card-body d-flex align-items-center justify-content-between p-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width: 36px; height: 36px;">
+                                <i class="fa-solid fa-user-gear"></i>
+                            </div>
+                            <div>
+                                <h4 id="override-panel-title" class="font-display card-title h6 fw-bold mb-0 text-warning-emphasis" style="letter-spacing: 0.02em;">
+                                    CHẾ ĐỘ PHÂN QUYỀN MODULE ĐẶC THÙ
+                                    (GHI ĐÈ)
+                                </h4>
+                                <p id="override-panel-desc" class="card-text text-muted mb-0" style="font-size: 11px;">
+                                    Kích hoạt chế độ này để tùy chỉnh quyền <strong>Module</strong> trực tiếp cho tài khoản
+                                    mà không kế thừa từ nhóm. Quyền truy cập <strong>Line</strong> luôn được cấu hình
+                                    riêng theo từng tài khoản, không phụ thuộc vào công tắc này.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="override-toggle" onchange="toggleOverride(this.checked)" style="transform: scale(1.3); cursor: pointer;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENT TAB 1: PHÂN QUYỀN LINE -->
+                <div id="content-lines" class="tab-pane fade show active">
+                    <!-- Check-all Line tools -->
+                    <div class="card border-0 shadow-sm p-3 mb-3 bg-white">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-list-check text-muted"></i>
+                                <span class="fw-bold small text-muted text-uppercase">Cấu hình nhanh theo nhóm (Lines):</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button onclick="quickSelectLines(true)" id="line-select-all" class="btn btn-outline-primary btn-sm fw-bold px-3"><i class="fa-solid fa-check me-1.5"></i>Chọn tất cả Line</button>
+                                <button onclick="quickSelectLines(false)" id="line-deselect-all" class="btn btn-outline-secondary btn-sm fw-bold px-3"><i class="fa-solid fa-xmark me-1.5"></i>Bỏ chọn hết</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="lines-grid-container" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- CONTENT TAB 2: PHÂN QUYỀN MODULE -->
+                <div id="content-modules" class="tab-pane fade" style="display: none;">
+
+                    <!-- Check-all Module tools -->
+                    <div class="card border-0 shadow-sm p-3 mb-3 bg-white">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-table-cells text-muted"></i>
+                                <span class="fw-bold small text-muted text-uppercase">Cấu hình nhanh theo nhóm (Module):</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button onclick="quickSelectModules('all')" id="module-select-all" class="btn btn-outline-primary btn-sm fw-bold px-3"><i class="fa-solid fa-square-check me-1.5"></i>Bật Full tất cả quyền</button>
+                                <button onclick="quickSelectModules('read-only')" id="module-select-read" class="btn btn-outline-info btn-sm fw-bold px-3"><i class="fa-solid fa-eye me-1.5"></i>Chỉ cấp quyền Xem (Read)</button>
+                                <button onclick="quickSelectModules('none')" id="module-deselect-all" class="btn btn-outline-secondary btn-sm fw-bold px-3"><i class="fa-solid fa-trash-can me-1.5"></i>Bỏ chọn tất cả</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm overflow-hidden bg-white">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="py-3 px-4 text-secondary text-uppercase fw-bold"
+                                            style="font-size: 11px;">Tên Module Chức Năng</th>
+                                        <th class="py-3 px-3 text-center text-secondary text-uppercase fw-bold"
+                                            style="font-size: 11px; width: 14%;">Xem (R)</th>
+                                        <th class="py-3 px-3 text-center text-secondary text-uppercase fw-bold"
+                                            style="font-size: 11px; width: 14%;">Sửa (U)</th>
+                                        <th class="py-3 px-3 text-center text-secondary text-uppercase fw-bold"
+                                            style="font-size: 11px; width: 14%;">Xóa (D)</th>
+                                        <th class="py-3 px-3 text-center text-secondary text-uppercase fw-bold"
+                                            style="font-size: 11px; width: 14%;">Full quyền</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="module-matrix-body">
+                                    <!-- Loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- CREATE OBJECT MODAL (ROLES / USERS) -->
+    <div class="modal fade" id="create-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-light border-bottom-0 py-3 px-4">
+                    <h5 class="font-display modal-title fw-bold text-dark fs-6 text-uppercase" style="letter-spacing: 0.03em;" id="modal-title">
+                        Tạo
+                        Nhóm Mới
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="modal-form">
+
+                        <div class="row g-3">
+
+                            <!-- Họ tên / Tên nhóm -->
+                            <div class="col-md-6">
+                                <label id="m-name-label"
+                                       class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Tên Nhóm
+                                </label>
+                                <input type="text"
+                                       id="m-name"
+                                       required
+                                       class="form-control bg-light border-0">
+                            </div>
+                            <!-- Username -->
+                            <div id="username-field" class="col-md-6" style="display:none;">
+                                <label class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Username
+                                </label>
+                                <input type="text"
+                                       id="m-username"
+                                       class="form-control bg-light border-0">
+                            </div>
+
+                            <!-- Email -->
+                            <div id="user-fields" class="col-md-6" style="display:none;">
+                                <label class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Email
+                                </label>
+                                <input type="email"
+                                       id="m-email"
+                                       class="form-control bg-light border-0">
+                            </div>
+                            <div id="employee-code-field" class="col-md-6" style="display:none;">
+                                <label class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Mã nhân viên
+                                </label>
+
+                                <input type="text"
+                                       id="m-employee-code"
+                                       class="form-control bg-light border-0"
+                                       placeholder="">
+                            </div>
+                            <div id="phone-code-field" class="col-md-6" style="display:none;">
+                                <label class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Số điện thoại
+                                </label>
+
+                                <input type="text"
+                                       id="m-phone-code"
+                                       class="form-control bg-light border-0"
+                                       maxlength="10"
+                                       placeholder="">
+                            </div>
+                            <div id="gender-field" class="col-md-6" style="display:none;">
+                                <label class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Giới tính
+                                </label>
+
+                                <select id="m-gender"
+                                        class="form-select bg-light border-0">
+                                    <option value="">-- Chọn giới tính --</option>
+                                    <option value="0">Nam</option>
+                                    <option value="1">Nữ</option>
+                                    <option value="2">Khác</option>
+                                </select>
+                            </div>
+
+                            <!-- Password -->
+                            <div id="password-field" class="col-md-6" style="display:none;">
+                                <label class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Password
+                                </label>
+
+                                <div class="input-group">
+                                    <input type="password"
+                                           id="m-password"
+                                           class="form-control bg-light border-0">
+
+                                    <button class="btn btn-light border-0"
+                                            type="button"
+                                            onclick="togglePassword('m-password', this)">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="confirm-password-field" class="col-md-6" style="display:none;">
+                                <label class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Xác nhận Password
+                                </label>
+
+                                <div class="input-group">
+                                    <input type="password"
+                                           id="m-confirm-password"
+                                           class="form-control bg-light border-0">
+
+                                    <button class="btn btn-light border-0"
+                                            type="button"
+                                            onclick="togglePassword('m-confirm-password', this)">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Nhóm quyền -->
+                            <div id="role-select-field" class="col-md-6" style="display:none;">
+                                <label class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Nhóm quyền <span class="text-muted normal-case" style="letter-spacing:0;">(không bắt buộc)</span>
+                                </label>
+
+                                <select id="m-role"
+                                        class="form-select bg-light border-0">
+                                </select>
+                                <div class="form-text" style="font-size:10px;">Nếu không chọn Nhóm quyền, tài khoản sẽ tự chuyển sang cấu hình Module riêng.</div>
+                            </div>
+
+                            <!-- Phòng ban -->
+                            <div id="phongban-select-field" class="col-md-6" style="display:none;">
+                                <label class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Phòng ban
+                                </label>
+
+                                <select id="m-phongban"
+                                        class="form-select bg-light border-0">
+                                </select>
+                            </div>
+
+                            <!-- Chức vụ -->
+                            <div id="chucvu-select-field" class="col-md-6" style="display:none;">
+                                <label class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Chức vụ
+                                </label>
+
+                                <select id="m-chucvu"
+                                        class="form-select bg-light border-0">
+                                </select>
+                            </div>
+
+                            <!-- Mô tả -->
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-secondary text-uppercase"
+                                       style="font-size:10px;">
+                                    Mô tả / Ghi chú
+                                </label>
+
+                                <textarea id="m-desc"
+                                          rows="3"
+                                          class="form-control bg-light border-0"></textarea>
+                            </div>
+
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit"
+                                    class="btn btn-primary fw-bold py-2">
+                                HOÀN TẤT & KHỞI TẠO
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT USER INFO MODAL -->
+    <div class="modal fade" id="edit-user-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-light border-bottom-0 py-3 px-4">
+                    <h5 class="font-display modal-title fw-bold text-dark fs-6 text-uppercase" style="letter-spacing: 0.03em;">
+                        CẬP NHẬT THÔNG TIN TÀI KHOẢN
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="edit-user-form">
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                    Tên Hiển Thị (Họ & Tên)
+                                </label>
+                                <input type="text" id="eu-name" required class="form-control bg-light border-0">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                    Username <span class="text-muted normal-case" style="letter-spacing:0;">(không thể thay đổi)</span>
+                                </label>
+                                <input type="text" id="eu-username" readonly class="form-control bg-light border-0" style="cursor: not-allowed; opacity: 0.7;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                    Email
+                                </label>
+                                <input type="email" id="eu-email" required class="form-control bg-light border-0">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                    Mã nhân viên
+                                </label>
+                                <input type="text" id="eu-employee-code" class="form-control bg-light border-0" placeholder="VD: NV0001">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                    Giới tính
+                                </label>
+                                <select id="eu-gender" class="form-select bg-light border-0">
+                                    <option value="">-- Chọn giới tính --</option>
+                                    <option value="0">Nam</option>
+                                    <option value="1">Nữ</option>
+                                    <option value="2">Khác</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                    Mã nhân viên
+                                </label>
+                                <input type="text" id="eu-phone-code" class="form-control bg-light border-0" placeholder="">
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                    Nhóm quyền <span class="text-muted normal-case" style="letter-spacing:0;">(không bắt buộc)</span>
+                                </label>
+                                <select id="eu-role" class="form-select bg-light border-0"></select>
+                                <div class="form-text" style="font-size:10px;">Nếu không chọn Nhóm quyền, tài khoản sẽ tự chuyển sang cấu hình Module riêng.</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                    Phòng ban
+                                </label>
+                                <select id="eu-phongban" class="form-select bg-light border-0"></select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                    Chức vụ
+                                </label>
+                                <select id="eu-chucvu" class="form-select bg-light border-0"></select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                    Mô tả / Ghi chú
+                                </label>
+                                <textarea id="eu-desc" rows="3" class="form-control bg-light border-0"></textarea>
+                            </div>
+
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary fw-bold py-2">
+                                LƯU THAY ĐỔI
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHANGE PASSWORD MODAL -->
+    <div class="modal fade" id="change-password-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-light border-bottom-0 py-3 px-4">
+                    <h5 class="font-display modal-title fw-bold text-dark fs-6 text-uppercase" id="cp-modal-title" style="letter-spacing: 0.03em;">
+                        ĐỔI MẬT KHẨU
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="change-password-form">
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                Mật khẩu mới
+                            </label>
+                            <div class="input-group">
+                                <input type="password" id="cp-new-password" required class="form-control bg-light border-0">
+                                <button class="btn btn-light border-0" type="button" onclick="togglePassword('cp-new-password', this)">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                Xác nhận mật khẩu mới
+                            </label>
+                            <div class="input-group">
+                                <input type="password" id="cp-confirm-password" required class="form-control bg-light border-0">
+                                <button class="btn btn-light border-0" type="button" onclick="togglePassword('cp-confirm-password', this)">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary fw-bold py-2">
+                                CẬP NHẬT MẬT KHẨU
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT ROLE (NHÓM QUYỀN) MODAL -->
+    <div class="modal fade" id="edit-role-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-light border-bottom-0 py-3 px-4">
+                    <h5 class="font-display modal-title fw-bold text-dark fs-6 text-uppercase" style="letter-spacing: 0.03em;">
+                        CẬP NHẬT NHÓM QUYỀN
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="edit-role-form">
+
+                        <input type="hidden" id="er-id">
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                Tên Nhóm
+                            </label>
+                            <input type="text" id="er-name" required class="form-control bg-light border-0">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:10px;">
+                                Mô tả / Ghi chú
+                            </label>
+                            <textarea id="er-desc" rows="3" class="form-control bg-light border-0"></textarea>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary fw-bold py-2">
+                                LƯU THAY ĐỔI
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>
+                        Xác nhận xóa
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p id="confirmDeleteMessage" class="mb-0"></p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                        Hủy
+                    </button>
+
+                    <button type="button" class="btn btn-danger" id="btnConfirmDelete">
+                        <i class="fa-solid fa-trash me-1"></i>
+                        Xóa
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteRoleModalLabel">
+                        <i class="fa-solid fa-users-slash text-danger me-2"></i>
+                        Xác nhận xóa nhóm quyền
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p id="deleteRoleModalMessage" class="mb-0"></p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
+                        Hủy
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-danger"
+                            id="deleteRoleModalConfirmBtn">
+                        <i class="fa-solid fa-trash me-1"></i>
+                        Xóa nhóm quyền
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap & jQuery Imports -->
+    <script src="~/Scripts/thuvienjs/jquery.js"></script>
+    <script src="~/Scripts/thuvienjs/bootstrap5.3.bundle.min.js"></script>
+    <script src="~/Scripts/thuvienjs/select2.js"></script>
+    <script src="~/Scripts/ThuVien/Dic_PhanQuyen_User.js?Ver=1.1"></script>
+
+</body>
+
+</html>

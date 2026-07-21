@@ -1,0 +1,408 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{122E8215-1F72-4C1E-B198-A9CED47A4916}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NtbSoft.ERP.Web</RootNamespace>
+    <AssemblyName>NtbSoft.ERP.Web</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort>44318</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode />
+    <TargetFrameworkProfile />
+    <Use64BitIISExpress />
+    <UseGlobalApplicationHostFile />
+    <SccProjectName>Svn</SccProjectName>
+    <SccLocalPath>Svn</SccLocalPath>
+    <SccAuxPath>Svn</SccAuxPath>
+    <SccProvider>SubversionScc</SccProvider>
+    <TypeScriptToolsVersion>4.3</TypeScriptToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotNet.Highcharts, Version=4.0.0.0, Culture=neutral, PublicKeyToken=88854f873df851bf, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNet.Highcharts.4.0\lib\DotNet.Highcharts.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus, Version=7.0.10.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.7.0.10\lib\net35\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus.Interfaces, Version=6.1.1.0, Culture=neutral, PublicKeyToken=a694d7f3b0907a61, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.Interfaces.6.1.1\lib\net35\EPPlus.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus.System.Drawing, Version=6.1.1.0, Culture=neutral, PublicKeyToken=2308d35469c9bac0, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.System.Drawing.6.1.1\lib\net35\EPPlus.System.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="Ghostscript.NET, Version=1.2.3.0, Culture=neutral, PublicKeyToken=f85051de34525b59, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ghostscript.NET.1.2.3\lib\net40\Ghostscript.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Client, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Client.2.4.3\lib\net45\Microsoft.AspNet.SignalR.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.3\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.3\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.2.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.2.1.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.2.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.9.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.9\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web.Cors, Version=5.2.9.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.9\lib\net45\System.Web.Cors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Http, Version=5.2.9.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.9\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Cors, Version=5.2.9.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Cors.5.2.9\lib\net45\System.Web.Http.Cors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest">
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.0.0\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.0.0\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.1\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.0.0\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.0.0\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.0.0\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.0.0\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WebGrease">
+      <Private>True</Private>
+      <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr3.Runtime">
+      <Private>True</Private>
+      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Api\ApiGetData\" />
+    <Folder Include="App_Data\" />
+    <Folder Include="Content\Templates\" />
+    <Folder Include="Models\" />
+    <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="Scripts\Settings\LoiQA\Api\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Api\Common\CommonController.cs" />
+    <Compile Include="Api\Hubs\WipHub.cs" />
+    <Compile Include="Api\Startup.cs" />
+    <Compile Include="Api\ThuVien\Dic_CheckListController.cs" />
+    <Compile Include="Api\ThuVien\Dic_ChungLoaiCongDoanController.cs" />
+    <Compile Include="Api\ThuVien\Dic_PBan_ChucVuController.cs" />
+    <Compile Include="Api\ThuVien\ERP_DicUserController.cs" />
+    <Compile Include="Api\ThuVien\SYS_LanguageController.cs" />
+    <Compile Include="Api\ThuVien\SYS_LoginController.cs" />
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Api\ThuVien\DKCaController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LanguageController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\SettingsController.cs" />
+    <Compile Include="Controllers\ThuVienController.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Date\bootstrap5.3.bundle.min.js" />
+    <Content Include="Content\Date\popperjs.js" />
+    <Content Include="Content\Date\tempus-dominus.min.css" />
+    <Content Include="Content\Date\tempus-dominus.min.js" />
+    <Content Include="css\thuviencss\bootstrap5.3.min.css" />
+    <Content Include="css\thuviencss\fontawesome.pro.6.0.0.css" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\computing.license.dll" />
+    <Content Include="css\thuviencss\roboto.css" />
+    <Content Include="css\thuviencss\select2.css" />
+    <Content Include="css\thuviencss\SignCss.css" />
+    <Content Include="css\thuviencss\tempus-dominus.min.css" />
+    <Content Include="css\thuviencss\toastr.min.css" />
+    <Content Include="DevExtreme\dx.all.js" />
+    <Content Include="DevExtreme\dx.aspnet.data.min.js" />
+    <Content Include="DevExtreme\dx.common.css" />
+    <Content Include="DevExtreme\dx.light.css" />
+    <Content Include="DevExtreme\knockout-latest.min.js" />
+    <Content Include="favicon.ico" />
+    <Content Include="Global.asax" />
+    <Content Include="Content\Date\Date.rar" />
+    <Content Include="img\CoMy.png" />
+    <Content Include="img\CoVietNam.png" />
+    <Content Include="img\logoNTB.png" />
+    <Content Include="PheDuyet\DuyetModule.cshtml" />
+    <Content Include="PheDuyet\Shared\_Layout.cshtml" />
+    <Content Include="img\logoSpectre.jpg" />
+    <Content Include="PheDuyet\DuyetModule.cshtml" />
+    <Content Include="PheDuyet\Shared\_Layout.cshtml" />
+    <Content Include="Scripts\BaseFoundation\Api\Fetch.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Actions\Button.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Data\Grid.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Editors\Checkbox.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Editors\Popover.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Editors\SearchLookup.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Editors\Slider.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Editors\TextEdit.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Layouts\Card.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Layouts\Content.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Layouts\Splitter.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Layouts\Tab.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Layouts\Toolbar.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Overlays\Dialog.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Overlays\Loading.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Overlays\Popup.js" />
+    <Content Include="Scripts\BaseFoundation\Components\Overlays\Toast.js" />
+    <Content Include="Scripts\BaseFoundation\Configs\BaseTable.js" />
+    <Content Include="Scripts\BaseFoundation\foundation.js" />
+    <Content Include="Scripts\BaseFoundation\Helpers\ExcelHelper.js" />
+    <Content Include="Scripts\BaseFoundation\Helpers\GenerateHelper.js" />
+    <Content Include="Scripts\BaseFoundation\Helpers\ParseHelper.js" />
+    <Content Include="Scripts\BaseFoundation\Styles\basic-styles.css" />
+    <Content Include="Scripts\Dashboard\Dashboard.js" />
+    <Content Include="Scripts\DKCa\shifts.js" />
+    <Content Include="Scripts\Language\ResourceMananger.js" />
+    <Content Include="Scripts\Settings\LoiQA\Components\Grid.js" />
+    <Content Include="Scripts\Settings\LoiQA\Components\Popover.js" />
+    <Content Include="Scripts\Settings\LoiQA\LoaiLoi.js" />
+    <Content Include="Scripts\Settings\LoiQA\ModuleLoi.js" />
+    <Content Include="Scripts\Settings\PCO\Components\Grid.js" />
+    <Content Include="Scripts\Settings\PCO\Components\Popover.js" />
+    <Content Include="Scripts\Settings\PCO\Components\SearchLookup.js" />
+    <Content Include="Scripts\Settings\PCO\Index.js" />
+    <Content Include="Scripts\thuvienjs\ajax3.6.0.js" />
+    <Content Include="Scripts\thuvienjs\bootstrap5.3.bundle.min.js" />
+    <Content Include="Scripts\thuvienjs\html2canvas.js" />
+    <Content Include="Scripts\thuvienjs\jquery-ui.js" />
+    <Content Include="Scripts\thuvienjs\jquery-ui.min.js" />
+    <Content Include="Scripts\thuvienjs\jquery.js" />
+    <Content Include="Scripts\thuvienjs\jquery3_7_1.js" />
+    <Content Include="Scripts\thuvienjs\jspdf.js" />
+    <Content Include="Scripts\thuvienjs\select2.js" />
+    <Content Include="Scripts\thuvienjs\Sign.js" />
+    <Content Include="Scripts\thuvienjs\toastr.min.js" />
+    <Content Include="Scripts\ThuVien\Dic_PBan_ChuVu.js" />
+    <Content Include="Scripts\ThuVien\BaoCao_Endline.js" />
+    <Content Include="Scripts\ThuVien\DicChungLoaiCongDoan.js" />
+    <Content Include="Scripts\ThuVien\Dic_PhanQuyen_User - Copy.js" />
+    <Content Include="Scripts\ThuVien\Dic_CheckList.js" />
+    <Content Include="Scripts\ThuVien\Dic_PhanQuyen_User.js" />
+    <Content Include="Scripts\ThuVien\Dic_Setting_Line.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\Home\Dashboard.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\_LayoutBCTH.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NtbSoft.ERP.Entity\NtbSoft.ERP.Entity.csproj">
+      <Project>{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}</Project>
+      <Name>NtbSoft.ERP.Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NtbSoft.ERP.Libs\NtbSoft.ERP.Libs.csproj">
+      <Project>{28091866-5eda-4578-bf37-368867311a16}</Project>
+      <Name>NtbSoft.ERP.Libs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NtbSoft.ERP.Model\NtbSoft.ERP.Model.csproj">
+      <Project>{8231ca67-2340-4195-a642-1c28a544a0cc}</Project>
+      <Name>NtbSoft.ERP.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-brands-400.ttf" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-brands-400.woff" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-brands-400.woff2" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-duotone-900.ttf" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-duotone-900.woff" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-duotone-900.woff2" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-light-300.ttf" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-light-300.woff" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-light-300.woff2" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-regular-400.ttf" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-regular-400.woff" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-regular-400.woff2" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-solid-900.ttf" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-solid-900.woff" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-solid-900.woff2" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-thin-100.ttf" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-thin-100.woff" />
+    <Content Include="css\thuviencss\icon-fonts\fontawesome-pro-icons\fa-thin-100.woff2" />
+    <Content Include="DevExtreme\fonts\Roboto-300.ttf" />
+    <Content Include="DevExtreme\fonts\Roboto-300.woff" />
+    <Content Include="DevExtreme\fonts\Roboto-300.woff2" />
+    <Content Include="DevExtreme\fonts\Roboto-400.ttf" />
+    <Content Include="DevExtreme\fonts\Roboto-400.woff" />
+    <Content Include="DevExtreme\fonts\Roboto-400.woff2" />
+    <Content Include="DevExtreme\fonts\Roboto-500.ttf" />
+    <Content Include="DevExtreme\fonts\Roboto-500.woff" />
+    <Content Include="DevExtreme\fonts\Roboto-500.woff2" />
+    <Content Include="DevExtreme\fonts\Roboto-700.ttf" />
+    <Content Include="DevExtreme\fonts\Roboto-700.woff" />
+    <Content Include="DevExtreme\fonts\Roboto-700.woff2" />
+    <Content Include="DevExtreme\icons\dxicons.ttf" />
+    <Content Include="DevExtreme\icons\dxicons.woff" />
+    <Content Include="DevExtreme\icons\dxicons.woff2" />
+    <Content Include="DevExtreme\icons\dxiconsfluent.ttf" />
+    <Content Include="DevExtreme\icons\dxiconsfluent.woff" />
+    <Content Include="DevExtreme\icons\dxiconsfluent.woff2" />
+    <Content Include="DevExtreme\icons\dxiconsmaterial.ttf" />
+    <Content Include="DevExtreme\icons\dxiconsmaterial.woff" />
+    <Content Include="DevExtreme\icons\dxiconsmaterial.woff2" />
+    <None Include="Project_Readme.html" />
+    <Content Include="Views\Login\Index.cshtml" />
+    <Content Include="Views\ThuVien\DicChungLoaiCongDoan.cshtml" />
+    <Content Include="Views\ThuVien\Dic_Setting_Line.cshtml" />
+    <Content Include="Views\ThuVien\Dic_PhanQuyen_User.cshtml" />
+    <Content Include="Views\ThuVien\Dic_PBan_ChucVu.cshtml" />
+    <Content Include="Views\ThuVien\BaoCao_Endline.cshtml" />
+    <Content Include="Views\ThuVien\Dic_CheckList.cshtml" />
+    <Content Include="Views\Settings\LoiQA.cshtml" />
+    <Content Include="Views\Settings\PCO.cshtml" />
+    <Content Include="Views\Language\Index.cshtml" />
+    <Content Include="Views\DKCa\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="licenses.licx" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>5470</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:5485/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+</Project>

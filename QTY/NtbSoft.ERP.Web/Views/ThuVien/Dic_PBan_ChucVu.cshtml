@@ -1,0 +1,611 @@
+﻿@{
+    Layout = null;
+    ViewBag.Ver = "1.1";
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+    <title>Khai báo chủng loại công đoạn</title>
+
+    <link href="~/css/thuviencss/fontawesome.pro.6.0.0.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/roboto.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/select2.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/toastr.min.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/bootstrap5.3.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css"
+          rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F3F5F6;
+            --surface: #FFFFFF;
+            --ink: #172230;
+            --ink-muted: #6C7686;
+            --line: #E4E8EC;
+            --navy: #1E2A45;
+            --navy-deep: #141D31;
+            --teal: #1F7A6C;
+            --teal-deep: #175C51;
+            --amber: #E19A3C;
+            --danger: #C4483A;
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .font-display {
+            font-family: 'Sora', sans-serif;
+        }
+
+        .font-mono {
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        /* Topbar */
+        .topbar {
+            background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+            color: #fff;
+            padding: 8px 32px;
+        }
+
+            .topbar .crumb {
+                color: rgba(255,255,255,.55);
+                font-size: 13px;
+                letter-spacing: .02em;
+            }
+
+                .topbar .crumb .current {
+                    color: rgba(255,255,255,.92);
+                }
+
+            .topbar h1 {
+                font-size: 20px;
+                margin: 0px 0 0;
+                font-weight: 700;
+                letter-spacing: -0.01em;
+            }
+
+            .topbar .badge-step {
+                background: rgba(31,122,108,.25);
+                border: 1px solid rgba(31,122,108,.55);
+                color: #7FDCC7;
+                font-size: 11.5px;
+                font-weight: 600;
+                padding: 4px 10px;
+                border-radius: 999px;
+                letter-spacing: .04em;
+            }
+
+        .main-wrap {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 28px 24px 60px;
+        }
+
+        /* Segmented tabs */
+        .seg-tabs {
+            display: inline-flex;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 4px;
+            gap: 4px;
+            box-shadow: 0 1px 2px rgba(20,29,49,.04);
+        }
+
+            .seg-tabs button {
+                border: none;
+                background: transparent;
+                padding: 9px 20px;
+                border-radius: 999px;
+                font-family: 'Sora', sans-serif;
+                font-weight: 600;
+                font-size: 14px;
+                color: var(--ink-muted);
+                transition: all .18s ease;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+                .seg-tabs button.active {
+                    background: var(--navy);
+                    color: #fff;
+                }
+
+                .seg-tabs button .count {
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 11.5px;
+                    background: rgba(255,255,255,.18);
+                    padding: 1px 7px;
+                    border-radius: 999px;
+                }
+
+                .seg-tabs button:not(.active) .count {
+                    background: var(--line);
+                    color: var(--ink-muted);
+                }
+
+        /* Card panel */
+        .panel-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: 0 1px 3px rgba(20,29,49,.05);
+            overflow: hidden;
+        }
+
+        .panel-toolbar {
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid var(--line);
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            width: 320px;
+            max-width: 100%;
+        }
+
+            .search-box input {
+                border-radius: 10px;
+                border: 1px solid var(--line);
+                padding: 9px 14px 9px 38px;
+                font-size: 14px;
+                background: var(--bg);
+            }
+
+                .search-box input:focus {
+                    box-shadow: 0 0 0 3px rgba(31,122,108,.15);
+                    border-color: var(--teal);
+                    background: #fff;
+                }
+
+            .search-box i {
+                position: absolute;
+                left: 13px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--ink-muted);
+                font-size: 14px;
+            }
+
+        .btn-teal {
+            background: var(--teal);
+            border: 1px solid var(--teal);
+            color: #fff;
+            font-weight: 600;
+            font-size: 12px;
+            padding: 6px 7px;
+            border-radius: 6px;
+            transition: background .15s ease;
+        }
+
+            .btn-teal:hover {
+                background: var(--teal-deep);
+                color: #fff;
+            }
+
+        .btn-ghost-icon {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--ink-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s ease;
+        }
+
+            .btn-ghost-icon:hover {
+                border-color: var(--teal);
+                color: var(--teal-deep);
+                background: #F0FAF8;
+            }
+
+            .btn-ghost-icon.danger:hover {
+                border-color: var(--danger);
+                color: var(--danger);
+                background: #FDF1EF;
+            }
+
+        table.data-table {
+            margin-bottom: 0;
+        }
+
+            table.data-table thead th {
+                font-family: 'Sora', sans-serif;
+                font-size: 12px;
+                text-transform: uppercase;
+                letter-spacing: .05em;
+                color: var(--ink-muted);
+                background: #FAFBFC;
+                border-bottom: 1px solid var(--line);
+                padding: 12px 20px;
+                font-weight: 600;
+                white-space: nowrap;
+            }
+
+            table.data-table tbody td {
+                padding: 14px 20px;
+                vertical-align: middle;
+                border-bottom: 1px solid var(--line);
+                font-size: 14px;
+            }
+
+            table.data-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            table.data-table tbody tr:hover {
+                background: #FAFCFB;
+            }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 13.5px;
+        }
+
+            .chip .dot {
+                width: 9px;
+                height: 9px;
+                border-radius: 3px;
+                flex-shrink: 0;
+            }
+
+        .code-tag {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            color: var(--ink-muted);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .status-pill {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .status-pill.active {
+                background: #E7F5F1;
+                color: var(--teal-deep);
+            }
+
+            .status-pill.inactive {
+                background: #F4F1EC;
+                color: #8A7A5C;
+            }
+
+            .status-pill::before {
+                content: '';
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: currentColor;
+            }
+
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--ink-muted);
+        }
+
+            .empty-state i {
+                font-size: 34px;
+                color: var(--line);
+                margin-bottom: 10px;
+                display: block;
+            }
+
+        .modal-content {
+            border-radius: 14px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: var(--navy);
+            color: #fff;
+            border-bottom: none;
+            padding: 18px 24px;
+        }
+
+            .modal-header .modal-title {
+                font-family: 'Sora', sans-serif;
+                font-weight: 700;
+                font-size: 17px;
+            }
+
+            .modal-header .btn-close {
+                filter: invert(1);
+                opacity: .8;
+            }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--ink-muted);
+        }
+
+        .form-control, .form-select {
+            border-radius: 9px;
+            border: 1px solid var(--line);
+            padding: 9px 12px;
+            font-size: 14px;
+        }
+
+            .form-control:focus, .form-select:focus {
+                box-shadow: 0 0 0 3px rgba(31,122,108,.15);
+                border-color: var(--teal);
+            }
+
+        .required-mark {
+            color: var(--danger);
+        }
+
+        .toast-container {
+            z-index: 1080;
+        }
+
+        .toast {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 6px 18px rgba(20,29,49,.15);
+        }
+
+        @@media (max-width: 640px) {
+            .panel-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+        }
+        .btn_body{
+            display:flex;
+            gap:2px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="main-wrap py-0">
+            <div class="d-flex align-items-center gap-3 mt-1 flex-wrap">
+                <h1 class="font-display mb-0">Phòng ban &amp; Chức vụ</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-wrap">
+     
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+            <div class="seg-tabs" id="segTabs">
+                <button type="button" class="active" data-target="department">
+                    <i class="bi bi-diagram-3"></i> Phòng ban <span class="count" id="countDept">0</span>
+                </button>
+                <button type="button" data-target="position">
+                    <i class="bi bi-person-badge"></i> Chức vụ <span class="count" id="countPos">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- PANEL: PHÒNG BAN -->
+        <div id="panel-department" class="panel-card mb-4">
+            <div class="panel-toolbar">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" id="searchDept" placeholder="">
+                </div>
+                <button class="btn-teal btn-sm" id="btnAddDept"><i class="bi bi-plus-lg me-1"></i>Thêm phòng ban</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table data-table mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width:44%">Phòng ban</th>
+                            <th>Mã</th>
+                            <th>Trạng thái</th>
+                            <th class="text-end" style="width:100px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblDept"></tbody>
+                </table>
+            </div>
+            <div id="emptyDept" class="empty-state d-none">
+                <i class="bi bi-inboxes"></i>
+                Không tìm thấy phòng ban phù hợp
+            </div>
+        </div>
+
+        <!-- PANEL: CHỨC VỤ -->
+        <div id="panel-position" class="panel-card d-none">
+            <div class="panel-toolbar">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" id="searchPos" placeholder="">
+                </div>
+                <button class="btn-teal btn-sm" id="btnAddPos"><i class="bi bi-plus-lg me-1"></i>Thêm chức vụ</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table data-table mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width:50%">Chức vụ</th>
+                            <th>Mã</th>
+                            <th class="text-end" style="width:100px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblPos"></tbody>
+                </table>
+            </div>
+            <div id="emptyPos" class="empty-state d-none">
+                <i class="bi bi-inboxes"></i>
+                Không tìm thấy chức vụ phù hợp
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL: PHÒNG BAN -->
+    <div class="modal fade" id="modalDept" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDeptTitle">Thêm phòng ban</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formDept">
+                        <input type="hidden" id="deptId">
+                        <div class="mb-3">
+                            <label class="form-label">Tên phòng ban <span class="required-mark">*</span></label>
+                            <input type="text" class="form-control" id="deptName" placeholder="" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Mã phòng ban <span class="required-mark">*</span></label>
+                                <input type="text" class="form-control font-mono" id="deptCode" placeholder="" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-select" id="deptStatus">
+                                    <option value="active">Đang hoạt động</option>
+                                    <option value="inactive">Ngừng hoạt động</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-1">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="deptDesc" rows="2" placeholder=""></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn-teal" id="btnSaveDept">Lưu phòng ban</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CHỨC VỤ -->
+    <div class="modal fade" id="modalPos" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalPosTitle">Thêm chức vụ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formPos">
+                        <input type="hidden" id="posId">
+                        <div class="mb-3">
+                            <label class="form-label">Tên chức vụ <span class="required-mark">*</span></label>
+                            <input type="text" class="form-control" id="posName" placeholder="" required>
+                        </div>
+                        <div class="mb-1">
+                            <label class="form-label">Mã chức vụ <span class="required-mark">*</span></label>
+                            <input type="text" class="form-control font-mono" id="posCode" placeholder="" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn-teal" id="btnSavePos">Lưu chức vụ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: XÁC NHẬN XÓA -->
+    <div class="modal fade" id="modalConfirm" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3" style="width:52px;height:52px;border-radius:14px;background:#FDF1EF;display:flex;align-items:center;justify-content:center;margin:0 auto;">
+                        <i class="bi bi-exclamation-triangle" style="color:var(--danger);font-size:22px;"></i>
+                    </div>
+                    <h6 class="font-display fw-bold mb-1">Xóa mục này?</h6>
+                    <p class="text-muted small mb-4" id="confirmMsg">Hành động này không thể hoàn tác.</p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn text-white px-4" style="background:var(--danger);" id="btnConfirmDelete">Xóa</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999999">
+        <div id="successToast" class="toast" role="alert">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Thành công</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="successMessage"></div>
+        </div>
+        <div id="errorToast" class="toast" role="alert">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong class="me-auto">Lỗi</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="errorMessage"></div>
+        </div>
+        <div id="warningToast" class="toast" role="alert">
+            <div class="toast-header bg-warning text-dark">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong class="me-auto">Cảnh báo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="warningMessage"></div>
+        </div>
+    </div>
+
+    <script src="~/Scripts/thuvienjs/jquery.js"></script>
+    <script src="~/Scripts/thuvienjs/bootstrap5.3.bundle.min.js"></script>
+    <script src="~/Scripts/thuvienjs/select2.js"></script>
+    <link href="~/DevExtreme/dx.light.css" rel="stylesheet" />
+    <link href="~/DevExtreme/dx.common.css" rel="stylesheet" />
+
+    <script src="~/DevExtreme/dx.all.js"></script>
+    <script src="~/DevExtreme/knockout-latest.min.js"></script>
+
+    <script src="~/Scripts/ThuVien/Dic_PBan_ChuVu.js?Ver=@ViewBag.Ver"></script>
+</body>
+</html>

@@ -1,0 +1,662 @@
+﻿let languageList = [];
+let pendingSaveItems = null; // used when user confirms overwrite
+
+// Helper to preserve cell widths when dragging table rows/headers
+function fixHelperTable(e, ui) {
+    ui.children().each(function () {
+        $(this).width($(this).width());
+    });
+    return ui;
+}
+
+$(function () {
+    // Load ngôn ngữ trước, sau đó mới load dữ liệu
+    loadLanguages().then(function () {
+        loadResources();
+    });
+
+    // Sự kiện Enter ở ô Resource Key
+    $('#txtResourceKey').on('keypress', function (e) {
+        if (e.which === 13) loadResourceByKey($(this).val().trim());
+    });
+
+    // Sự kiện nút Lưu
+    $('#btnSave').on('click', saveResource);
+
+    // Sự kiện Làm mới
+    $('#btnClear').on('click', clearForm);
+
+    // Sự kiện Tra cứu
+    $('#btnSearch').on('click', function () { loadResources(); });
+    $('#btnRefresh').on('click', function () { $('#txtSearch').val(''); loadResources(); });
+    $('#txtSearch').on('keypress', function (e) {
+        if (e.which === 13) loadResources();
+    });
+
+    // Sự kiện Thêm ngôn ngữ mới
+    $('#btnAddLangGlobal').on('click', function () {
+        clearLangForm();
+        loadLangList();
+        $('#modalAddLang').modal('show');
+    });
+
+    $('#btnSaveNewLang').on('click', async function () {
+        var code = $('#txtNewLangCode').val().trim();
+        var name = $('#txtNewLangName').val().trim();
+        var native = $('#txtNewNativeName').val().trim();
+
+        if (!code) { showToast('warning', 'Vui lòng nhập mã ngôn ngữ!'); return; }
+        if (!name) { showToast('warning', 'Vui lòng nhập tên ngôn ngữ!'); return; }
+
+        try {
+            // First attempt: try save without overwrite
+            var url = '/api/SYS_Language/SaveLanguage?langCode=' + encodeURIComponent(code) + '&langName=' + encodeURIComponent(name) + '&nativeName=' + encodeURIComponent(native);
+            var response = await fetch(url, { method: 'POST' });
+            var result = await response.json();
+            if (result === 'True') {
+                showToast('success', 'Đã lưu ngôn ngữ "' + name + '"!');
+                clearLangForm();
+                loadLangList();
+                // Reload languages cho panel chính
+                await loadLanguages();
+                loadResources();
+                return;
+            }
+
+            // If backend returned EXISTS, ask user whether to overwrite
+            if (result === 'EXISTS') {
+                if (!confirm('Ngôn ngữ "' + code + '" đã tồn tại. Bạn có muốn cập nhật thông tin?')) return;
+                // call again with allowOverwrite = true
+                var resp2 = await fetch(url + '&allowOverwrite=true', { method: 'POST' });
+                var r2 = await resp2.json();
+                if (r2 === 'True') {
+                    showToast('success', 'Đã cập nhật ngôn ngữ "' + name + '"!');
+                    clearLangForm();
+                    loadLangList();
+                    await loadLanguages();
+                    loadResources();
+                    return;
+                }
+                showToast('error', 'Lưu thất bại!');
+                return;
+            }
+
+            showToast('error', 'Lưu thất bại!');
+        } catch (ex) {
+            showToast('error', 'Lỗi: ' + ex.message);
+        }
+    });
+
+    $('#btnClearLangForm').on('click', clearLangForm);
+
+    $('#txtLangFilter').on('keyup', function () {
+        loadLangList();
+    });
+});
+
+// ============================================================
+// Load danh sách ngôn ngữ trong modal
+// ============================================================
+function loadLangList() {
+    var keyword = ($('#txtLangFilter').val() || '').trim().toLowerCase();
+    var filtered = languageList.filter(function (l) {
+        if (!keyword) return true;
+        return (l.LanguageID || '').toLowerCase().indexOf(keyword) >= 0
+            || (l.LanguageName || '').toLowerCase().indexOf(keyword) >= 0
+            || (l.NativeName || '').toLowerCase().indexOf(keyword) >= 0;
+    });
+    renderLangList(filtered);
+}
+
+// ============================================================
+// Render danh sách ngôn ngữ trong modal
+// ============================================================
+function renderLangList(langArray) {
+    var $body = $('#langListBody');
+    $body.empty();
+    $('#langCount').text(langArray.length + ' ngôn ngữ');
+
+    // Keep existing order from languageList (server-controlled). Move Vietnamese to top if present.
+    langArray.sort(function (a, b) {
+        if (a.LanguageID === 'vi-VN') return -1;
+        if (b.LanguageID === 'vi-VN') return 1;
+        return 0; // keep server order for others
+    });
+
+    if (langArray.length === 0) {
+        $body.append('<tr><td colspan="5" class="text-center text-muted py-3">Không tìm thấy ngôn ngữ nào.</td></tr>');
+        return;
+    }
+
+    langArray.forEach(function (lang) {
+        var isDefault = (lang.LanguageID === 'vi-VN');
+        // attach data-lang to the row so sortable can read the language code after reordering
+        var $tr = $('<tr data-lang="' + lang.LanguageID + '">' +
+            '<td style="padding:6px 8px;font-size:13px"><code>' + escapeHtml(lang.LanguageID) + '</code></td>' +
+            '<td style="padding:6px 8px;font-size:13px" class="edit-lang-name">' + escapeHtml(lang.LanguageName || '') + '</td>' +
+            '<td style="padding:6px 8px;font-size:13px" class="edit-lang-native">' + escapeHtml(lang.NativeName || '') + '</td>' +
+            '<td style="padding:6px 8px;font-size:13px;text-align:center">' + (isDefault ? '<span class="badge bg-primary">Mặc định</span>' : '') + '</td>' +
+            '<td style="padding:6px 8px;text-align:center">' +
+            '<button class="btn btn-sm btn-outline-secondary btn-move-up py-0 px-1 me-1" title="Lên"><i class="fas fa-arrow-up" style="font-size:11px"></i></button>' +
+            '<button class="btn btn-sm btn-outline-secondary btn-move-down py-0 px-1 me-1" title="Xuống"><i class="fas fa-arrow-down" style="font-size:11px"></i></button>' +
+            '<button class="btn btn-sm btn-outline-primary btn-edit-lang py-0 px-1" title="Sửa"><i class="fas fa-pen" style="font-size:11px"></i></button> ' +
+            (!isDefault ? '<button class="btn btn-sm btn-outline-danger btn-del-lang-confirm py-0 px-1" title="Xóa"><i class="fas fa-trash" style="font-size:11px"></i></button>' : '') +
+            '</td>' +
+            '</tr>');
+
+        // Sửa ngôn ngữ
+        $tr.find('.btn-edit-lang').on('click', function () {
+            $('#txtNewLangCode').val(lang.LanguageID).prop('readonly', true);
+            $('#txtNewLangName').val(lang.LanguageName);
+            $('#txtNewNativeName').val(lang.NativeName);
+            $('#txtNewLangName').focus();
+        });
+
+        // Move up/down handlers inside modal list
+        $tr.find('.btn-move-up').on('click', function () {
+            var $prev = $tr.prev();
+            if ($prev && $prev.length) {
+                $tr.insertBefore($prev);
+                saveLangOrderFromModal();
+            }
+        });
+        $tr.find('.btn-move-down').on('click', function () {
+            var $next = $tr.next();
+            if ($next && $next.length) {
+                $tr.insertAfter($next);
+                saveLangOrderFromModal();
+            }
+        });
+
+        // Xóa ngôn ngữ
+        $tr.find('.btn-del-lang-confirm').on('click', async function () {
+            if (!confirm('Xóa ngôn ngữ "' + lang.LanguageName + '" (' + lang.LanguageID + ')?\nTất cả bản dịch của ngôn ngữ này cũng sẽ bị xóa!')) return;
+            try {
+                var response = await fetch('/api/SYS_Language/DeleteLanguage?langCode=' + encodeURIComponent(lang.LanguageID), { method: 'POST' });
+                var result = await response.json();
+                if (result === 'True') {
+                    showToast('success', 'Đã xóa ngôn ngữ "' + lang.LanguageName + '"!');
+                    loadLangList();
+                    // Reload languages cho panel chính
+                    await loadLanguages();
+                    loadResources();
+                } else {
+                    showToast('error', 'Xóa thất bại!');
+                }
+            } catch (ex) {
+                showToast('error', 'Lỗi: ' + ex.message);
+            }
+        });
+
+        $body.append($tr);
+    });
+
+    // Make language list in modal draggable so user can reorder languages
+    try {
+        if ($.ui && $.ui.sortable) {
+            $body.sortable('destroy');
+            $body.sortable({
+                axis: 'y',
+                helper: fixHelperTable,
+                start: function () { $('body').addClass('lang-dragging'); },
+                stop: function () { $('body').removeClass('lang-dragging'); },
+                update: async function (evt, ui) {
+                    var order = [];
+                    $body.find('tr').each(function () { order.push($(this).data('lang')); });
+                    try {
+                        const resp = await fetch('/api/SYS_Language/SaveOrder', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(order)
+                        });
+                        const r = await resp.json();
+                        if (r === 'True') {
+                            showToast('success', 'Đã lưu thứ tự ngôn ngữ!');
+                            await loadLanguages();
+                            loadResources();
+                        } else {
+                            showToast('error', 'Lưu thứ tự thất bại!');
+                        }
+                    } catch (ex) {
+                        console.error('Save lang order error', ex);
+                        showToast('error', 'Lỗi khi lưu thứ tự: ' + ex.message);
+                    }
+                }
+            }).disableSelection();
+        }
+    } catch (e) { console.warn('init lang list sortable failed', e); }
+
+    // (no-op) duplicate sortable init removed
+}
+
+
+// ============================================================
+// Clear form thêm/sửa ngôn ngữ
+// ============================================================
+function clearLangForm() {
+    $('#txtNewLangCode').val('').prop('readonly', false);
+    $('#txtNewLangName').val('');
+    $('#txtNewNativeName').val('');
+    $('#txtNewLangCode').focus();
+}
+
+function showToast(type, msg) {
+    if (typeof toastr !== 'undefined') {
+        toastr[type](msg);
+    } else {
+        alert(msg);
+    }
+}
+
+// Load danh sách ngôn ngữ vào combobox
+async function loadLanguages() {
+    try {
+        const response = await fetch('/api/SYS_Language/GetLanguages');
+        languageList = await response.json();
+
+        // Render input cho từng ngôn ngữ trong panel thêm/sửa
+        renderLangInputs();
+
+        // Render header động cho grid
+        renderPivotHeader();
+    } catch (ex) {
+        console.error('Load languages error:', ex);
+    }
+}
+
+// ============================================================
+// Render bảng nhập liệu: hiện tất cả ngôn ngữ từ DB
+// ============================================================
+function renderLangInputs() {
+    var $body = $('#langInputBody');
+    $body.empty();
+    // Sắp xếp: Tiếng Việt lên đầu
+    var sorted = languageList.slice().sort(function (a, b) {
+        if (a.LanguageID === 'vi-VN') return -1;
+        if (b.LanguageID === 'vi-VN') return 1;
+        return a.LanguageID.localeCompare(b.LanguageID);
+    });
+    sorted.forEach(function (l) {
+        var $row = $('<tr class="lang-row" data-lang="' + l.LanguageID + '">' +
+            '<td style="padding:4px 10px;font-size:13px;font-weight:500">' +
+            '<span class="lang-name">' + escapeHtml(l.NativeName) + ' (' + l.LanguageID + ')</span>' +
+            '</td>' +
+            '<td style="padding:4px 10px"><input type="text" class="form-control form-control-sm lang-input" data-lang="' + l.LanguageID + '" placeholder="Nhập bản dịch ' + l.LanguageID + '..." /></td>' +
+            '</tr>');
+        $body.append($row);
+    });
+
+    // Make the input language rows sortable so user can rearrange order in the input panel
+    try {
+        if ($.ui && $.ui.sortable) {
+            $body.sortable('destroy');
+            $body.sortable({
+                axis: 'y',
+                handle: '.lang-name',
+                helper: fixHelperTable,
+                start: function () { $('body').addClass('lang-dragging'); },
+                stop: function () { $('body').removeClass('lang-dragging'); },
+                update: async function (evt, ui) {
+                    var order = [];
+                    $body.find('tr.lang-row').each(function () { order.push($(this).data('lang')); });
+                    // Optimistically reorder languageList locally so UI updates immediately
+                    reorderLanguageListLocal(order);
+                    renderLangInputs();
+                    renderPivotHeader();
+                    try {
+                        const resp = await fetch('/api/SYS_Language/SaveOrder', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(order)
+                        });
+                        const r = await resp.json();
+                        if (r === 'True') {
+                            showToast('success', 'Đã lưu thứ tự ngôn ngữ!');
+                            await loadLanguages();
+                            loadResources();
+                        } else {
+                            showToast('error', 'Lưu thứ tự thất bại!');
+                        }
+                    } catch (ex) {
+                        console.error('Save order error', ex);
+                        showToast('error', 'Lỗi khi lưu thứ tự: ' + ex.message);
+                    }
+                }
+            }).disableSelection();
+        }
+    } catch (e) { console.warn('init lang input sortable failed', e); }
+}
+
+// Helper to reorder the languageList array in memory according to an array of language IDs
+function reorderLanguageListLocal(newOrder) {
+    if (!Array.isArray(newOrder) || !languageList || languageList.length === 0) return;
+    var map = {};
+    languageList.forEach(function (l) { map[l.LanguageID] = l; });
+    var reordered = [];
+    newOrder.forEach(function (id) { if (map[id]) reordered.push(map[id]); });
+    // append any missing languages that were not in newOrder
+    languageList.forEach(function (l) { if (!newOrder.includes(l.LanguageID)) reordered.push(l); });
+    languageList = reordered;
+}
+
+// Load tất cả resources (có filter theo từ khóa)
+async function loadResources() {
+    try {
+        const keyword = $('#txtSearch').val().trim();
+
+        let url;
+        if (keyword) {
+            url = '/api/SYS_Language/GetByKey?resourceKey=' + encodeURIComponent(keyword);
+        } else {
+            url = '/api/SYS_Language/Get?action=GET_ALL';
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+        renderTable(data || []);
+    } catch (ex) {
+        console.error('Load resources error:', ex);
+    }
+}
+
+// Load resource theo key (khi user Enter ở ô nhập key)
+async function loadResourceByKey(key) {
+    if (!key) return;
+    try {
+        const response = await fetch('/api/SYS_Language/GetByKey?resourceKey=' + encodeURIComponent(key));
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+            // Key đã tồn tại → load lên grid + điền vào panel
+            renderTable(data);
+            $('#txtSearch').val(key);
+
+            // Điền giá trị vào các ô ngôn ngữ
+            $('#txtResourceKey').val(key);
+            $('.lang-input').val('');
+            data.forEach(function (row) {
+                var $input = $('.lang-input[data-lang="' + row.LanguageID + '"]');
+                if ($input.length) $input.val(row.Value || '');
+            });
+            $('#txtResourceKey').focus();
+        } else {
+            // Key mới → clear form, set key, chỉ giữ Tiếng Việt
+            clearForm();
+            $('#txtResourceKey').val(key);
+            $('.lang-input').first().focus();
+        }
+    } catch (ex) {
+        console.error('Load by key error:', ex);
+    }
+}
+
+// ============================================================
+// PIVOT: Nhóm dữ liệu theo ResourceKey, mỗi key = 1 dòng
+// ============================================================
+function pivotData(data) {
+    const grouped = {};
+    (data || []).forEach(function (row) {
+        const key = row.ResourceKey || '';
+        if (!grouped[key]) grouped[key] = { ResourceKey: key };
+        grouped[key][row.LanguageID] = row.Value || '';
+    });
+    return Object.values(grouped);
+}
+
+// ============================================================
+// Render động tiêu đề cột theo danh sách ngôn ngữ
+// ============================================================
+function renderPivotHeader() {
+    const $thead = $('#tblHeader');
+    let html = '<tr><th style="width:40px">#</th><th style="width:180px">Resource Key</th>';
+    languageList.forEach(function (l) {
+        html += '<th class="sortable-col" data-lang="' + l.LanguageID + '" style="min-width:120px">' + escapeHtml(l.NativeName) + ' (' + l.LanguageID + ')</th>';
+    });
+    html += '<th style="width:80px">Thao tác</th></tr>';
+    $thead.html(html);
+    // Initialize column sortable after header is rendered
+    initColumnSortable();
+}
+
+function initColumnSortable() {
+    try {
+        const $row = $('#tblHeader tr');
+        if (!($row && $row.length && $.ui && $.ui.sortable)) return;
+        // Make only language columns sortable (exclude first two and last)
+        $row.sortable('destroy');
+        $row.sortable({
+            axis: 'x',
+            items: 'th.sortable-col',
+            placeholder: 'ui-state-highlight',
+            helper: function (e, ui) { return fixHelperTable(e, ui.clone()); },
+            update: async function (evt, ui) {
+                // collect new language order
+                var newOrder = [];
+                $row.find('th.sortable-col').each(function () { newOrder.push($(this).data('lang')); });
+                // reorder languageList locally so columns update immediately
+                reorderLanguageListLocal(newOrder);
+                renderPivotHeader();
+                // also re-render current table body to reflect new column order
+                // NOTE: renderTable will call renderPivotHeader again, but calling loadResources to fetch data and render is safer
+                try {
+                    const resp = await fetch('/api/SYS_Language/SaveOrder', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newOrder)
+                    });
+                    const r = await resp.json();
+                    if (r === 'True') {
+                        showToast('success', 'Đã lưu thứ tự cột ngôn ngữ!');
+                        // reload languages and resources to reflect new order
+                        await loadLanguages();
+                        loadResources();
+                    } else {
+                        showToast('error', 'Lưu thứ tự cột thất bại!');
+                    }
+                } catch (ex) {
+                    console.error('Save column order error', ex);
+                    showToast('error', 'Lỗi khi lưu thứ tự cột: ' + ex.message);
+                }
+            }
+        });
+    } catch (e) { console.warn('initColumnSortable failed', e); }
+}
+
+// Render grid dạng pivot
+function renderTable(data) {
+    renderPivotHeader();
+    const $body = $('#tblBody');
+    $body.empty();
+
+    if (!data || data.length === 0) {
+        const colspan = 2 + languageList.length + 1;
+        $body.append('<tr><td colspan="' + colspan + '" class="text-center text-muted py-3">Không tìm thấy từ khóa nào.</td></tr>');
+        return;
+    }
+
+    const pivoted = pivotData(data);
+    pivoted.forEach(function (row, idx) {
+        var html = '<tr>';
+        html += '<td class="text-center">' + (idx + 1) + '</td>';
+        html += '<td><strong>' + escapeHtml(row.ResourceKey || '') + '</strong></td>';
+        languageList.forEach(function (l) {
+            var val = row[l.LanguageID] || '';
+            html += '<td class="lang-cell" data-lang="' + l.LanguageID + '">';
+            html += '<span class="lang-value">' + escapeHtml(val) + '</span>';
+            // Removed small inline "X" delete button per UI requirement; keep full-row delete (trash) only
+            html += '</td>';
+        });
+        html += '<td class="text-center">';
+        html += '<button class="btn btn-sm btn-outline-primary btn-edit" title="Sửa"><i class="fas fa-pen"></i></button> ';
+        html += '<button class="btn btn-sm btn-outline-danger btn-delete" title="Xóa toàn bộ key"><i class="fas fa-trash"></i></button>';
+        html += '</td></tr>';
+
+        var $tr = $(html);
+        // attach resource key for sortable and easy lookup
+        $tr.attr('data-resource', row.ResourceKey || '');
+
+        // Nút Sửa → load key + tất cả bản dịch lên panel
+        $tr.find('.btn-edit').on('click', function () {
+            $('#txtResourceKey').val(row.ResourceKey);
+            // Điền giá trị cho từng ngôn ngữ
+            $('.lang-input').each(function () {
+                var langId = $(this).data('lang');
+                $(this).val(row[langId] || '');
+            });
+            $('#txtResourceKey').focus();
+        });
+
+        // Nút Xóa bản dịch của 1 ngôn ngữ
+        $tr.find('.btn-del-lang').on('click', async function () {
+            var $td = $(this).closest('td.lang-cell');
+            var langID = $td.data('lang');
+            if (!langID) return;
+
+            if (!confirm('Xóa bản dịch "' + row.ResourceKey + '" (' + langID + ')?')) return;
+            try {
+                var response = await fetch('/api/SYS_Language/Delete?resourceKey=' + encodeURIComponent(row.ResourceKey) + '&languageID=' + encodeURIComponent(langID), { method: 'POST' });
+                var result = await response.json();
+                if (result === 'True') {
+                    showToast('success', 'Xóa bản dịch ' + langID + ' thành công!');
+                    loadResources();
+                } else {
+                    showToast('error', 'Xóa thất bại!');
+                }
+            } catch (ex) {
+                showToast('error', 'Lỗi: ' + ex.message);
+            }
+        });
+
+        // Nút Xóa toàn bộ key
+        $tr.find('.btn-delete').on('click', async function () {
+            if (!confirm('Xóa toàn bộ bản dịch của "' + row.ResourceKey + '"?')) return;
+            try {
+                var response = await fetch('/api/SYS_Language/Get?action=DELETE_BY_KEY&para1=' + encodeURIComponent(row.ResourceKey));
+                var result = await response.json();
+                if (result && result.length > 0 && (result[0].Result === 'True' || result[0].Result === true)) {
+                    showToast('success', 'Xóa thành công!');
+                    loadResources();
+                } else {
+                    showToast('error', 'Xóa thất bại!');
+                }
+            } catch (ex) {
+                showToast('error', 'Lỗi: ' + ex.message);
+            }
+        });
+
+        $body.append($tr);
+    });
+}
+
+// Lưu resource — gửi tất cả ngôn ngữ cùng lúc
+async function saveResource() {
+    const key = $('#txtResourceKey').val().trim();
+
+    if (!key) {
+        showToast('warning', 'Vui lòng nhập Resource Key!');
+        $('#txtResourceKey').focus();
+        return;
+    }
+
+    // Thu thập tất cả bản dịch
+    var items = [];
+    $('.lang-input').each(function () {
+        var val = $(this).val().trim();
+        if (val) {
+            items.push({
+                ResourceKey: key,
+                LanguageID: $(this).data('lang'),
+                Value: val,
+                Description: '',
+                IsHtml: false,
+                UpdatedBy: 'admin'
+            });
+        }
+    });
+
+    if (items.length === 0) {
+        showToast('warning', 'Vui lòng nhập ít nhất một bản dịch!');
+        return;
+    }
+
+    try {
+        // Check duplicates first
+        const chkResp = await fetch('/api/SYS_Language/CheckResourceExists', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(items)
+        });
+        const chk = await chkResp.json();
+        if (chk && chk.length > 0) {
+            // There are existing translations for some ResourceKey/Language combinations
+            var msg = 'Một hoặc nhiều bản dịch đã tồn tại. Bạn có muốn ghi đè (overwrite) không?';
+            if (!confirm(msg)) return;
+            // User confirmed overwrite -> call Save with allowOverwrite=true
+            const response = await fetch('/api/SYS_Language/Save?allowOverwrite=true', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(items)
+            });
+            const result = await response.json();
+            if (result === 'True') {
+                showToast('success', 'Lưu thành công (' + items.length + ' ngôn ngữ)!');
+                clearForm();
+                loadResources();
+                $('#txtResourceKey').focus();
+            } else if (result === 'EXISTS') {
+                showToast('warning', 'Một số bản dịch đã tồn tại. Vui lòng thử lại.');
+            } else {
+                showToast('error', 'Lưu thất bại!');
+            }
+        } else {
+            // No duplicates -> save normally
+            const response = await fetch('/api/SYS_Language/Save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(items)
+            });
+            const result = await response.json();
+            if (result === 'True') {
+                showToast('success', 'Lưu thành công (' + items.length + ' ngôn ngữ)!');
+                clearForm();
+                loadResources();
+                $('#txtResourceKey').focus();
+            } else if (result === 'EXISTS') {
+                // Should not normally happen because we checked, but handle defensively
+                if (confirm('Một hoặc nhiều bản dịch đã tồn tại. Bạn có muốn ghi đè không?')) {
+                    const r2 = await fetch('/api/SYS_Language/Save?allowOverwrite=true', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(items)
+                    });
+                    const rr2 = await r2.json();
+                    if (rr2 === 'True') {
+                        showToast('success', 'Lưu thành công!');
+                        clearForm();
+                        loadResources();
+                        $('#txtResourceKey').focus();
+                    } else {
+                        showToast('error', 'Lưu thất bại!');
+                    }
+                }
+            } else {
+                showToast('error', 'Lưu thất bại!');
+            }
+        }
+    } catch (ex) {
+        showToast('error', 'Lỗi kết nối: ' + ex.message);
+    }
+}
+
+// Clear form
+function clearForm() {
+    $('#txtResourceKey').val('');
+    $('.lang-input').val('');
+    $('#txtResourceKey').focus();
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}

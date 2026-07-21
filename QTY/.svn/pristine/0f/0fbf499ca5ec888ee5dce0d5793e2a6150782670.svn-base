@@ -1,0 +1,464 @@
+﻿BaseFoundation.requireClass("BaseDevExtremeGrid");
+
+class PhanLoaiLoiGrid extends BaseDevExtremeGrid {
+    constructor(Container, Datasource, Setting, Appearance, Events) {
+        super(Container, Datasource, Setting, Appearance, Events);
+    }
+
+    buildDefaultColumns() {
+        const self = this;
+        self.Columns = [            
+            {
+                dataField: "Sort",
+                caption: "STT",
+                allowEditing: true,
+                sortOrder: "asc",
+                width: 60
+            },
+            {
+                dataField: "MaLoiChiTiet",
+                caption: "Mã lỗi",
+                allowSorting: false,
+                allowEditing: false,
+                width: 70
+            },
+            {
+                dataField: "TenLoi",
+                caption: "Tên Lỗi",
+                allowSorting: false,
+                allowEditing: true,
+                minWidth: 100
+            },
+        ];
+        self.ColumnFields = self.Columns
+            .filter(col => col.dataField)
+            .map(col => col.dataField);
+        return self.Columns;
+    }
+}
+class PhanLoaiModuleGrid extends BaseDevExtremeGrid {
+    constructor(Container, Datasource, Setting, Appearance, Events) {
+        super(Container, Datasource, Setting, Appearance, Events);
+    }
+
+    buildDefaultColumns() {
+        const self = this;
+        self.Columns = [          
+            {
+                dataField: "Sort",
+                caption: "STT",
+                allowSorting: false,
+                allowEditing: true,
+                sortOrder: "asc",
+                width: 60
+            },
+            {
+                dataField: "TenNhomLoi",
+                caption: "Công đoạn",
+                allowSorting: false,
+                allowEditing: true,
+                width: 300
+            },
+            {
+                dataField: "CodeNhomLoi",
+                caption: "Mã lỗi",
+                allowSorting: false,
+                allowEditing: true,
+                minWidth: 70
+            },
+        ];
+        self.ColumnFields = self.Columns
+            .filter(col => col.dataField)
+            .map(col => col.dataField);
+        return self.Columns;
+    }
+
+    getMaxSort() {
+        return Math.max(...this.Datasource.map(row => row.Sort || 0));
+    }
+}
+class ModuleNhomLoiGrid extends BaseDevExtremeGrid {
+    constructor(Container, Datasource, Setting, Appearance, Events) {
+        super(Container, Datasource, Setting, Appearance, Events);
+    }
+
+    buildDefaultColumns() {
+        const self = this;
+        self.Columns = [          
+            {
+                dataField: "TenBoPhan",
+                caption: "Bộ phận",
+                allowSorting: false,
+                allowEditing: false,
+                
+            },
+            {
+                dataField: "Sort",
+                caption: "STT",
+                allowSorting: false,
+                allowEditing: true,
+                sortOrder: "asc",
+                width: 60
+            },
+            {
+                dataField: "TenNhomLoi",
+                caption: "Công đoạn",
+                allowSorting: false,
+                allowEditing: true,
+                width: 300
+            },
+            {
+                dataField: "CodeNhomLoi",
+                caption: "Mã lỗi",
+                allowSorting: false,
+                allowEditing: true,
+                minWidth: 60
+            },
+            // {
+            //    dataField: "BackColor",
+            //    caption: "Màu nền sau",
+            //    allowSorting: false,
+            //    allowEditing: true,
+            //    width: 120
+            // },
+            // {
+            //    dataField: "ForColor",
+            //    caption: "Màu nền trước",
+            //    allowSorting: false,
+            //    allowEditing: true,
+            //    width: 120
+            // },
+        ];
+        self.ColumnFields = self.Columns
+            .filter(col => col.dataField)
+            .map(col => col.dataField);
+        return self.Columns;
+    }
+}
+class KCSQAGrid extends BaseDevExtremeGrid {
+    constructor(Container, Datasource, Setting, Appearance, Events) {
+        super(Container, Datasource, Setting, Appearance, Events);
+    }
+
+    buildDefaultColumns() {
+        const self = this;
+        self.Columns = [
+            {
+                caption: "",
+                width: 50,
+                alignment: "center",
+                allowSorting: false,
+                allowFiltering: false,
+                allowResizing: false,
+                allowReordering: false,
+
+                headerCellTemplate: function (header, info) {
+                    $("<div>")
+                        .dxButton({
+                            icon: "refresh",
+                            hint: "Reload dữ liệu",
+                            stylingMode: "text",
+                            elementAttr: {
+                                class: "btn-reload-header"
+                            },
+                            onClick: () => {
+                                self.Events.onReload?.();
+                            }
+                        })
+                        .appendTo(header);
+                }
+            },
+            {
+                dataField: "CodeModule",
+                caption: "Code Module",
+                allowEditing: true,
+                width: 150
+            },
+            {
+                dataField: "TenModule",
+                caption: "Tên module",
+                allowEditing: true,
+                width: 350
+            },
+            {
+                dataField: "GhiChu",
+                caption: "Ghi chú",
+                allowEditing: true,
+            },
+            {
+                caption: "",
+                width: 120,
+                alignment: "center",
+                cellTemplate(container, options) {
+
+                    const createButton = (text, className, onClick) => {
+                        $("<button>")
+                            .addClass(`btn btn-sm ${className} w-100 d-flex align-items-center justify-content-center`)
+                            .css({
+                                height: "32px"
+                            })
+                            .text(text)
+                            .on("click", onClick)
+                            .appendTo(container);
+                    };
+
+                    if (options.data.TrangThai != 1) {
+                        createButton("Xoá", "btn-danger", () => {
+                            self.Events.onDelete?.(options.data);
+                        });
+                    }                        
+                }
+            }
+        ];
+        self.ColumnFields = self.Columns
+            .filter(col => col.dataField)
+            .map(col => col.dataField);
+        return self.Columns;
+    }
+}
+class HangMucLoiGrid extends BaseDevExtremeGrid {
+    constructor(Container, Datasource, Setting, Appearance, Events) {
+        super(Container, Datasource, Setting, Appearance, Events);
+    }
+
+    buildDefaultColumns() {
+        const self = this;
+        self.Columns = [
+            {
+                caption: "",
+                width: 50,
+                alignment: "center",
+                allowSorting: false,
+                allowFiltering: false,
+                allowResizing: false,
+                allowReordering: false,
+
+                headerCellTemplate: function (header, info) {
+                    $("<div>")
+                        .dxButton({
+                            icon: "refresh",
+                            hint: "Reload dữ liệu",
+                            stylingMode: "text",
+                            elementAttr: {
+                                class: "btn-reload-header"
+                            },
+                            onClick: () => {
+                                self.Events.onReload?.();
+                            }
+                        })
+                        .appendTo(header);
+                }
+            },
+            {
+                dataField: "CodeHangMucLoi",
+                caption: "Code dạng lỗi",
+                allowEditing: true,
+                width: 150
+            },
+            {
+                dataField: "TenHangMucLoi",
+                caption: "Nhóm dạng lỗi",
+                allowEditing: true,
+                width: 350
+            },
+            {
+                dataField: "GhiChu",
+                caption: "Ghi chú",
+                allowEditing: true,
+            },
+            {
+                    caption: "",
+                    width: 120,
+                    alignment: "center",
+                    cellTemplate(container, options) {
+
+                        const createButton = (text, className, onClick) => {
+                            $("<button>")
+                                .addClass(`btn btn-sm ${className} w-100 d-flex align-items-center justify-content-center`)
+                                .css({
+                                    height: "32px"
+                                })
+                                .text(text)
+                                .on("click", onClick)
+                                .appendTo(container);
+                        };
+
+                        if (options.data.TrangThai != 1) {
+                            createButton("Xoá", "btn-danger", () => {
+                                self.Events.onDelete?.(options.data);
+                            });
+                        }                        
+                    }
+                }
+        ];
+        self.ColumnFields = self.Columns
+            .filter(col => col.dataField)
+            .map(col => col.dataField);
+        return self.Columns;
+    }
+}
+class BoPhanGrid extends BaseDevExtremeGrid {
+    constructor(Container, Datasource, Setting, Appearance, Events) {
+        super(Container, Datasource, Setting, Appearance, Events);
+    }
+
+    buildDefaultColumns() {
+        const self = this;
+        self.Columns = [
+            {
+                caption: "",
+                width: 50,
+                alignment: "center",
+                allowSorting: false,
+                allowFiltering: false,
+                allowResizing: false,
+                allowReordering: false,
+
+                headerCellTemplate: function (header, info) {
+                    $("<div>")
+                        .dxButton({
+                            icon: "refresh",
+                            hint: "Reload dữ liệu",
+                            stylingMode: "text",
+                            elementAttr: {
+                                class: "btn-reload-header"
+                            },
+                            onClick: () => {
+                                self.Events.onReload?.();
+                            }
+                        })
+                        .appendTo(header);
+                }
+            },
+            {
+                dataField: "CodeBoPhan",
+                caption: "Code Bộ phận",
+                allowEditing: true,
+                width: 120
+            },
+            {
+                dataField: "TenBoPhan",
+                caption: "Tên bộ phận",
+                allowEditing: true,
+                width: 250
+            },
+            {
+                dataField: "GhiChu",
+                caption: "Ghi chú",
+                allowEditing: true,
+                minWidth: 100
+            },
+            {
+                caption: "",
+                width: 80,
+                alignment: "center",
+                cellTemplate(container, options) {
+
+                    const createButton = (text, className, onClick) => {
+                        $("<button>")
+                            .addClass(`btn btn-sm ${className} w-100 d-flex align-items-center justify-content-center`)
+                            .css({
+                                height: "32px"
+                            })
+                            .text(text)
+                            .on("click", onClick)
+                            .appendTo(container);
+                    };
+
+                    if (options.data.TrangThai != 1) {
+                        createButton("Xoá", "btn-danger", () => {
+                            self.Events.onDelete?.(options.data);
+                        });
+                    }                        
+                }
+            }
+        ];
+        self.ColumnFields = self.Columns
+            .filter(col => col.dataField)
+            .map(col => col.dataField);
+        return self.Columns;
+    }
+}
+class PhanLoaiBoPhanGrid extends BaseDevExtremeGrid {
+    constructor(Container, Datasource, Setting, Appearance, Events) {
+        super(Container, Datasource, Setting, Appearance, Events);
+    }
+
+    buildDefaultColumns() {
+        const self = this;
+        self.Columns = [
+            {
+                caption: "",
+                width: 50,
+                alignment: "center",
+                allowSorting: false,
+                allowFiltering: false,
+                allowResizing: false,
+                allowReordering: false,
+
+                headerCellTemplate: function (header, info) {
+                    $("<div>")
+                        .dxButton({
+                            icon: "refresh",
+                            hint: "Reload dữ liệu",
+                            stylingMode: "text",
+                            elementAttr: {
+                                class: "btn-reload-header"
+                            },
+                            onClick: () => {
+                                self.Events.onReload?.();
+                            }
+                        })
+                        .appendTo(header);
+                }
+            },
+            // {
+            //     dataField: "Nhom",
+            //     caption: "Nhóm",
+            //     allowEditing: false,
+            //     groupIndex: 0
+            // },
+            {
+                dataField: "Sort",
+                caption: "STT",
+                allowSorting: false,
+                allowEditing: true,
+                sortOrder: "asc",
+                width: 60
+            },
+            {
+                dataField: "Name",
+                caption: "Nhóm lỗi",
+                allowEditing: false,
+                minWidth: 200
+            },
+            {
+                dataField: "TenBoPhan",
+                caption: "Bộ phận",
+                allowEditing: false,
+                width: 200
+            },           
+            {
+                caption: "",
+                width: 80,
+                alignment: "center",
+                cellTemplate(container, options) {
+                    const trangthai = options.data.TrangThai;
+                    $("<div>")
+                        .dxCheckBox({
+                            value: Number(trangthai) >= 1,
+                            disabled: trangthai == 2,
+                            onValueChanged: (e) => {
+                                self.Events?.onChange(options.data, e.value);
+                            }
+                        })
+                        .appendTo(container);         
+                }
+            }
+        ];
+        self.ColumnFields = self.Columns
+            .filter(col => col.dataField)
+            .map(col => col.dataField);
+        return self.Columns;
+    }
+}

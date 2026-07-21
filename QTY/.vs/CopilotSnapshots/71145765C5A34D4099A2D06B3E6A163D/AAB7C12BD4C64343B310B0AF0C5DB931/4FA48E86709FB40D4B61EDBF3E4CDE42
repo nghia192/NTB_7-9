@@ -1,0 +1,482 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Thư viện ngôn ngữ</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css"/>
+    <link href="~/css/thuviencss/fontawesome.pro.6.0.0.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/bootstrap5.3.min.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/toastr.min.css" rel="stylesheet" />
+
+    <style>
+        /* Ép backdrop nằm dưới modal */
+        .modal {
+            z-index: 2000 !important; /* Đẩy cao hẳn lên */
+        }
+        .modal-backdrop {
+            z-index: 1999 !important; /* Phải thấp hơn modal */
+        }
+        :root {
+            --clr-primary: #185FA5;
+            --clr-border: #dee2e6;
+            --clr-header-bg: #f8f9fa;
+            --clr-warning: #f5a623;
+            --clr-warning-bg: #fff7e6;
+            --clr-danger: #e5484d;
+            --clr-danger-bg: #fdecea;
+        }
+
+        body {
+            background: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 13px;
+        }
+
+        .page-card {
+            background: #fff;
+            border-radius: 6px;
+            border: 1px solid var(--clr-border);
+            padding: 20px;
+            margin: 10px;
+        }
+
+        .page-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--clr-border);
+        }
+
+            .page-title i {
+                color: var(--clr-primary);
+                font-size: 18px;
+            }
+
+        .form-control, .form-select {
+            font-size: 13px;
+            border-radius: 4px;
+        }
+
+        .btn {
+            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--clr-primary);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: #A32D2D;
+            color: #fff;
+        }
+
+        .btn-success {
+            background: #1A7D3A;
+            color: #fff;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: #333;
+            border: 1px solid var(--clr-border);
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .badge-vi {
+            background: #e8effe;
+            color: #1a56db;
+        }
+
+        .badge-en {
+            background: #e6f9f3;
+            color: #0ea472;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        th {
+            background: var(--clr-header-bg);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        th, td {
+            border: 1px solid var(--clr-border);
+            padding: 6px 8px;
+            text-align: left;
+        }
+
+        .grid-container {
+            max-height: 331px;
+            overflow-y: auto;
+            border: 1px solid var(--clr-border);
+            border-radius: 4px;
+        }
+
+        .grid-container table {
+            margin-top: 0;
+        }
+
+        .input-group-custom {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        /* Hide small inline delete 'X' buttons inside cells but keep trash icons in action column */
+        .btn-del-lang { display: none !important; }
+        /* Ensure confirmation popups (e.g., SweetAlert2) appear above Bootstrap modals */
+        .swal2-container, .swal2-backdrop, .swal2-popup { z-index: 20050 !important; }
+        /* Ensure our custom overwrite modal appears above other modals */
+        #modalOverwriteConfirm.modal { z-index: 20060 !important; }
+        #modalOverwriteConfirm .modal-backdrop { z-index: 20050 !important; }
+        .modal-content {
+            border: none;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.22);
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            background: #fff;
+            border-bottom: 1px solid #eef0f3;
+        }
+
+            .modal-header .modal-title {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+        .modal-footer {
+            padding: 14px 20px;
+            border-top: 1px solid #eef0f3;
+            background: #fbfcfd;
+        }
+
+        .modal-footer .btn,
+        .modal-header .btn-close {
+            border-radius: 8px;
+        }
+
+        .btn-icon-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ---------------- Modal xác nhận chung (thay window.confirm) ---------------- */
+        #modalConfirmGeneric .modal-dialog {
+            max-width: 420px;
+        }
+
+        #modalConfirmGeneric .modal-body {
+            text-align: center;
+            padding: 34px 28px 26px;
+        }
+
+        #confirmIconWrap {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            margin: 0 auto 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--clr-warning-bg);
+            transition: background .15s ease;
+        }
+
+        #confirmIcon {
+            font-size: 26px;
+            color: var(--clr-warning);
+        }
+
+        #confirmTitle {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        #confirmMessage {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.55;
+            white-space: pre-line;
+            margin-bottom: 22px;
+        }
+
+        #modalConfirmGeneric .modal-body .btn {
+            flex: 1;
+            max-width: 150px;
+            padding: 9px 0;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+
+        #btnConfirmCancel {
+            background: #fff;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+
+            #btnConfirmCancel:hover {
+                background: #f3f4f6;
+            }
+
+        #btnConfirmOk {
+            background: var(--clr-warning);
+            color: #fff;
+            box-shadow: 0 6px 16px rgba(245, 166, 35, 0.35);
+        }
+
+            #btnConfirmOk:hover {
+                filter: brightness(0.95);
+            }
+
+        /* ---------------- Modal ghi đè bản dịch ---------------- */
+        #modalOverwriteConfirm .modal-header {
+            border-left: 4px solid var(--clr-warning);
+        }
+
+        #modalOverwriteConfirm .modal-header .modal-title i {
+            color: var(--clr-warning);
+        }
+
+        #modalOverwriteConfirm .modal-body p {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        #modalOverwriteConfirm table thead tr {
+            background: #f8f9fa;
+        }
+
+        #modalOverwriteConfirm .btn-danger {
+            background: var(--clr-danger);
+            border-radius: 8px;
+        }
+
+        /* ---------------- Modal quản lý ngôn ngữ ---------------- */
+        #modalAddLang .modal-header {
+            border-left: 4px solid var(--clr-primary);
+        }
+
+        #modalAddLang .modal-title i {
+            color: var(--clr-primary);
+        }
+
+        #modalAddLang .btn-success,
+        #modalAddLang .btn-outline {
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-card">
+        <div class="page-title">
+            <i class="fas fa-language"></i> Thư viện ngôn ngữ
+            <button class="btn btn-sm btn-primary ms-auto d-flex align-items-center justify-content-center" id="btnAddLangGlobal" style="font-size:12px; gap:6px;">
+                <i class="fas fa-plus"></i> Thêm ngôn ngữ mới
+            </button>
+        </div>
+
+        <div style="background: #f8f9fa; border: 1px solid var(--clr-border); border-radius: 6px; padding: 16px; margin-bottom: 16px;">
+            <div class="section-title"><i class="fas fa-plus-circle" style="color:var(--clr-primary)"></i> Thêm / Sửa từ khóa</div>
+            <div class="input-group-custom" style="margin-bottom:10px">
+                <div style="flex:1;min-width:200px">
+                    <label style="font-size:11px;font-weight:600;color:#6c757d;margin-bottom:2px">Resource Key</label>
+                    <input type="text" id="txtResourceKey" class="form-control" placeholder="VD: login.title, common.save, id_btn_save" />
+                </div>
+            </div>
+            <div style="border:1px solid var(--clr-border);border-radius:4px;overflow:hidden">
+                <div style="max-height:200px;overflow-y:auto">
+                    <table style="margin:0;width:100%">
+                        <thead>
+                            <tr style="background:#eef1f5">
+                                <th style="width:160px;padding:6px 10px;font-size:11px;font-weight:600;color:#6c757d;border:none">Ngôn ngữ</th>
+                                <th style="padding:6px 10px;font-size:11px;font-weight:600;color:#6c757d;border:none">Giá trị dịch</th>
+                            </tr>
+                        </thead>
+                        <tbody id="langInputBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:4px">
+                <button class="btn btn-success" id="btnSave"><i class="fas fa-save"></i> Lưu tất cả</button>
+                <button class="btn btn-outline" id="btnClear"><i class="fas fa-undo"></i> Làm mới</button>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+            <div class="section-title"><i class="fas fa-search" style="color:var(--clr-primary)"></i> Tra cứu từ khóa</div>
+            <div class="input-group-custom">
+                <input type="text" id="txtSearch" class="form-control" placeholder="Nhập resource key cần tìm..." style="flex:2;min-width:200px" />
+                <button class="btn btn-primary" id="btnSearch"><i class="fas fa-search"></i> Tra cứu</button>
+                <button class="btn btn-outline" id="btnRefresh"><i class="fas fa-sync"></i> Tất cả</button>
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <table>
+                <thead id="tblHeader"></thead>
+                <tbody id="tblBody"></tbody>
+            </table>
+        </div>
+    </div> <div id="modalOverwriteConfirm" class="modal fade" tabindex="-1" style="display:none">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">
+                        <span class="btn-icon-circle" style="background:var(--clr-warning-bg)"><i class="fas fa-triangle-exclamation"></i></span>
+                        Xác nhận ghi đè bản dịch
+                    </h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Các bản dịch sau đã tồn tại trong hệ thống. Chọn "Ghi đè" để thay thế giá trị hiện tại:</p>
+                    <div style="max-height:320px;overflow:auto;border:1px solid var(--clr-border);border-radius:8px">
+                        <table class="table table-sm" id="tblOverwriteList" style="margin:0">
+                            <thead>
+                                <tr><th>ResourceKey</th><th>LanguageID</th><th>CurrentValue</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnOverwriteConfirm" class="btn btn-danger"><i class="fas fa-rotate"></i> Ghi đè</button>
+                    <button class="btn btn-outline" data-bs-dismiss="modal">Hủy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalConfirmGeneric" class="modal fade" tabindex="-1" style="display:none" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="confirmIconWrap">
+                        <i id="confirmIcon" class="fas fa-triangle-exclamation"></i>
+                    </div>
+                    <h5 id="confirmTitle">Xác nhận</h5>
+                    <p id="confirmMessage"></p>
+                    <div class="d-flex justify-content-center" style="gap:10px">
+                        <button type="button" id="btnConfirmCancel" class="btn" data-bs-dismiss="modal">Huỷ</button>
+                        <button type="button" id="btnConfirmOk" class="btn">Đồng ý</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalAddLang" class="modal fade" tabindex="-1" style="display:none">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="border-radius:8px">
+                <div class="modal-header" style="padding:12px 16px;background:#f8f9fa;border-bottom:1px solid var(--clr-border)">
+                    <h6 class="modal-title" style="font-size:14px;font-weight:600"><i class="fas fa-globe" style="color:var(--clr-primary)"></i> Quản lý ngôn ngữ</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="padding:16px">
+                    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-end;flex-wrap:wrap">
+                        <div style="flex:1;min-width:120px">
+                            <label style="font-size:11px;font-weight:600;color:#6c757d;margin-bottom:2px">Mã ngôn ngữ</label>
+                            <input type="text" id="txtNewLangCode" class="form-control" placeholder="VD: zh-CN" />
+                        </div>
+                        <div style="flex:1;min-width:140px">
+                            <label style="font-size:11px;font-weight:600;color:#6c757d;margin-bottom:2px">Tên ngôn ngữ</label>
+                            <input type="text" id="txtNewLangName" class="form-control" placeholder="VD: Chinese" />
+                        </div>
+                        <div style="flex:1;min-width:140px">
+                            <label style="font-size:11px;font-weight:600;color:#6c757d;margin-bottom:2px">Tên bản địa</label>
+                            <input type="text" id="txtNewNativeName" class="form-control" placeholder="VD: 中文" />
+                        </div>
+                        <div style="flex:1;min-width:140px">
+                            <label style="font-size:11px;font-weight:600;color:#6c757d;margin-bottom:2px">Icon Cờ</label>
+                            <select id="txtNewFlagIcon" class="form-control">
+                                <option value="">-- Không chọn --</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:4px">
+                            <button class="btn btn-success" id="btnSaveNewLang" style="font-size:12px"><i class="fas fa-save"></i> Lưu</button>
+                            <button class="btn btn-outline" id="btnClearLangForm" style="font-size:12px"><i class="fas fa-undo"></i></button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center">
+                        <input type="text" id="txtLangFilter" class="form-control" placeholder="Tìm kiếm ngôn ngữ..." style="flex:1;font-size:13px" />
+                        <span id="langCount" style="font-size:12px;color:#999;white-space:nowrap"></span>
+                    </div>
+
+                    <div style="max-height:260px;overflow-y:auto;border:1px solid var(--clr-border);border-radius:4px">
+                        <table style="margin:0;width:100%">
+                            <thead>
+                                <tr style="background:#eef1f5">
+                                    <th style="width:100px;padding:6px 8px;font-size:11px;font-weight:600;color:#6c757d;border:none">Mã</th>
+                                    <th style="padding:6px 8px;font-size:11px;font-weight:600;color:#6c757d;border:none">Tên ngôn ngữ</th>
+                                    <th style="padding:6px 8px;font-size:11px;font-weight:600;color:#6c757d;border:none">Tên bản địa</th>
+                                    <th style="width:60px;padding:6px 8px;font-size:11px;font-weight:600;color:#6c757d;border:none;text-align:center">Cờ</th>
+                                    <th style="width:80px;padding:6px 8px;font-size:11px;font-weight:600;color:#6c757d;border:none;text-align:center">Mặc định</th>
+                                    <th style="width:80px;padding:6px 8px;font-size:11px;font-weight:600;color:#6c757d;border:none;text-align:center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="langListBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding:10px 16px;border-top:1px solid var(--clr-border)">
+                    <button class="btn btn-outline" data-bs-dismiss="modal" style="font-size:12px">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/Scripts/thuvienjs/jquery.js"></script>
+    <script src="~/Scripts/thuvienjs/jquery-ui.min.js"></script>
+    <script src="~/Scripts/thuvienjs/bootstrap5.3.bundle.min.js"></script>
+    <script src="~/Scripts/thuvienjs/toastr.min.js"></script>
+    
+    <script src="~/Scripts/Language/ResourceMananger.js"></script>
+</body>
+</html>

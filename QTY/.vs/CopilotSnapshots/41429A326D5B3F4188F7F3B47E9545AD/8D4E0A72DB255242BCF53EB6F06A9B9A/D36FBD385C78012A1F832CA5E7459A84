@@ -1,0 +1,114 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý ca làm việc</title>
+    <link href="~/css/thuviencss/bootstrap5.3.min.css" rel="stylesheet" />
+    <link href="~/DevExtreme/dx.light.css" rel="stylesheet" />
+    <link href="~/DevExtreme/dx.common.css" rel="stylesheet" />
+    <link href="~/css/sweetalert2.min-11.6.0.css" rel="stylesheet" />
+    <style>
+        /* Ensure SweetAlert2 popups appear above other overlays on this page */
+        .swal2-container, .swal2-backdrop, .swal2-popup { z-index: 20050 !important; }
+    </style>
+    <style>
+        /* Use fonts that support Vietnamese glyphs */
+        body{font-family: Tahoma, 'Segoe UI', 'Noto Sans', Arial, sans-serif; background:#f4f6f9;margin:0;padding:8px; font-size:14px; color:#222}
+        .page-card{background:#fff;border-radius:6px;border:1px solid #dee2e6;padding:12px}
+        .page-title{font-weight:700;color:#1a1a2e;margin-bottom:12px;display:flex;align-items:center;font-size:16px}
+        .form-row{display:flex;gap:8px;align-items:end;margin-bottom:12px}
+        .form-row .form-group{flex:1;min-width:150px}
+        .btn{font-size:13px}
+        .detail-panel{margin-top:12px;padding:12px;border:1px solid #e9ecef;border-radius:6px;background:#fafbfd}
+        /* DevExtreme grid font adjustments */
+        .dx-datagrid-headers {
+            font-family: inherit !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: #495057 !important;
+        }
+        .dx-datagrid .dx-row {
+            font-family: inherit !important;
+            font-size: 13px !important;
+            color: #333 !important;
+        }
+        /* Smaller filter inputs inside grid */
+        .dx-datagrid-filter-row .dx-editor-cell input {
+            font-size: 13px !important;
+        }
+        /* layout for grids side-by-side without large gaps */
+        .grids-row{
+            display:flex;
+            gap:12px;
+            align-items:stretch;
+            margin-top:8px;
+        }
+        .grids-row .left-grid{
+            flex:1;
+            min-width:420px;
+        }
+        .grids-row .right-grid{
+            width:680px;
+            display:flex;
+            flex-direction:column;
+        }
+        /* remove extra internal margins of grid containers */
+        #gridShifts, #gridShiftDetails{width:100%;}
+    </style>
+</head>
+<body>
+    <div class="page-card">
+        <div class="page-title"><i class="fas fa-clock"></i>&nbsp;Quản lý ca làm việc</div>
+
+        <div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Ca</label>
+                    <!-- allow letters and numbers for CaLV -->
+                    <input id="inpCaLV" type="text" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Thời gian bắt đầu</label>
+                    <input id="inpTGBatDau" type="time" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Thời gian kết thúc</label>
+                    <input id="inpTGKetThuc" type="time" class="form-control" />
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <button id="btnCreateShift" class="btn btn-primary">Tạo ca</button>
+                    <button id="btnRefresh" class="btn btn-outline">Làm mới</button>
+                </div>
+            </div>
+
+
+            <div class="grids-row">
+                <div class="left-grid">
+                    <div id="gridShifts"></div>
+                </div>
+                <div class="right-grid">
+                    <div id="gridShiftDetails"></div>
+                </div>
+            </div>
+
+            <div class="detail-panel" id="detailInfo" style="display:none">
+                <div style="font-weight:600;margin-bottom:6px">Chi tiết khoảng thời gian được chọn</div>
+                <div id="detailFields">
+                    <!-- populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/DevExtreme/dx.all.js"></script>
+    <script src="~/Scripts/sweetalert2.min-11.6.0.js"></script>
+    <script src="~/Scripts/DKCa/shifts.js"></script>
+</body>
+</html>

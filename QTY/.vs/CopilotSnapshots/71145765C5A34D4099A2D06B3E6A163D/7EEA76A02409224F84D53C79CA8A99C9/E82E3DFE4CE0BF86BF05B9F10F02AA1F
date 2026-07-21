@@ -1,0 +1,274 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Thư viện ngôn ngữ</title>
+
+    <link href="~/css/thuviencss/fontawesome.pro.6.0.0.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/bootstrap5.3.min.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/toastr.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --clr-primary: #185FA5;
+            --clr-border: #dee2e6;
+            --clr-header-bg: #f8f9fa;
+        }
+
+        body {
+            background: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 13px;
+        }
+
+        .page-card {
+            background: #fff;
+            border-radius: 6px;
+            border: 1px solid var(--clr-border);
+            padding: 20px;
+            margin: 10px;
+        }
+
+        .page-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--clr-border);
+        }
+
+            .page-title i {
+                color: var(--clr-primary);
+                font-size: 18px;
+            }
+
+        .form-control, .form-select {
+            font-size: 13px;
+            border-radius: 4px;
+        }
+
+        .btn {
+            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--clr-primary);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: #A32D2D;
+            color: #fff;
+        }
+
+        .btn-success {
+            background: #1A7D3A;
+            color: #fff;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: #333;
+            border: 1px solid var(--clr-border);
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .badge-vi {
+            background: #e8effe;
+            color: #1a56db;
+        }
+
+        .badge-en {
+            background: #e6f9f3;
+            color: #0ea472;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        th {
+            background: var(--clr-header-bg);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        th, td {
+            border: 1px solid var(--clr-border);
+            padding: 6px 8px;
+            text-align: left;
+        }
+
+        .grid-container {
+            max-height: 331px;
+            overflow-y: auto;
+            border: 1px solid var(--clr-border);
+            border-radius: 4px;
+        }
+
+        .grid-container table {
+            margin-top: 0;
+        }
+
+        .input-group-custom {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-card">
+        <div class="page-title">
+            <i class="fas fa-language"></i> Thư viện ngôn ngữ
+            <button class="btn btn-sm btn-primary ms-auto" id="btnAddLangGlobal" style="font-size:12px"><i class="fas fa-plus"></i> Thêm ngôn ngữ mới</button>
+        </div>
+
+        <!-- PANEL NHẬP LIỆU -->
+        <div style="background: #f8f9fa; border: 1px solid var(--clr-border); border-radius: 6px; padding: 16px; margin-bottom: 16px;">
+            <div class="section-title"><i class="fas fa-plus-circle" style="color:var(--clr-primary)"></i> Thêm / Sửa từ khóa</div>
+            <div class="input-group-custom" style="margin-bottom:10px">
+                <div style="flex:1;min-width:200px">
+                    <label style="font-size:11px;font-weight:600;color:#6c757d;margin-bottom:2px">Resource Key</label>
+                    <input type="text" id="txtResourceKey" class="form-control" placeholder="VD: login.title, common.save, id_btn_save" />
+                </div>
+            </div>
+            <div style="border:1px solid var(--clr-border);border-radius:4px;overflow:hidden">
+                <div style="max-height:200px;overflow-y:auto">
+                <table style="margin:0;width:100%">
+                    <thead>
+                        <tr style="background:#eef1f5">
+                            <th style="width:160px;padding:6px 10px;font-size:11px;font-weight:600;color:#6c757d;border:none">Ngôn ngữ</th>
+                            <th style="padding:6px 10px;font-size:11px;font-weight:600;color:#6c757d;border:none">Giá trị dịch</th>
+                        </tr>
+                    </thead>
+                    <tbody id="langInputBody">
+                        <!-- Do JS render: tất cả ngôn ngữ từ DB -->
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:4px">
+                <button class="btn btn-success" id="btnSave"><i class="fas fa-save"></i> Lưu tất cả</button>
+                <button class="btn btn-outline" id="btnClear"><i class="fas fa-undo"></i> Làm mới</button>
+            </div>
+        </div>
+
+        <!-- PANEL TRA CỨU -->
+        <div style="margin-bottom: 12px;">
+            <div class="section-title"><i class="fas fa-search" style="color:var(--clr-primary)"></i> Tra cứu từ khóa</div>
+            <div class="input-group-custom">
+                <input type="text" id="txtSearch" class="form-control" placeholder="Nhập resource key cần tìm..." style="flex:2;min-width:200px" />
+                <button class="btn btn-primary" id="btnSearch"><i class="fas fa-search"></i> Tra cứu</button>
+                <button class="btn btn-outline" id="btnRefresh"><i class="fas fa-sync"></i> Tất cả</button>
+            </div>
+        </div>
+
+        <!-- GRID KẾT QUẢ -->
+        <div class="grid-container">
+            <table>
+                <thead id="tblHeader"></thead>
+                <tbody id="tblBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL QUẢN LÝ NGÔN NGỮ -->
+    <div id="modalAddLang" class="modal fade" tabindex="-1" style="display:none">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="border-radius:8px">
+                <div class="modal-header" style="padding:12px 16px;background:#f8f9fa;border-bottom:1px solid var(--clr-border)">
+                    <h6 class="modal-title" style="font-size:14px;font-weight:600"><i class="fas fa-globe" style="color:var(--clr-primary)"></i> Quản lý ngôn ngữ</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="padding:16px">
+                    <!-- Form thêm/sửa -->
+                    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-end;flex-wrap:wrap">
+                        <div style="flex:1;min-width:120px">
+                            <label style="font-size:11px;font-weight:600;color:#6c757d;margin-bottom:2px">Mã ngôn ngữ</label>
+                            <input type="text" id="txtNewLangCode" class="form-control" placeholder="VD: zh-CN" />
+                        </div>
+                        <div style="flex:1;min-width:140px">
+                            <label style="font-size:11px;font-weight:600;color:#6c757d;margin-bottom:2px">Tên ngôn ngữ</label>
+                            <input type="text" id="txtNewLangName" class="form-control" placeholder="VD: Chinese" />
+                        </div>
+                        <div style="flex:1;min-width:140px">
+                            <label style="font-size:11px;font-weight:600;color:#6c757d;margin-bottom:2px">Tên bản địa</label>
+                            <input type="text" id="txtNewNativeName" class="form-control" placeholder="VD: 中文" />
+                        </div>
+                        <div style="display:flex;gap:4px">
+                            <button class="btn btn-success" id="btnSaveNewLang" style="font-size:12px"><i class="fas fa-save"></i> Lưu</button>
+                            <button class="btn btn-outline" id="btnClearLangForm" style="font-size:12px"><i class="fas fa-undo"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Thanh filter + sắp xếp -->
+                    <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center">
+                        <input type="text" id="txtLangFilter" class="form-control" placeholder="Tìm kiếm ngôn ngữ..." style="flex:1;font-size:13px" />
+                        <select id="cbLangSort" style="font-size:12px;padding:4px 8px;border:1px solid #dee2e6;border-radius:4px;cursor:pointer">
+                            <option value="asc">A-Z</option>
+                            <option value="desc">Z-A</option>
+                        </select>
+                        <span id="langCount" style="font-size:12px;color:#999;white-space:nowrap"></span>
+                    </div>
+
+                    <!-- Danh sách ngôn ngữ -->
+                    <div style="max-height:260px;overflow-y:auto;border:1px solid var(--clr-border);border-radius:4px">
+                        <table style="margin:0;width:100%">
+                            <thead>
+                                <tr style="background:#eef1f5">
+                                    <th style="width:100px;padding:6px 8px;font-size:11px;font-weight:600;color:#6c757d;border:none">Mã</th>
+                                    <th style="padding:6px 8px;font-size:11px;font-weight:600;color:#6c757d;border:none">Tên ngôn ngữ</th>
+                                    <th style="padding:6px 8px;font-size:11px;font-weight:600;color:#6c757d;border:none">Tên bản địa</th>
+                                    <th style="width:80px;padding:6px 8px;font-size:11px;font-weight:600;color:#6c757d;border:none;text-align:center">Mặc định</th>
+                                    <th style="width:80px;padding:6px 8px;font-size:11px;font-weight:600;color:#6c757d;border:none;text-align:center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="langListBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding:10px 16px;border-top:1px solid var(--clr-border)">
+                    <button class="btn btn-outline" data-bs-dismiss="modal" style="font-size:12px">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/Scripts/thuvienjs/jquery.js"></script>
+    <script src="~/Scripts/thuvienjs/bootstrap5.3.bundle.min.js"></script>
+    <script src="~/Scripts/thuvienjs/toastr.min.js"></script>
+    <script src="~/Scripts/Language/ResourceMananger.js"></script>
+</body>
+</html>

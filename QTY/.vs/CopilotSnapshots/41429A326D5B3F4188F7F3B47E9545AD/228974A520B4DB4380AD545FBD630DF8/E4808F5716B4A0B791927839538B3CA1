@@ -1,0 +1,178 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý ca làm việc</title>
+    <link href="~/css/thuviencss/bootstrap5.3.min.css" rel="stylesheet" />
+    <link href="~/DevExtreme/dx.light.css" rel="stylesheet" />
+    <link href="~/DevExtreme/dx.common.css" rel="stylesheet" />
+    <style>
+        body{font-family: 'Segoe UI',sans-serif;background:#f4f6f9;margin:0;padding:12px}
+        .page-card{background:#fff;border-radius:6px;border:1px solid #dee2e6;padding:18px}
+        .page-title{font-weight:600;color:#1a1a2e;margin-bottom:12px;display:flex;align-items:center}
+        .form-row{display:flex;gap:8px;align-items:end;margin-bottom:12px}
+        .form-row .form-group{flex:1;min-width:150px}
+        .btn{font-size:13px}
+        .detail-panel{margin-top:12px;padding:12px;border:1px solid #e9ecef;border-radius:6px;background:#fafbfd}
+    </style>
+</head>
+<body>
+    <div class="page-card">
+        <div class="page-title"><i class="fas fa-clock"></i>&nbsp;Quản lý ca làm việc</div>
+
+        <div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>CaLV</label>
+                    <input id="inpCaLV" type="number" class="form-control" min="1" />
+                </div>
+                <div class="form-group">
+                    <label>Thời gian bắt đầu</label>
+                    <input id="inpTGBatDau" type="time" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Thời gian kết thúc</label>
+                    <input id="inpTGKetThuc" type="time" class="form-control" />
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <button id="btnCreateShift" class="btn btn-primary">Tạo ca</button>
+                    <button id="btnRefresh" class="btn btn-outline">Làm mới</button>
+                </div>
+            </div>
+
+            <div style="margin-top:8px">
+                <div id="gridShifts"></div>
+            </div>
+
+            <div style="margin-top:10px">
+                <div id="gridShiftDetails"></div>
+            </div>
+
+            <div class="detail-panel" id="detailInfo" style="display:none">
+                <div style="font-weight:600;margin-bottom:6px">Chi tiết khoảng thời gian được chọn</div>
+                <div id="detailFields">
+                    <!-- populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/DevExtreme/dx.all.js"></script>
+    <script>
+        $(function(){
+            var shifts = [];
+            var details = [];
+
+            var gridShifts = $("#gridShifts").dxDataGrid({
+                dataSource: shifts,
+                showBorders: true,
+                paging: { pageSize: 10 },
+                filterRow: { visible: true },
+                searchPanel: { visible: true, width: 240, placeholder: 'Tìm ca...' },
+                columns: [
+                    { caption: 'STT', dataField: 'STT', width: 70, allowFiltering:false },
+                    { caption: 'CaLV', dataField: 'CaLV', width: 90 },
+                    { caption: 'Thời gian bắt đầu', dataField: 'TGBatDau', dataType: 'string' },
+                    { caption: 'Thời gian kết thúc', dataField: 'TGKetThuc', dataType: 'string' }
+                ],
+                onRowClick: function(e){
+                    var caLV = e.data.CaLV;
+                    loadShiftDetails(caLV);
+                }
+            }).dxDataGrid('instance');
+
+            var gridDetails = $("#gridShiftDetails").dxDataGrid({
+                dataSource: details,
+                showBorders: true,
+                paging: { pageSize: 12 },
+                filterRow: { visible: true },
+                searchPanel: { visible: true, width: 240 },
+                columns: [
+                    { caption: 'STT', dataField: 'STT', width: 70, allowFiltering:false },
+                    { caption: 'TimeShiftID', dataField: 'TimeShiftID', width: 110 },
+                    { caption: 'Thời Gian', dataField: 'Name' },
+                    { caption: 'Số Phút', dataField: 'Minutes', width: 100 }
+                ],
+                onRowClick: function(e){
+                    showDetailInfo(e.data);
+                }
+            }).dxDataGrid('instance');
+
+            function renderSTT(list){
+                for(var i=0;i<list.length;i++){ list[i].STT = i+1; }
+                return list;
+            }
+
+            function loadShifts(){
+                $.getJSON('/Language/GetShifts')
+                    .done(function(data){
+                        shifts = renderSTT(data || []);
+                        gridShifts.option('dataSource', shifts);
+                    })
+                    .fail(function(){
+                        // fallback: keep empty
+                    });
+            }
+
+            function loadShiftDetails(caLV){
+                $.getJSON('/Language/GetShiftDetails', { caLV: caLV })
+                    .done(function(data){
+                        details = renderSTT(data || []);
+                        gridDetails.option('dataSource', details);
+                        $("#detailInfo").hide();
+                    })
+                    .fail(function(){
+                        details = [];
+                        gridDetails.option('dataSource', details);
+                    });
+            }
+
+            function showDetailInfo(item){
+                if(!item) return; 
+                var html = '<div>stt: ' + (item.STT||'') + '</div>' +
+                           '<div>timeShiftID: ' + (item.TimeShiftID||'') + '</div>' +
+                           '<div>Thời Gian (Name): ' + (item.Name||'') + '</div>' +
+                           '<div>Số Phút (Minutes): ' + (item.Minutes||'') + '</div>';
+                $("#detailFields").html(html);
+                $("#detailInfo").show();
+            }
+
+            $('#btnCreateShift').on('click', function(){
+                var CaLV = parseInt($('#inpCaLV').val(),10);
+                var TGBatDau = $('#inpTGBatDau').val();
+                var TGKetThuc = $('#inpTGKetThuc').val();
+                if(!CaLV || !TGBatDau || !TGKetThuc){ alert('Nhập đầy đủ CaLV, TGBatDau và TGKetThuc'); return; }
+
+                $.ajax({
+                    url: '/Language/CreateShift',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ CaLV: CaLV, TGBatDau: TGBatDau, TGKetThuc: TGKetThuc }),
+                    success: function(resp){
+                        // Expect server to return updated shifts list or at least success
+                        loadShifts();
+                        if(resp && resp.details){
+                            details = renderSTT(resp.details);
+                            gridDetails.option('dataSource', details);
+                        }
+                    },
+                    error: function(xhr){
+                        alert('Lỗi khi tạo ca: ' + (xhr.responseText || xhr.statusText));
+                    }
+                });
+            });
+
+            $('#btnRefresh').on('click', function(){ loadShifts(); });
+
+            // initial load
+            loadShifts();
+        });
+    </script>
+</body>
+</html>

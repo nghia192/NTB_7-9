@@ -1,0 +1,176 @@
+﻿$(function(){
+    var shifts = [];
+    var details = [];
+
+    var gridShifts = $("#gridShifts").dxDataGrid({
+        dataSource: shifts,
+        showBorders: true,
+        paging: { pageSize: 10 },
+        filterRow: { visible: true },
+        searchPanel: { visible: true, width: 240, placeholder: 'Tìm ca...' },
+        columns: [
+            { caption: 'STT', dataField: 'STT', width: 70, allowFiltering:false },
+            { caption: 'CaLV', dataField: 'CaLV', width: 90 },
+            { caption: 'Thời gian bắt đầu', dataField: 'TGBatDau', dataType: 'string' },
+            { caption: 'Thời gian kết thúc', dataField: 'TGKetThuc', dataType: 'string' }
+        ],
+        onRowClick: function(e){
+            var caLV = e.data.CaLV;
+            loadShiftDetails(caLV);
+        }
+    }).dxDataGrid('instance');
+
+    var selectedCaLV = null;
+
+    // details grid visible always
+    $("#gridShiftDetails").show();
+
+    var gridDetails = $("#gridShiftDetails").dxDataGrid({
+        dataSource: details,
+        showBorders: true,
+        paging: { pageSize: 12 },
+        filterRow: { visible: true },
+        searchPanel: { visible: true, width: 240 },
+        editing: {
+            mode: 'cell',
+            allowUpdating: true,
+            allowDeleting: false
+        },
+        columns: [
+            { caption: 'STT', dataField: 'STT', width: 70, allowFiltering:false, allowEditing: false },
+            { caption: 'TimeShiftID', dataField: 'TimeShiftID', width: 110, allowEditing: false },
+            { caption: 'Thời Gian', dataField: 'Name', allowEditing: true },
+            { caption: 'Số Phút', dataField: 'Minutes', width: 100, allowEditing: false },
+            { caption: '', width: 90, allowFiltering: false, allowSorting: false, allowEditing: false, cellTemplate: function(container, options){
+                    var btn = $('<button class="btn btn-sm btn-outline-danger">Xóa</button>');
+                    btn.on('click', function(){
+                        if(!selectedCaLV){ alert('Chưa chọn ca.'); return; }
+                        if(!confirm('Xóa khoảng thời gian ' + options.data.TimeShiftID + '?')) return;
+                        $.ajax({
+                            url: '/DKCa/DeleteShiftDetail',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ caLV: selectedCaLV, timeShiftID: options.data.TimeShiftID }),
+                            success: function(resp){
+                                if(resp && resp.details){
+                                    details = renderSTT(resp.details);
+                                    gridDetails.option('dataSource', details);
+                                } else {
+                                    loadShiftDetails(selectedCaLV);
+                                }
+                            },
+                            error: function(){ alert('Lỗi khi xóa.'); }
+                        });
+                    });
+                    $(container).append(btn);
+                }
+            }
+        ],
+        onRowClick: function(e){
+            showDetailInfo(e.data);
+        },
+        onEditingStart: function(e){
+            // prevent editing the first row start time (STT == 1)
+            if(e.data && e.data.STT === 1 && e.column && e.column.dataField === 'Name'){
+                e.cancel = true;
+            }
+        },
+        onRowUpdated: function(e){
+            // after cell edit saved, push update to server
+            if(!selectedCaLV) return;
+            var updated = e.key ? e.key : e.data;
+            var timeShiftID = e.data.TimeShiftID;
+            var newName = e.data.Name;
+            $.ajax({
+                url: '/DKCa/UpdateShiftName',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ CaLV: selectedCaLV, TimeShiftID: timeShiftID, NewName: newName }),
+                success: function(resp){
+                    if(resp && resp.details){
+                        details = renderSTT(resp.details);
+                        gridDetails.option('dataSource', details);
+                    } else {
+                        loadShiftDetails(selectedCaLV);
+                    }
+                },
+                error: function(){ alert('Lỗi khi lưu thay đổi.'); }
+            });
+        }
+    }).dxDataGrid('instance');
+
+    function renderSTT(list){
+        for(var i=0;i<list.length;i++){ list[i].STT = i+1; }
+        return list;
+    }
+
+    function loadShifts(){
+        $.getJSON('/DKCa/GetShifts')
+            .done(function(data){
+                shifts = renderSTT(data || []);
+                gridShifts.option('dataSource', shifts);
+            })
+            .fail(function(){
+                alert('Không thể tải danh sách ca. Kiểm tra kết nối server.');
+            });
+    }
+
+    function loadShiftDetails(caLV){
+        $.getJSON('/DKCa/GetShiftDetails', { caLV: caLV })
+            .done(function(data){
+                details = renderSTT(data || []);
+                gridDetails.option('dataSource', details);
+                $("#detailInfo").hide();
+            })
+            .fail(function(){
+                details = [];
+                gridDetails.option('dataSource', details);
+                alert('Không thể tải chi tiết ca.');
+            });
+    }
+
+    function showDetailInfo(item){
+        if(!item) return; 
+        var html = '<div>stt: ' + (item.STT||'') + '</div>' +
+                   '<div>timeShiftID: ' + (item.TimeShiftID||'') + '</div>' +
+                   '<div>Thời Gian (Name): ' + (item.Name||'') + '</div>' +
+                   '<div>Số Phút (Minutes): ' + (item.Minutes||'') + '</div>';
+        $("#detailFields").html(html);
+        $("#detailInfo").show();
+    }
+
+    $('#btnCreateShift').on('click', function(){
+        var CaLV = parseInt($('#inpCaLV').val(),10);
+        var TGBatDau = $('#inpTGBatDau').val();
+        var TGKetThuc = $('#inpTGKetThuc').val();
+        if(!CaLV || !TGBatDau || !TGKetThuc){ alert('Nhập đầy đủ CaLV, TGBatDau và TGKetThuc'); return; }
+
+            $.ajax({
+                url: '/DKCa/CreateShift',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ CaLV: CaLV, TGBatDau: TGBatDau, TGKetThuc: TGKetThuc }),
+                success: function(resp){
+                    if(resp && resp.success === false){
+                        alert('Lỗi: ' + (resp.error || 'Không thể tạo ca'));
+                        return;
+                    }
+                    loadShifts();
+                    if(resp && resp.details){
+                        details = renderSTT(resp.details);
+                        gridDetails.option('dataSource', details);
+                        $("#gridShiftDetails").show();
+                    }
+                },
+                error: function(xhr){
+                    var msg = xhr && xhr.responseText ? xhr.responseText : xhr.statusText;
+                    alert('Lỗi khi tạo ca: ' + msg);
+                }
+            });
+    });
+
+    $('#btnRefresh').on('click', function(){ loadShifts(); });
+
+    // initial load
+    loadShifts();
+});

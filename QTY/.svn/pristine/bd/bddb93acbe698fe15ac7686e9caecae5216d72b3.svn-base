@@ -1,0 +1,50 @@
+﻿using Newtonsoft.Json;
+using NtbSoft.ERP.Model.ThuVien;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using WebApplication.Entity;
+
+namespace NtbSoft.ERP.Web.Api.ThuVien
+{
+    [RoutePrefix("api/SYS_Login")]
+    public class SYS_LoginController : ApiController
+    {
+        [HttpGet]
+        [Route("Get")]
+        public string Get(string para1, string para2)
+        {
+            if (para1 == "" || para2 == "") return null;
+            DataTable dtTable = new SYS_LoginModel().Get();
+            string json = JsonConvert.SerializeObject(dtTable);
+            List<Login> login = JsonConvert.DeserializeObject<List<Login>>(json);
+            Login user = login.Where(x => x.UserName.ToLower() == para1.Trim().ToLower()).FirstOrDefault();
+            if (user == null) return "Tên đăng nhập không đúng";
+            else
+            {
+                MD5StringCrypt Md5Crypt = new MD5StringCrypt();
+                string deCrypt = Md5Crypt.Decrypt(user.Password, true);
+                if (deCrypt == para2) return "true";
+                else return null;
+            }
+        }
+        [HttpGet]
+        [Route("GetUserDashBoard")]
+        public DataTable GetUserDashBoard(string para1)
+        {
+            return new SYS_LoginModel().GetPhanQuyenUserWebDashBoard(para1);
+        }
+    }
+    public class Login
+    {
+        public string UserName { get; set; }
+        public string Password { get; set; }
+
+
+    }
+
+}

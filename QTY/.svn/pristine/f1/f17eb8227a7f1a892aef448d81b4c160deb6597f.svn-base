@@ -1,0 +1,858 @@
+﻿var userNameSave = localStorage.getItem("username1")
+let nhanVienList = [];
+let lineList = []
+let moduleList = [];
+let quyenLineList = [];
+let quyenModuleList = [];
+
+let currentNhanVienId = null;
+let dxGridNhanVien, dxGridLine, dxGridModule;
+let lineGridInited = false, moduleGridInited = false;
+
+//   TIỆN ÍCH DÙNG CHUNG
+function showToast(type, message, delay = 2500) {
+    let toastId, messageId;
+    switch (type) {
+        case 'success': toastId = 'successToast'; messageId = 'successMessage'; break;
+        case 'error': toastId = 'errorToast'; messageId = 'errorMessage'; break;
+        case 'warning': toastId = 'warningToast'; messageId = 'warningMessage'; break;
+        default: return;
+    }
+    $('#' + messageId).text(message);
+    const toastElement = $('#' + toastId)[0];
+    new bootstrap.Toast(toastElement, { autohide: true, delay: delay }).show();
+}
+
+function showConfirmModalXoa(onConfirm, message) {
+    $("#txtXacNhanXoa").text(message || "Bạn có chắc chắn muốn xóa mục này không?");
+    $('#btnXacNhanXoa').off('click').on('click', async function () {
+        if (typeof onConfirm === 'function') {
+            const result = await onConfirm();
+            if (result === false) return;
+        }
+        bootstrap.Modal.getInstance(document.getElementById("modalXacNhanXoa"))?.hide();
+    });
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("modalXacNhanXoa")).show();
+}
+
+function getInitials(fullName) {
+    if (!fullName) return "?";
+    let parts = fullName.trim().split(/\s+/);
+    return parts[parts.length - 1].charAt(0).toUpperCase();
+}
+
+// Lấy danh sách Line (dạng mảng string) mà 1 nhân viên đang được chọn
+function getLinesCuaNV(nvId) {
+    return quyenLineList.filter(x => x.UserID === nvId).map(x => x.Lines);
+}
+
+// Ghi đè lại toàn bộ danh sách Line đã chọn cho 1 nhân viên
+function setLinesCuaNV(nvId, lineIds) {
+    quyenLineList = quyenLineList.filter(x => x.UserID !== nvId);
+    lineIds.forEach(function (lineId) {
+        quyenLineList.push({ UserID: nvId, Lines: lineId });
+    });
+    console.log(3)
+}
+
+// Lấy (hoặc tạo mới nếu chưa có) dòng quyền Module của 1 nhân viên
+function getModuleQuyen(nvId, moduleId) {
+    let mQuyen = quyenModuleList.find(x => x.UserID === nvId && x.ModuleId === moduleId);
+    if (!mQuyen) {
+        mQuyen = { UserID: nvId, ModuleId: moduleId, Xem: 0, Sua: 0, Xoa: 0 };
+        quyenModuleList.push(mQuyen);
+    }
+    return mQuyen;
+}
+// Xóa toàn bộ phân quyền (cả Line lẫn Module) của 1 nhân viên
+function xoaPhanQuyenCuaNV(nvId) {
+    quyenLineList = quyenLineList.filter(x => x.UserID !== nvId);
+    quyenModuleList = quyenModuleList.filter(x => x.UserID !== nvId);
+}
+function headerCheckAllTemplate(field, caption) {
+    return function (container, options) {
+        const $wrap = $('<div class="d-flex flex-column align-items-center gap-1"></div>');
+        const $label = $('<div></div>').text(caption);
+        const $chk = $('<input type="checkbox" class="form-check-input perm-check-all" title="Chọn nhanh tất cả">');
+        $wrap.append($label).append($chk);
+        container.append($wrap);
+
+        function refreshState() {
+            if (currentNhanVienId == null || moduleList.length === 0) {
+                $chk.prop("checked", false);
+                $chk.prop("indeterminate", false);
+                return;
+            }
+            let total = moduleList.length;
+            let soDaChon = moduleList.filter(function (m) {
+                return getModuleQuyen(currentNhanVienId, m.ModuleId)[field] === 1;
+            }).length;
+            $chk.prop("checked", soDaChon === total);
+            $chk.prop("indeterminate", soDaChon > 0 && soDaChon < total);
+        }
+        refreshState();
+
+        $chk.on("change", function () {
+            if (currentNhanVienId == null) {
+                showToast("warning", "Vui lòng chọn nhân viên trước!");
+                $chk.prop("checked", false);
+                return;
+            }
+            let checked = $(this).is(":checked") ? 1 : 0;
+            moduleList.forEach(function (m) {
+                getModuleQuyen(currentNhanVienId, m.ModuleId)[field] = checked;
+            });
+            dxGridModule.refresh();
+            savePhanQuyenModule()
+        });
+    };
+}
+//   GRID: DANH SÁCH NHÂN VIÊN
+function GetDanhSachNhanVien(data) {
+    let grid = $("#gridNhanVien").data("dxDataGrid");
+    if (grid) {
+        grid.option("dataSource", data);
+        grid.refresh();
+        return;
+    }
+    dxGridNhanVien = $("#gridNhanVien").dxDataGrid({
+        dataSource: data,
+        columnAutoWidth: true,
+        wordWrapEnabled: true,
+        showRowLines: true,
+        showBorders: true,
+        noDataText: "Chưa có nhân viên",
+        width: "100%",
+        scrolling: { mode: 'standard' },
+        filterRow: { visible: true },
+        headerFilter: { visible: false },
+        paging: { enabled: false },
+        renderAsync: false,
+        loadPanel: { enabled: true, text: "Đang tải dữ liệu...", showIndicator: true, showPane: true },
+        onCellPrepared: function (e) {
+            if (e.rowType === "header") $(e.cellElement).addClass("col-header");
+            if (e.rowType === "data") $(e.cellElement).addClass("text-center");
+        },
+        onRowClick: function (e) {
+            chonNhanVien(e.data);
+        },
+        onRowPrepared: function (e) {
+            if (e.rowType === "data" && e.data.UserID === currentNhanVienId) {
+                $(e.rowElement).addClass("nv-row-selected");
+            }
+        },
+        columns: [
+            {
+                caption: "STT",
+                alignment: "center",
+                width: 45,
+                allowFiltering: false,
+                allowSorting: false,
+                cellTemplate: function (container, options) {
+                    container.text(options.rowIndex + 1);
+                }
+            },
+            {
+                caption: "Họ tên",
+                dataField: "FullName",
+                minWidth: 130,
+                alignment: "left"
+            },
+            {
+                caption: "Tài khoản",
+                dataField: "UserName",
+                minWidth: 110,
+                alignment: "center"
+            },
+            {
+                caption: "Trạng thái",
+                dataField: "TrangThai",
+                width: 90,
+                alignment: "center",
+                visible: false,
+                cellTemplate: function (container, options) {
+                    let active = options.data.TrangThai === 1;
+                    $('<span></span>')
+                        .addClass(active ? "badge-trangthai-active" : "badge-trangthai-inactive")
+                        .text(active ? "Đang hoạt động" : "Ngừng")
+                        .appendTo(container);
+                }
+            },
+            {
+                type: "buttons",
+                caption: "",
+                width: 90,
+                alignment: "center",
+                buttons: [
+                    {
+                        hint: "Đổi tên",
+                        template: function (cellElement, cellInfo) {
+                            if (cellInfo.row.data.UserName?.toLowerCase() === "admin") return;
+                            $("<a>")
+                                .addClass("btn-icon-only me-3")
+                                .attr("title", "Đổi tên")
+                                .html('<i class="fa-solid fa-user-pen" style="color:#33629C"></i>')
+                                .appendTo(cellElement)
+                                .on("click", function (ev) {
+                                    ev.stopPropagation();
+                                    chonNhanVien(cellInfo.row.data);
+                                    moModalDoiTen(cellInfo.row.data);
+                                });
+                        }
+                    },
+                    {
+                        hint: "Đổi mật khẩu",
+                        template: function (cellElement, cellInfo) {
+                            if (cellInfo.row.data.UserName?.toLowerCase() === "admin") {
+                                return;
+                            }
+                            $("<a>")
+                                .addClass("text-primary btn-icon-only me-3")
+                                .attr("title", "Đổi mật khẩu")
+                                .html('<i class="fa-solid fa-key"></i>')
+                                .appendTo(cellElement)
+                                .on("click", function (ev) {
+                                    ev.stopPropagation();
+                                    chonNhanVien(cellInfo.row.data);   // ✅ chọn đúng row đang bấm
+                                    moNhanVienDoiMatKhau(cellInfo.row.data);
+                                });
+                        }
+                    },
+                    {
+                        hint: "Xóa nhân viên",
+                        template: function (cellElement, cellInfo) {
+                            if (cellInfo.row.data.UserName?.toLowerCase() === "admin") {
+                                return;
+                            }
+                            $("<a>")
+                                .addClass("text-danger btn-icon-only")
+                                .attr("title", "Xóa nhân viên")
+                                .html('<i class="fa-solid fa-trash"></i>')
+                                .appendTo(cellElement)
+                                .on("click", async function (ev) {
+                                    ev.stopPropagation();
+                                    chonNhanVien(cellInfo.row.data);   // ✅ chọn đúng row đang bấm
+                                    showConfirmModalXoa(async function () {
+                                        console.log(cellInfo.row.data.UserID)
+                                        nhanVienList = nhanVienList.filter(x => x.UserID !== cellInfo.row.data.UserID);
+                                        xoaPhanQuyenCuaNV(cellInfo.row.data.UserID);
+                                        if (currentNhanVienId === cellInfo.row.data.UserID) {
+                                            currentNhanVienId = null;
+                                            capNhatThanhPhanNhanVienDangChon(null);
+                                        }
+                                        const saveNV = [{
+                                            UserId: "",
+                                            FullName: "",
+                                            UserName: cellInfo.row.data.UserID,
+                                            Password: "",
+                                            TrangThai: 1
+                                        }];
+                                        const checkSave = await ApiSaveUser(saveNV, 'DeleteUser')
+                                        if (checkSave != "True") return
+                                        showToast("success", "Xóa tài khoản thành công");
+
+                                        dxGridNhanVien.option("dataSource", nhanVienList);
+                                        return true;
+                                    }, `Bạn có chắc chắn muốn xóa nhân viên "${cellInfo.row.data.FullName || ''}" không?`);
+                                });
+                        }
+                    }
+                ]
+            }
+        ]
+    }).dxDataGrid("instance");
+    $("#Layer_1").click()
+}
+async function savePhanQuyenLine() {
+    if (currentNhanVienId == null) {
+        showToast("warning", "Vui lòng chọn nhân viên cần phân quyền!");
+        return;
+    }
+    let linesCuaNV = quyenLineList.filter(x => x.UserID === currentNhanVienId);
+    let arrSaveLines = linesCuaNV.map(x => ({
+        UserID: x.UserID,
+        Module: x.Lines,
+        IsView: 1,
+        IsEdit: 1,
+        IsDelete: 1
+    }));
+
+    if (arrSaveLines.length == 0) {
+        arrSaveLines = [{
+            UserID: currentNhanVienId,
+            Module: "",
+            IsView: 1,
+            IsEdit: 1,
+            IsDelete: 1
+        }]
+    }
+
+    const checkSaveLines = await ApiSaveUser(arrSaveLines, 'UpdatePhanQuyenLine', 'PostPQ')
+    if (checkSaveLines != "True") return
+
+    showToast("success", "Lưu phân quyền thành công");
+}
+async function savePhanQuyenModule() {
+    if (currentNhanVienId == null) {
+        showToast("warning", "Vui lòng chọn nhân viên cần phân quyền!");
+        return;
+    }
+    let modulesCuaNV = quyenModuleList.filter(x => x.UserID === currentNhanVienId);
+
+
+    let arrSaveModules = modulesCuaNV.map(x => ({
+        UserID: x.UserID,
+        Module: x.ModuleId,
+        IsView: x.Xem,
+        IsEdit: x.Sua,
+        IsDelete: x.Xoa
+    }));
+
+    if (arrSaveModules.length == 0) {
+        arrSaveModules = [{
+            UserID: currentNhanVienId,
+            Module: "",
+            IsView: 1,
+            IsEdit: 1,
+            IsDelete: 1
+        }]
+    }
+    const checkSaveMoudules = await ApiSaveUser(arrSaveModules, 'UpdatePhanQuyenModule', 'PostPQ')
+    if (checkSaveMoudules != "True") return
+    showToast("success", "Lưu phân quyền thành công");
+}
+function moNhanVienDoiMatKhau(nv) {
+    $("#doiMatKhauNvId").val(nv.UserID);
+    $("#doiMatKhauSubtitle").text("Nhân viên: " + nv.FullName + " (" + nv.UserName + ")");
+
+    $("#inpMatKhauCu").val("");
+    $("#inpMatKhauMoi").val("");
+    $("#inpMatKhauMoiLai").val("");
+    $("#modalDoiMatKhau .toggle-pass i").removeClass("fa-eye-slash").addClass("fa-eye");
+    $("#inpMatKhauCu, #inpMatKhauMoi, #inpMatKhauMoiLai").attr("type", "password");
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("modalDoiMatKhau")).show();
+}
+
+//   CHỌN NHÂN VIÊN ĐỂ PHÂN QUYỀN
+function chonNhanVien(nv) {
+    currentNhanVienId = nv.UserID;
+    capNhatThanhPhanNhanVienDangChon(nv);
+    dxGridNhanVien.refresh();
+
+    $("#btnLuuPhanQuyen").prop("disabled", false);
+
+    // Nạp lại danh sách Line đã chọn
+    if (!lineGridInited) {
+        GetDanhSachLinePhanQuyen(lineList);
+        lineGridInited = true;
+    }
+    dxGridLine.selectRows(getLinesCuaNV(nv.UserID), false);
+
+    // Nạp lại quyền Module
+    if (!moduleGridInited) {
+        GetDanhSachModulePhanQuyen(moduleList);
+        moduleGridInited = true;
+    } else {
+        dxGridModule.repaint();
+    }
+
+}
+
+function capNhatThanhPhanNhanVienDangChon(nv) {
+    if (!nv) {
+        $("#currentNvAvt").text("?");
+        $("#currentNvName").text("Chưa chọn nhân viên");
+        $("#currentNvUser").text("Vui lòng chọn 1 nhân viên bên trái để phân quyền");
+        return;
+    }
+    $("#currentNvAvt").text(getInitials(nv.FullName));
+    $("#currentNvName").text(nv.FullName);
+    $("#currentNvUser").text("Tài khoản: " + nv.UserName);
+}
+
+
+//   TAB 1: GRID CHỌN LINE (chọn nhiều bằng checkbox)
+function GetDanhSachLinePhanQuyen(data) {
+    let grid = $("#gridLinePhanQuyen").data("dxDataGrid");
+    if (grid) {
+        grid.option("dataSource", data);
+        grid.refresh();
+        return;
+    }
+    dxGridLine = $("#gridLinePhanQuyen").dxDataGrid({
+        dataSource: data,
+        keyExpr: "Line_ID",
+        columnAutoWidth: true,
+        wordWrapEnabled: true,
+        showRowLines: true,
+        showBorders: true,
+        noDataText: "Chưa có line",
+        width: "100%",
+        scrolling: { mode: 'standard' },
+        filterRow: { visible: true },
+        headerFilter: { visible: false },
+        paging: { enabled: false },
+        renderAsync: false,
+        selection: { mode: "multiple", showCheckBoxesMode: "always" },
+        loadPanel: { enabled: true, text: "Đang tải dữ liệu...", showIndicator: true, showPane: true },
+
+        onContentReady: function (e) {
+            $(e.element).find(".dx-checkbox, .dx-data-row")
+                .off("click.userSelect")
+                .on("click.userSelect", function () {
+                    userInteracting = true;
+                    setTimeout(() => userInteracting = false, 200);
+                });
+        },
+        onCellPrepared: function (e) {
+            if (e.rowType === "header") $(e.cellElement).addClass("col-header");
+        },
+        onSelectionChanged: function (e) {
+            if (currentNhanVienId == null) return;
+            setLinesCuaNV(currentNhanVienId, e.selectedRowKeys);
+
+        },
+        columns: [
+            {
+                caption: "STT",
+                alignment: "center",
+                width: 50,
+                allowFiltering: false,
+                allowSorting: false,
+                cellTemplate: function (container, options) {
+                    container.text(options.rowIndex + 1);
+                }
+            },
+            {
+                caption: "Line ID",
+                dataField: "Line_ID",
+                width: 150,
+                alignment: "center"
+            },
+            {
+                caption: "Line Name",
+                dataField: "Line_Name",
+                minWidth: 150,
+                alignment: "left"
+            }
+        ]
+    }).dxDataGrid("instance");
+
+}
+
+//   TAB 2: GRID MODULE - QUYỀN XEM / SỬA / XÓA
+function taoCheckboxQuyen(container, checked, onChange) {
+    const $wrap = $('<div class="d-flex justify-content-center"></div>');
+    const $chk = $('<input type="checkbox" class="form-check-input perm-check">');
+    $chk.prop("checked", !!checked);
+    $chk.on("change", function () {
+        onChange($(this).is(":checked"));
+        savePhanQuyenModule()
+    });
+    $wrap.append($chk);
+    container.append($wrap);
+}
+
+function GetDanhSachModulePhanQuyen(data) {
+    let grid = $("#gridModulePhanQuyen").data("dxDataGrid");
+    if (grid) {
+        grid.option("dataSource", data);
+        grid.refresh();
+        return;
+    }
+    dxGridModule = $("#gridModulePhanQuyen").dxDataGrid({
+        dataSource: data,
+        keyExpr: "ModuleId",
+        columnAutoWidth: true,
+        wordWrapEnabled: true,
+        showRowLines: true,
+        showBorders: true,
+        noDataText: "Chưa có module",
+        width: "100%",
+        scrolling: { mode: 'standard' },
+        filterRow: { visible: true },
+        headerFilter: { visible: false },
+        paging: { enabled: false },
+        renderAsync: false,
+        loadPanel: { enabled: true, text: "Đang tải dữ liệu...", showIndicator: true, showPane: true },
+        onCellPrepared: function (e) {
+            if (e.rowType === "header") $(e.cellElement).addClass("col-header");
+            if (e.rowType === "data") $(e.cellElement).addClass("text-center");
+        },
+        columns: [
+            {
+                caption: "STT",
+                alignment: "center",
+                width: 50,
+                allowFiltering: false,
+                allowSorting: false,
+                cellTemplate: function (container, options) {
+                    container.text(options.rowIndex + 1);
+                }
+            },
+            {
+                caption: "Module",
+                dataField: "ModuleName",
+                minWidth: 180,
+                alignment: "left",
+                cssClass: "text-left"
+            },
+            {
+                caption: "Xem",
+                width: 80,
+                alignment: "center",
+                allowFiltering: false,
+                headerCellTemplate: headerCheckAllTemplate("Xem", "Xem"),
+                cellTemplate: function (container, options) {
+                    let mQuyen = getModuleQuyen(currentNhanVienId, options.data.ModuleId);
+                    taoCheckboxQuyen(container, mQuyen.Xem === 1, function (checked) {
+                        mQuyen.Xem = checked ? 1 : 0;
+                    });
+                }
+            },
+            {
+                caption: "Sửa",
+                width: 80,
+                alignment: "center",
+                allowFiltering: false,
+                headerCellTemplate: headerCheckAllTemplate("Sua", "Sửa"),
+                cellTemplate: function (container, options) {
+                    let mQuyen = getModuleQuyen(currentNhanVienId, options.data.ModuleId);
+                    taoCheckboxQuyen(container, mQuyen.Sua === 1, function (checked) {
+                        mQuyen.Sua = checked ? 1 : 0;
+                    });
+                }
+            },
+            {
+                caption: "Xóa",
+                width: 80,
+                alignment: "center",
+                allowFiltering: false,
+                headerCellTemplate: headerCheckAllTemplate("Xoa", "Xóa"),
+                cellTemplate: function (container, options) {
+                    let mQuyen = getModuleQuyen(currentNhanVienId, options.data.ModuleId);
+                    taoCheckboxQuyen(container, mQuyen.Xoa === 1, function (checked) {
+                        mQuyen.Xoa = checked ? 1 : 0;
+                    });
+                }
+            }
+        ]
+    }).dxDataGrid("instance");
+}
+
+//   MODAL: TẠO NHÂN VIÊN
+function resetFormNhanVien() {
+    $("#inpFullName").val("");
+    $("#inpUserName").val("");
+    $("#inpPassword").val("");
+    $("#inpRePassword").val("");
+    $(".toggle-pass i").removeClass("fa-eye-slash").addClass("fa-eye");
+    $("#inpPassword, #inpRePassword").attr("type", "password");
+}
+
+async function SaveNhanVien() {
+    let fullName = $("#inpFullName").val().trim();
+    let userName = $("#inpUserName").val().trim();
+    let password = $("#inpPassword").val();
+    let rePassword = $("#inpRePassword").val();
+
+    if (!fullName) {
+        showToast("warning", "Vui lòng nhập Họ và tên!");
+        return;
+    }
+    if (!userName) {
+        showToast("warning", "Vui lòng nhập Tài khoản!");
+        return;
+    }
+    if (/\s/.test(userName)) {
+        showToast("warning", "Tài khoản không được chứa khoảng trắng!");
+        return;
+    }
+    let trung = nhanVienList.some(x => (x.UserName || "").toLowerCase() === userName.toLowerCase());
+    if (trung) {
+        showToast("warning", `Tài khoản "${userName}" đã tồn tại!`);
+        return;
+    }
+  
+    if (password !== rePassword) {
+        showToast("warning", "Mật khẩu nhập lại không khớp!");
+        return;
+    }
+    let newId = nhanVienList.length ? Math.max(...nhanVienList.map(x => x.UserId)) + 1 : 1;
+
+    const saveNV = [{
+        UserId: newId,
+        FullName: fullName,
+        UserName: userName,
+        Password: password, // TODO: gửi lên API để hash ở server, không lưu plaintext
+        TrangThai: 1
+    }];
+    const checkSave = await ApiSaveUser(saveNV, 'PostUser')
+    if (checkSave != "True") return
+    nhanVienList.push({
+        UserId: newId,
+        FullName: fullName,
+        UserName: userName,
+        Password: password, // TODO: gửi lên API để hash ở server, không lưu plaintext
+        TrangThai: 1
+    });
+    showToast("success", "Tạo nhân viên thành công");
+    dxGridNhanVien.option("dataSource", nhanVienList);
+    bootstrap.Modal.getInstance(document.getElementById("modalTaoNhanVien")).hide();
+}
+
+async function SaveDoiMatKhau() {
+    let nvId = parseInt($("#doiMatKhauNvId").val(), 10);
+    let matKhauCu = $("#inpMatKhauCu").val();
+    let matKhauMoi = $("#inpMatKhauMoi").val();
+    let matKhauMoiLai = $("#inpMatKhauMoiLai").val();
+
+    let nv = nhanVienList.find(x => x.UserID === currentNhanVienId);
+    if (!nv) {
+        showToast("error", "Không tìm thấy nhân viên!");
+        return;
+    }
+
+    if (!matKhauCu) {
+        showToast("warning", "Vui lòng nhập mật khẩu cũ!");
+        return;
+    }
+    const checkMK = await GetCheckUser(currentNhanVienId, matKhauCu)
+    if (!checkMK) {
+        showToast("warning", "Mật khẩu cũ không đúng!");
+        return;
+    }
+
+
+    if (matKhauMoi !== matKhauMoiLai) {
+        showToast("warning", "Mật khẩu mới nhập lại không khớp!");
+        return;
+    }
+
+    if (matKhauMoi === matKhauCu) {
+        showToast("warning", "Mật khẩu mới phải khác mật khẩu cũ!");
+        return;
+    }
+
+    const saveNV = [{
+        UserId: "",
+        FullName: "",
+        UserName: currentNhanVienId,
+        Password: matKhauMoi,
+        TrangThai: 1
+    }];
+    const checkSave = await ApiSaveUser(saveNV, 'UpdateUser')
+    if (checkSave != "True") return
+    showToast("success", "Đổi mật khẩu thành công");
+    bootstrap.Modal.getInstance(document.getElementById("modalDoiMatKhau")).hide();
+}
+function moModalDoiTen(nv) {
+    $("#doiTenNvId").val(nv.UserID);
+    $("#doiTenSubtitle").text("Nhân viên: " + nv.FullName + " (" + nv.UserName + ")");
+
+    // ✅ Hiển thị tên cũ
+    $("#inpFullNameCu").val(nv.FullName);
+
+    // ✅ Reset tên mới
+    $("#inpFullNameMoi").val("");
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("modalDoiTen")).show();
+
+    // ✅ Focus vào input mới
+    setTimeout(() => $("#inpFullNameMoi").focus(), 300);
+}
+
+async function SaveDoiTen() {
+    let nvId = $("#doiTenNvId").val();
+    let fullNameCu = $("#inpFullNameCu").val().trim();
+    let fullNameMoi = $("#inpFullNameMoi").val().trim();
+
+    if (!fullNameMoi) {
+        showToast("warning", "Vui lòng nhập họ và tên mới!");
+        return;
+    }
+
+    if (fullNameMoi === fullNameCu) {
+        showToast("warning", "Họ và tên mới phải khác họ và tên cũ!");
+        return;
+    }
+
+    const saveNV = [{
+        UserId: "",
+        FullName: fullNameMoi,
+        UserName: nvId,
+        Password: "",
+        TrangThai: 1
+    }];
+
+    const checkSave = await ApiSaveUser(saveNV, 'UpdateFullName');
+    if (checkSave != "True") return;
+
+    // ✅ Cập nhật local list
+    let nv = nhanVienList.find(x => x.UserID === nvId);
+    if (nv) nv.FullName = fullNameMoi;
+
+    showToast("success", "Đổi tên thành công!");
+
+    // ✅ Cập nhật bar nhân viên đang chọn
+    if (currentNhanVienId === nvId) {
+        $("#currentNvName").text(fullNameMoi);
+        $("#currentNvAvt").text(getInitials(fullNameMoi));
+    }
+
+    dxGridNhanVien.option("dataSource", nhanVienList);
+    bootstrap.Modal.getInstance(document.getElementById("modalDoiTen")).hide();
+}
+$(function () {
+    GetListLine()
+    $("#btnLuuDoiTen").on("click", async function () {
+        await SaveDoiTen();
+    });
+    $('#tab-line-btn').on('shown.bs.tab', function () {
+        if (dxGridLine) dxGridLine.updateDimensions();
+    });
+    $('#tab-module-btn').on('shown.bs.tab', function () {
+        if (dxGridModule) dxGridModule.updateDimensions();
+    });
+    $("#btnLuuNhanVien").on("click", async function () {
+        SaveNhanVien()
+    });
+    $("#btnLuuDoiMatKhau").on("click", async function () {
+        SaveDoiMatKhau()
+    });
+    $("#btnTaoNhanVien").on("click", function () {
+        resetFormNhanVien();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("modalTaoNhanVien")).show();
+    });
+
+    $(document).on("click", "#gridLinePhanQuyen .dx-command-select", function () {
+        savePhanQuyenLine()
+    });
+
+    // Toggle hiện/ẩn mật khẩu
+    $(document).on("click", ".toggle-pass", function () {
+        let targetId = $(this).data("target");
+        let $input = $("#" + targetId);
+        let $icon = $(this).find("i");
+        if ($input.attr("type") === "password") {
+            $input.attr("type", "text");
+            $icon.removeClass("fa-eye").addClass("fa-eye-slash");
+        } else {
+            $input.attr("type", "password");
+            $icon.removeClass("fa-eye-slash").addClass("fa-eye");
+        }
+    });
+});
+
+async function ApiSaveUser(arrSave, action, router = "SaveUser") {
+    try {
+        const request = new Request(`/api/ERP_DicUser/${router}?action=${action}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(arrSave),
+        });
+        let response = await fetch(request)
+        let data = await response.json()
+        if (data == "True")
+            return data
+    } catch (err) {
+        console.error(err)
+        showToast("error", "Lưu thất bại")
+        return false;
+    }
+
+}
+async function GetCheckUser(userName, password) {
+    var url = `/api/ERP_DicUser/GetUserName?action=GetUserName&para1=${userName}&para2=${password}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        var data = await response.json();
+        if (data.length > 0) return true
+        else return false
+
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+async function GetListUser() {
+    var url = `/api/ERP_DicUser/Get?action=GetUser`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        var data = await response.json();
+        if (userNameSave.toUpperCase() != "ADMIN")
+            data = data.filter(x => x.UserID.toUpperCase() != "ADMIN")
+
+        nhanVienList = data
+        GetDanhSachNhanVien(nhanVienList);
+        if (nhanVienList.length > 0) {
+            chonNhanVien(nhanVienList[0]);
+        }
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+async function GetListLine() {
+    var url = `/api/ERP_DicUser/Get?action=GetLine`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        var data = await response.json();
+        lineList = data
+        await GetListModule()
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+async function GetListModule() {
+    var url = `/api/ERP_DicUser/Get?action=GetModule`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        var data = await response.json();
+        moduleList = data
+        GetPQLine()
+        GetPQModule()
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+async function GetPQLine() {
+    var url = `/api/ERP_DicUser/Get?action=GetPhanQuyenLine`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        var data = await response.json();
+        quyenLineList = data
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+async function GetPQModule() {
+    var url = `/api/ERP_DicUser/Get?action=GetPhanQuyenModule`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        var data = await response.json();
+        quyenModuleList = data
+        await GetListUser()
+    } catch (error) {
+        console.error(error.message);
+    }
+}

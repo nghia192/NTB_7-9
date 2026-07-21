@@ -1,0 +1,190 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|c:\\users\\public\\downloads\\qty1\\qty\\ntbsoft.erp.web\\api\\thuvien\\dkcacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|solutionrelative:ntbsoft.erp.web\\api\\thuvien\\dkcacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|c:\\users\\public\\downloads\\qty1\\qty\\ntbsoft.erp.web\\scripts\\dkca\\shifts.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|solutionrelative:ntbsoft.erp.web\\scripts\\dkca\\shifts.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|c:\\users\\public\\downloads\\qty1\\qty\\ntbsoft.erp.entity\\system\\shiftdetailmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|solutionrelative:ntbsoft.erp.entity\\system\\shiftdetailmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|c:\\users\\public\\downloads\\qty1\\qty\\ntbsoft.erp.entity\\system\\shiftmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|solutionrelative:ntbsoft.erp.entity\\system\\shiftmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|c:\\users\\public\\downloads\\qty1\\qty\\ntbsoft.erp.entity\\system\\deleteshiftdetailrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|solutionrelative:ntbsoft.erp.entity\\system\\deleteshiftdetailrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|c:\\users\\public\\downloads\\qty1\\qty\\ntbsoft.erp.entity\\system\\addshiftdetailrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|solutionrelative:ntbsoft.erp.entity\\system\\addshiftdetailrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|c:\\users\\public\\downloads\\qty1\\qty\\ntbsoft.erp.entity\\system\\createshiftrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|solutionrelative:ntbsoft.erp.entity\\system\\createshiftrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28091866-5EDA-4578-BF37-368867311A16}|NtbSoft.ERP.Libs\\NtbSoft.ERP.Libs.csproj|c:\\users\\public\\downloads\\qty1\\qty\\ntbsoft.erp.libs\\clsconvert.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28091866-5EDA-4578-BF37-368867311A16}|NtbSoft.ERP.Libs\\NtbSoft.ERP.Libs.csproj|solutionrelative:ntbsoft.erp.libs\\clsconvert.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|C:\\Users\\Public\\Downloads\\QTY1\\QTY\\ntbsoft.erp.web\\views\\dkca\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|solutionrelative:ntbsoft.erp.web\\views\\dkca\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|C:\\Users\\Public\\Downloads\\QTY1\\QTY\\ntbsoft.erp.web\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|solutionrelative:ntbsoft.erp.web\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 8,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "shifts.js",
+              "DocumentMoniker": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Web\\Scripts\\DKCa\\shifts.js",
+              "RelativeDocumentMoniker": "NtbSoft.ERP.Web\\Scripts\\DKCa\\shifts.js",
+              "ToolTip": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Web\\Scripts\\DKCa\\shifts.js",
+              "RelativeToolTip": "NtbSoft.ERP.Web\\Scripts\\DKCa\\shifts.js",
+              "ViewState": "AgIAANcAAACAmZmZmVk2wIQAAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-07-20T06:09:33.779Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AddShiftDetailRequest.cs",
+              "DocumentMoniker": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\AddShiftDetailRequest.cs",
+              "RelativeDocumentMoniker": "NtbSoft.ERP.Entity\\SYSTEM\\AddShiftDetailRequest.cs",
+              "ToolTip": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\AddShiftDetailRequest.cs",
+              "RelativeToolTip": "NtbSoft.ERP.Entity\\SYSTEM\\AddShiftDetailRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-21T07:36:37.674Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "CreateShiftRequest.cs",
+              "DocumentMoniker": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\CreateShiftRequest.cs",
+              "RelativeDocumentMoniker": "NtbSoft.ERP.Entity\\SYSTEM\\CreateShiftRequest.cs",
+              "ToolTip": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\CreateShiftRequest.cs",
+              "RelativeToolTip": "NtbSoft.ERP.Entity\\SYSTEM\\CreateShiftRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-21T07:36:33.179Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "DeleteShiftDetailRequest.cs",
+              "DocumentMoniker": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\DeleteShiftDetailRequest.cs",
+              "RelativeDocumentMoniker": "NtbSoft.ERP.Entity\\SYSTEM\\DeleteShiftDetailRequest.cs",
+              "ToolTip": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\DeleteShiftDetailRequest.cs",
+              "RelativeToolTip": "NtbSoft.ERP.Entity\\SYSTEM\\DeleteShiftDetailRequest.cs",
+              "ViewState": "AgIAAAEAAACQmZmZmZkuwAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-21T07:36:26.761Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ShiftDetailModel.cs",
+              "DocumentMoniker": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\ShiftDetailModel.cs",
+              "RelativeDocumentMoniker": "NtbSoft.ERP.Entity\\SYSTEM\\ShiftDetailModel.cs",
+              "ToolTip": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\ShiftDetailModel.cs",
+              "RelativeToolTip": "NtbSoft.ERP.Entity\\SYSTEM\\ShiftDetailModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-21T07:36:11.787Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ShiftModel.cs",
+              "DocumentMoniker": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\ShiftModel.cs",
+              "RelativeDocumentMoniker": "NtbSoft.ERP.Entity\\SYSTEM\\ShiftModel.cs",
+              "ToolTip": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\ShiftModel.cs",
+              "RelativeToolTip": "NtbSoft.ERP.Entity\\SYSTEM\\ShiftModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-21T07:35:30.877Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "clsConvert.cs",
+              "DocumentMoniker": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Libs\\clsConvert.cs",
+              "RelativeDocumentMoniker": "NtbSoft.ERP.Libs\\clsConvert.cs",
+              "ToolTip": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Libs\\clsConvert.cs",
+              "RelativeToolTip": "NtbSoft.ERP.Libs\\clsConvert.cs",
+              "ViewState": "AgIAACwAAACAMTMzM3MqwDkAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-21T07:24:40.987Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Web\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "NtbSoft.ERP.Web\\Controllers\\HomeController.cs",
+              "ToolTip": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Web\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "NtbSoft.ERP.Web\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAAAA4AAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T09:38:37.134Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DKCaController.cs",
+              "DocumentMoniker": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Web\\Api\\ThuVien\\DKCaController.cs",
+              "RelativeDocumentMoniker": "NtbSoft.ERP.Web\\Api\\ThuVien\\DKCaController.cs",
+              "ToolTip": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Web\\Api\\ThuVien\\DKCaController.cs",
+              "RelativeToolTip": "NtbSoft.ERP.Web\\Api\\ThuVien\\DKCaController.cs",
+              "ViewState": "AgIAAKoAAAAAAAAAAAAUwAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T07:52:39.324Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Web\\Views\\DKCa\\Index.cshtml",
+              "RelativeDocumentMoniker": "NtbSoft.ERP.Web\\Views\\DKCa\\Index.cshtml",
+              "ToolTip": "C:\\Users\\Public\\Downloads\\QTY1\\QTY\\NtbSoft.ERP.Web\\Views\\DKCa\\Index.cshtml",
+              "RelativeToolTip": "NtbSoft.ERP.Web\\Views\\DKCa\\Index.cshtml",
+              "ViewState": "AgIAABgAAAAAAAAAAAAqwKAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-20T06:04:22.054Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Web.Mvc;
+using NtbSoft.ERP.Libs;
+using NtbSoft.ERP.Web.Models.DKCa;
+
+namespace NtbSoft.ERP.Web.Controllers
+{
+    public class DKCaController : Controller
+    {
+        // GET: /DKCa/GetShifts
+        public JsonResult GetShifts()
+        {
+            try
+            {
+                using (var conn = SqlHelper.GetConnection())
+                {
+                    var ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, "SELECT CaLV, TGBatDau, TGKetThuc FROM dbo.DM_CaLamViec ORDER BY CaLV");
+                    var list = new List<ShiftModel>();
+                    if (ds != null && ds.Tables.Count > 0)
+                    {
+                        foreach (DataRow r in ds.Tables[0].Rows)
+                        {
+                            var item = new ShiftModel();
+                            item.CaLV = r.Field<int>("CaLV");
+                            var tb = r["TGBatDau"];
+                            var te = r["TGKetThuc"];
+                            if (tb != DBNull.Value)
+                                item.TGBatDau = ((TimeSpan)tb).ToString(@"hh\:mm");
+                            if (te != DBNull.Value)
+                                item.TGKetThuc = ((TimeSpan)te).ToString(@"hh\:mm");
+                            list.Add(item);
+                        }
+                    }
+                    return Json(list, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // GET: /DKCa/GetShiftDetails?caLV=1
+        public JsonResult GetShiftDetails(int caLV)
+        {
+            try
+            {
+                var tableName = "TimeShift_Ca" + caLV;
+                var sql = $"SELECT TimeShiftID, Name, TimeLine, Minutes FROM dbo.{tableName} ORDER BY TimeLine";
+                using (var conn = SqlHelper.GetConnection())
+                {
+                    var ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
+                    var list = new List<ShiftDetailModel>();
+                    if (ds != null && ds.Tables.Count > 0)
+                    {
+                        foreach (DataRow r in ds.Tables[0].Rows)
+                        {
+                            var item = new ShiftDetailModel();
+                            item.TimeShiftID = r.Field<string>("TimeShiftID");
+                            item.Name = r.Field<string>("Name");
+                            var tl = r["TimeLine"];
+                            if (tl != DBNull.Value)
+                                item.TimeLine = ((TimeSpan)tl).ToString(@"hh\:mm\:ss");
+                            item.Minutes = r.Field<int>("Minutes");
+                            list.Add(item);
+                        }
+                    }
+                    return Json(list, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception)
+            {
+                return Json(new List<ShiftDetailModel>(), JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // POST: /DKCa/CreateShift
+        [HttpPost]
+        public JsonResult CreateShift(CreateShiftRequest req)
+        {
+            try
+            {
+                using (var conn = SqlHelper.GetConnection())
+                {
+                    var ds = SqlHelper.ExecuteDataset(conn, "SP_CaLamViec_TaoCaTuDong", req.CaLV, req.TGBatDau, req.TGKetThuc);
+                    var details = new List<ShiftDetailModel>();
+                    if (ds != null && ds.Tables.Count > 0)
+                    {
+                        foreach (DataRow r in ds.Tables[0].Rows)
+                        {
+                            var item = new ShiftDetailModel();
+                            item.TimeShiftID = r.Field<string>("TimeShiftID");
+                            item.Name = r.Field<string>("Name");
+                            var tl = r["TimeLine"];
+                            if (tl != DBNull.Value)
+                                item.TimeLine = ((TimeSpan)tl).ToString(@"hh\:mm\:ss");
+                            item.Minutes = r.Field<int>("Minutes");
+                            details.Add(item);
+                        }
+                    }
+                    return Json(new { success = true, details = details });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+        }
+    }
+}

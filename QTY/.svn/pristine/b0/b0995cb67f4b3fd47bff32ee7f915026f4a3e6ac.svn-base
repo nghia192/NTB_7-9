@@ -1,0 +1,684 @@
+﻿@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+    <title>Phân quyền người dùng</title>
+
+
+
+    <link href="~/css/thuviencss/fontawesome.pro.6.0.0.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/roboto.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/select2.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/toastr.min.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/bootstrap5.3.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css"
+          rel="stylesheet">
+
+    <style>
+        :root {
+            --clr-primary: #185FA5;
+            --clr-danger: #A32D2D;
+            --clr-border: #dee2e6;
+            --clr-header-bg: #f8f9fa;
+        }
+
+        body {
+            background: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 13px;
+        }
+
+        .dx-header-row .col-header {
+            background: #5da566;
+            color: #fff !important;
+            text-align: center !important;
+            vertical-align: middle !important
+        }
+
+        .dx-data-row .col-header {
+            text-align: center !important;
+            font-size: 13px !important;
+            vertical-align: middle !important
+        }
+
+        .dx-data-row .checkboxTD {
+            display: flex;
+            justify-content: center
+        }
+
+        .dx-footer-row .col-header .dx-datagrid-text-content {
+            text-align: center !important;
+            color: red !important
+        }
+
+        .dx-datagrid-summary-item {
+            text-align: center !important;
+            color: red !important
+        }
+
+        .dx-datagrid-filter-row {
+            background: #fff !important;
+        }
+        /* 2. Scrollbar custom */
+        ::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+            /* Handle on hover */
+            ::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+
+        .title {
+            background: #357C97;
+            color: #Fff
+        }
+
+        .title {
+            background: #357C97;
+            color: #fff;
+        }
+
+        .page-card {
+            background: #fff;
+            padding: 8px;
+            margin: 0px 4px;
+            border-radius: 5px;
+        }
+
+        .page-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border: 0;
+        }
+
+            .page-title i {
+                color: var(--clr-primary);
+                font-size: 16px;
+            }
+
+        .col-header {
+            font-weight: 600;
+            background: #f1f3f5;
+        }
+
+        .btn-icon-only {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+            .btn-icon-only.disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+        /* Select2 nằm trong DataGrid / Modal cần z-index cao hơn overlay */
+        .select2-container {
+            z-index: 99 !important;
+        }
+
+        .dx-datagrid-rowsview .dx-row {
+            border-top: 1px solid transparent;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Dòng nhân viên đang được chọn để phân quyền */
+        .nv-row-selected {
+            background-color: #e8f0fe !important;
+        }
+
+            .nv-row-selected td {
+                background-color: #e8f0fe !important;
+            }
+
+        #gridNhanVien .dx-row {
+            cursor: pointer;
+        }
+
+        /* Khối tiêu đề bên phải hiển thị nhân viên đang phân quyền */
+        .current-nv-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #eef4fa;
+            border: 1px solid #d7e6f3;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            display: none
+        }
+
+            .current-nv-bar .avt {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background: var(--clr-primary);
+                color: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                font-size: 12px;
+                flex-shrink: 0;
+            }
+
+            .current-nv-bar .nv-name {
+                font-weight: 600;
+                color: #1a1a2e;
+            }
+
+            .current-nv-bar .nv-user {
+                color: #6c757d;
+                font-size: 12px;
+            }
+
+        /* Tabs */
+        .nav-quyen .nav-link {
+            font-size: 13px;
+            font-weight: 500;
+            color: #495057;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 6px 14px;
+        }
+
+            .nav-quyen .nav-link.active {
+                color: var(--clr-primary);
+                border-bottom-color: var(--clr-primary);
+                background: transparent;
+            }
+
+            .nav-quyen .nav-link i {
+                margin-right: 6px;
+            }
+
+        .perm-check {
+            transform: scale(1.15);
+            cursor: pointer;
+        }
+
+        .badge-trangthai-active {
+            background: #e6f6ea;
+            color: #1e7e34;
+            font-weight: 600;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .badge-trangthai-inactive {
+            background: #fdeaea;
+            color: #a32d2d;
+            font-weight: 600;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        /* ========== MODAL TẠO NHÂN VIÊN ========== */
+        .modal-line-content {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 45px rgba(15, 42, 87, 0.25);
+        }
+
+        .modal-line-header {
+            background: linear-gradient(135deg, #16336b 0%, #0f7ea8 100%);
+            color: #fff;
+            padding: 1rem 1.25rem;
+        }
+
+            .modal-line-header .modal-title {
+                font-weight: 600;
+                font-size: 0.95rem;
+                letter-spacing: 0.2px;
+            }
+
+        .modal-line-subtitle {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.75);
+            margin-top: 2px;
+        }
+
+        .modal-icon-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .form-label-line {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #5c6b7a;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .form-label-line i {
+                color: #0f7ea8;
+                font-size: 0.68rem;
+            }
+
+        .input-group-line .input-group-text {
+            background: #f1f5f9;
+            border-right: none;
+            color: #0f7ea8;
+            border-color: #dbe3ea;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .input-group-line .form-control {
+            border-left: none;
+            border-color: #dbe3ea;
+            font-size: 0.82rem;
+        }
+
+            .input-group-line .form-control:focus {
+                box-shadow: none;
+                border-color: #0f7ea8;
+            }
+
+        .input-group-line:focus-within .input-group-text {
+            border-color: #0f7ea8;
+        }
+
+        .btn-line-primary {
+            background: linear-gradient(135deg, #16336b, #0f7ea8);
+            border: none;
+            color: #fff;
+            font-weight: 500;
+            padding: 0.45rem 1.1rem;
+            border-radius: 8px;
+            transition: filter 0.15s ease;
+        }
+
+            .btn-line-primary:hover {
+                filter: brightness(1.08);
+                color: #fff;
+            }
+
+        .dx-datagrid-rowsview .dx-row {
+            border-top: 1px solid transparent;
+            border-bottom: 1px solid #ccc;
+            border-bottom-width: 1px !important;
+        }
+
+        .dx-datagrid-content .dx-datagrid-table [class*=column] + [class*=column]:last-child {
+            float: none;
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <div class="title">
+            <div style="display: flex; align-items: center; width: 100%; justify-content: space-between">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 6px;">
+                    <i id="home" style="font-size: 21px; cursor: pointer; margin-right: 7px; color: #fff; margin-top: 2px;" class="fa-sharp fa-solid fa-house"></i>
+                    <span style="margin-top: 2px; color: white; font-size: 18px; padding: 4px 8px; font-weight: 700;">Phân quyền người dùng</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div style="padding: 3px;">
+        <div class="row m-0">
+            <div class="col-12 col-lg-6 m-0 p-0">
+                <div class="page-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="page-title">
+                            <i class="fa-solid fa-users"></i>Danh sách nhân viên
+                        </div>
+                        <button id="btnTaoNhanVien" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-user-plus"></i> Tạo NV
+                        </button>
+                    </div>
+                    <div id="gridNhanVien" style="max-height: calc(100vh - 140px); min-height: 300px;"></div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 m-0 p-0">
+                <div class="page-card h-100">
+                    <div class="d-none justify-content-between align-items-center mb-2">
+                        <div class="page-title">
+                            <i class="fa-solid fa-user-shield"></i>Phân quyền
+                        </div>
+
+                    </div>
+                    @*Nhân viên đang được chọn*@
+                    <div class="current-nv-bar">
+                        <div class="avt" id="currentNvAvt">?</div>
+                        <div>
+                            <div class="nv-name" id="currentNvName">Chưa chọn nhân viên</div>
+                            <div class="nv-user" id="currentNvUser">Vui lòng chọn 1 nhân viên bên trái để phân quyền</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <ul class="nav nav-quyen border-bottom mb-1" id="tabPhanQuyen" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="tab-line-btn" data-bs-toggle="tab" data-bs-target="#tab-line" type="button" role="tab">
+                                        <i class="fa-solid fa-route"></i>Chọn Line
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="tab-module-btn" data-bs-toggle="tab" data-bs-target="#tab-module" type="button" role="tab">
+                                        <i class="fa-solid fa-layer-group"></i>Module
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="d-none">
+                            <button id="btnLuuPhanQuyen" class="btn btn-success btn-sm" disabled>
+                                <i class="fa-solid fa-floppy-disk"></i> Lưu PQ
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="tab-line" role="tabpanel">
+                            <div id="gridLinePhanQuyen" style="max-height: calc(100vh - 300px); min-height: 260px;"></div>
+                        </div>
+                        <div class="tab-pane fade" id="tab-module" role="tabpanel">
+                            <div id="gridModulePhanQuyen" style="max-height: calc(100vh - 300px); min-height: 260px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*================= MODAL TẠO NHÂN VIÊN =================*@
+    <div class="modal fade" id="modalTaoNhanVien" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-line-content">
+                <div class="modal-header modal-line-header border-0">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="modal-icon-badge">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-0">Tạo nhân viên</h5>
+                            <div class="modal-line-subtitle">Đăng ký tài khoản đăng nhập cho nhân viên</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body pt-4 pb-2">
+                    <div class="mb-3">
+                        <label class="form-label-line"><i class="fa-solid fa-id-card"></i>Họ và tên</label>
+                        <div class="input-group input-group-line">
+                            <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
+                            <input type="text" id="inpFullName" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label-line"><i class="fa-solid fa-user"></i>Tài khoản</label>
+                        <div class="input-group input-group-line">
+                            <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" id="inpUserName" class="form-control" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label-line"><i class="fa-solid fa-lock"></i>Mật khẩu</label>
+                        <div class="input-group input-group-line">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" id="inpPassword" class="form-control" autocomplete="new-password">
+                            <span class="input-group-text toggle-pass" data-target="inpPassword">
+                                <i class="fa-solid fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-1">
+                        <label class="form-label-line"><i class="fa-solid fa-lock"></i>Nhập lại mật khẩu</label>
+                        <div class="input-group input-group-line">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" id="inpRePassword" class="form-control" autocomplete="new-password">
+                            <span class="input-group-text toggle-pass" data-target="inpRePassword">
+                                <i class="fa-solid fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button class="btn btn-light" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark"></i> Đóng
+                    </button>
+                    <button id="btnLuuNhanVien" class="btn btn-line-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Lưu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*Modal xác nhận xóa (dùng chung)*@
+    <div class="modal fade" id="modalXacNhanXoa" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">
+                        <i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>Xác nhận xóa
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="txtXacNhanXoa" class="mb-0">Bạn có chắc chắn muốn xóa mục này không?</p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button class="btn btn-light" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark"></i> Hủy
+                    </button>
+                    <button id="btnXacNhanXoa" class="btn btn-danger">
+                        <i class="fa-solid fa-trash"></i> Xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999999">
+        <div id="successToast" class="toast" role="alert">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Thành công</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="successMessage"></div>
+        </div>
+        <div id="errorToast" class="toast" role="alert">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong class="me-auto">Lỗi</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="errorMessage"></div>
+        </div>
+        <div id="warningToast" class="toast" role="alert">
+            <div class="toast-header bg-warning text-dark">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong class="me-auto">Cảnh báo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="warningMessage"></div>
+        </div>
+    </div>
+    @*================= MODAL ĐỔI MẬT KHẨU =================*@
+    <div class="modal fade" id="modalDoiMatKhau" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-line-content">
+                <div class="modal-header modal-line-header border-0">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="modal-icon-badge">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-0">Đổi mật khẩu</h5>
+                            <div class="modal-line-subtitle" id="doiMatKhauSubtitle">Nhân viên: —</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body pt-4 pb-2">
+                    <input type="hidden" id="doiMatKhauNvId">
+
+                    <div class="mb-3">
+                        <label class="form-label-line"><i class="fa-solid fa-lock"></i>Mật khẩu cũ</label>
+                        <div class="input-group input-group-line">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" id="inpMatKhauCu" class="form-control" autocomplete="off">
+                            <span class="input-group-text toggle-pass" data-target="inpMatKhauCu">
+                                <i class="fa-solid fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label-line"><i class="fa-solid fa-lock"></i>Mật khẩu mới</label>
+                        <div class="input-group input-group-line">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" id="inpMatKhauMoi" class="form-control" autocomplete="new-password">
+                            <span class="input-group-text toggle-pass" data-target="inpMatKhauMoi">
+                                <i class="fa-solid fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-1">
+                        <label class="form-label-line"><i class="fa-solid fa-lock"></i>Nhập lại mật khẩu mới</label>
+                        <div class="input-group input-group-line">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" id="inpMatKhauMoiLai" class="form-control" autocomplete="new-password">
+                            <span class="input-group-text toggle-pass" data-target="inpMatKhauMoiLai">
+                                <i class="fa-solid fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button class="btn btn-light" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark"></i> Đóng
+                    </button>
+                    <button id="btnLuuDoiMatKhau" class="btn btn-line-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Lưu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalDoiTen" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-line-content">
+                <div class="modal-header modal-line-header border-0">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="modal-icon-badge">
+                            <i class="fa-solid fa-user-pen"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-0">Đổi tên</h5>
+                            <div class="modal-line-subtitle" id="doiTenSubtitle">Nhân viên: —</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body pt-4 pb-2">
+                    <input type="hidden" id="doiTenNvId">
+                    <!-- Họ và tên cũ - readonly -->
+                    <div class="mb-3">
+                        <label class="form-label-line">
+                            <i class="fa-solid fa-id-card"></i>Họ và tên cũ
+                        </label>
+                        <div class="input-group input-group-line">
+                            <span class="input-group-text">
+                                <i class="fa-solid fa-id-card"></i>
+                            </span>
+                            <input type="text" id="inpFullNameCu" class="form-control"
+                                   readonly style="background:#f1f5f9; color:#6c757d;">
+                        </div>
+                    </div>
+
+                    <!-- Họ và tên mới -->
+                    <div class="mb-1">
+                        <label class="form-label-line">
+                            <i class="fa-solid fa-user-pen"></i>Họ và tên mới
+                        </label>
+                        <div class="input-group input-group-line">
+                            <span class="input-group-text">
+                                <i class="fa-solid fa-user-pen"></i>
+                            </span>
+                            <input type="text" id="inpFullNameMoi" class="form-control"
+                                   placeholder="">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button class="btn btn-light" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark"></i> Đóng
+                    </button>
+                    <button id="btnLuuDoiTen" class="btn btn-line-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Lưu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/Scripts/thuvienjs/jquery.js"></script>
+    <script src="~/Scripts/thuvienjs/bootstrap5.3.bundle.min.js"></script>
+    <script src="~/Scripts/thuvienjs/select2.js"></script>
+    <link href="~/DevExtreme/dx.light.css" rel="stylesheet" />
+    <link href="~/DevExtreme/dx.common.css" rel="stylesheet" />
+
+    <script src="~/DevExtreme/dx.all.js"></script>
+    <script src="~/DevExtreme/knockout-latest.min.js"></script>
+
+
+    <script src="~/Scripts/ThuVien/Dic_PhanQuyen_User.js"></script>
+</body>
+</html>

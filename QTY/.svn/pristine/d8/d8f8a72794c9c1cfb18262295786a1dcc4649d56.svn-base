@@ -1,0 +1,896 @@
+﻿@{
+    Layout = null;
+    ViewBag.Ver = "1.4";
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+    <title>Khai báo chủng loại công đoạn</title>
+
+    <link href="~/css/thuviencss/fontawesome.pro.6.0.0.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/roboto.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/select2.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/toastr.min.css" rel="stylesheet" />
+    <link href="~/css/thuviencss/bootstrap5.3.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --clr-primary: #185FA5;
+            --clr-danger: #A32D2D;
+            --clr-border: #dee2e6;
+            --clr-header-bg: #f8f9fa;
+        }
+
+        body {
+            background: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 13px;
+        }
+
+        .select2-container--default .select2-dropdown {
+            border: 1px solid #ced4da;
+            min-width: 100px;
+            overflow-wrap: break-word;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 26px;
+            position: absolute;
+            top: 2px;
+            right: 1px;
+            width: 20px;
+        }
+
+        .select2-results__option[aria-selected] {
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .txtselected {
+            margin-bottom: 2px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .select2-container .select2-selection--single .select2-selection__rendered {
+            font-size: 13px;
+            padding-top: 0px;
+        }
+
+        .select2-container .select2-selection--single {
+            box-sizing: border-box;
+            cursor: pointer;
+            display: block;
+            height: 33px;
+            border: 1px solid #ccc !important;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        /* ── Page wrapper ── */
+        .page-card {
+            background: #fff;
+            border-radius: 2px;
+            border: 1px solid var(--clr-border);
+            padding: 4px 4px;
+            margin: 5px 4px;
+        }
+
+        /* ── Page title ── */
+        .page-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--clr-border);
+        }
+
+            .page-title i {
+                color: var(--clr-primary);
+                font-size: 18px;
+            }
+
+        /* ── Filter bar ── */
+        .filter-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 0px 0px;
+            margin-bottom: 10px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        /* ── Buttons ── */
+        .btn-tra {
+            background: #185FA5;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0 18px;
+            height: 36px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+            .btn-tra:hover {
+                background: #0C447C;
+            }
+
+        .btn-bo {
+            border: 1px solid #A32D2D;
+            border-radius: 6px;
+            padding: 0 18px;
+            height: 36px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background .15s, color .15s;
+            background: #A32D2D;
+            color: #fff;
+        }
+
+            .btn-bo:hover {
+                background: #A32D2D;
+                color: #fff;
+            }
+
+        /* ── Grid header bar ── */
+        .grid-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--clr-header-bg);
+            border: 1px solid var(--clr-border);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            font-size: 13px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+            .grid-topbar .sel-count {
+                background: #e8f0fe;
+                color: #185FA5;
+                border-radius: 99px;
+                font-size: 11px;
+                font-weight: 600;
+                padding: 2px 10px;
+            }
+
+        /* ── DevExtreme overrides ── */
+        #gridTraHang {
+            border-radius: 0 0 8px 8px;
+            border: 1px solid var(--clr-border);
+            border-top: none;
+            max-height: calc(100vh - 205px);
+        }
+
+        .dx-datagrid-headers {
+            background: #f1f3f5 !important;
+        }
+
+            .dx-datagrid-headers .dx-header-row td {
+                font-weight: 600 !important;
+                font-size: 13px !important;
+            }
+
+        .dx-datagrid-rowsview .dx-row {
+            font-size: 13px;
+        }
+
+        .dx-datagrid-rowsview .dx-row-alt > td {
+            background: #fafbfc;
+        }
+
+        /* SL màu khác nhau */
+        .sl-diff {
+            color: #c0392b;
+            font-weight: 600;
+        }
+
+        .sl-match {
+            color: #27ae60;
+            font-weight: 500;
+        }
+
+        /* ── Footer summary ── */
+        .grid-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border: 1px solid var(--clr-border);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            background: #f8f9fa;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+            .grid-footer strong {
+                color: #185FA5;
+            }
+
+        /* Select2 height fix */
+        .select2-container--bootstrap-5 .select2-selection {
+            height: 36px !important;
+            font-size: 13px !important;
+        }
+
+        .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+            line-height: 34px !important;
+        }
+
+        /* Toast */
+        .toast-custom {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .3s;
+            z-index: 9999;
+            white-space: nowrap;
+        }
+
+            .toast-custom.show {
+                opacity: 1;
+            }
+
+        .dx-header-row .col-header {
+            background: #5da566;
+            color: #fff !important;
+            text-align: center !important;
+            vertical-align: middle !important
+        }
+
+        .dx-data-row .col-header {
+            text-align: center !important;
+            font-size: 13px !important;
+            vertical-align: middle !important
+        }
+
+        .dx-data-row .checkboxTD {
+            display: flex;
+            justify-content: center
+        }
+
+        .dx-footer-row .col-header .dx-datagrid-text-content {
+            text-align: center !important;
+            color: red !important
+        }
+
+        .dx-datagrid-summary-item {
+            text-align: center !important;
+            color: red !important
+        }
+
+        .dx-datagrid-filter-row {
+            background: #fff !important;
+        }
+        /* 2. Scrollbar custom */
+        ::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+            /* Handle on hover */
+            ::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+
+        .title {
+            background: #357C97;
+            color: #Fff
+        }
+
+        .btn-text {
+            font-size: 13px;
+        }
+
+        @@media (max-width: 768px) {
+            .btn-text {
+                font-size: 10px;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .btn-text {
+                font-size: 9px;
+            }
+        }
+
+        /* Select2 nằm trong DataGrid / Modal cần z-index cao hơn overlay */
+        .select2-container {
+            z-index: 99 !important;
+        }
+
+        .khuvuc-row td {
+            vertical-align: middle;
+        }
+
+        #modalKhuVuc .modal-dialog {
+            max-width: 950px;
+        }
+
+        .col-header {
+            font-weight: 600;
+            background: #f1f3f5;
+        }
+
+        .btn-icon-only {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .dx-select2-cell-editor {
+            min-width: 100%;
+        }
+
+        /* Wrapper để grid không bị kéo full 100% màn hình lớn */
+        #gridWrapper {
+            width: 100%;
+        }
+
+        /* Màn hình càng lớn thì grid càng thu nhỏ lại (không full ngang) */
+        /*@@media (min-width: 992px) {
+            #gridWrapper {
+                width: auto;
+                max-width: 850px;
+            }
+        }
+
+        @@media (min-width: 1200px) {
+            #gridWrapper {
+                max-width: 750px;
+            }
+        }
+
+
+        @@media (min-width: 1600px) {
+            #gridWrapper {
+                max-width: 780px;
+            }
+        }*/
+
+        .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit {
+            vertical-align: middle;
+        }
+        /* ========== MODAL THÊM CHUYỀN ========== */
+        .modal-line-content {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 45px rgba(15, 42, 87, 0.25);
+        }
+
+        .modal-line-header {
+            background: linear-gradient(135deg, #16336b 0%, #0f7ea8 100%);
+            color: #fff;
+            padding: 1rem 1.25rem;
+        }
+
+            .modal-line-header .modal-title {
+                font-weight: 600;
+                font-size: 0.95rem;
+                letter-spacing: 0.2px;
+            }
+
+        .modal-line-subtitle {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.75);
+            margin-top: 2px;
+        }
+
+        .modal-icon-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .form-label-line {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #5c6b7a;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .form-label-line i {
+                color: #0f7ea8;
+                font-size: 0.68rem;
+            }
+
+        .input-group-line .input-group-text {
+            background: #f1f5f9;
+            border-right: none;
+            color: #0f7ea8;
+            border-color: #dbe3ea;
+            font-size: 0.8rem;
+        }
+
+        .input-group-line .form-control {
+            border-left: none;
+            border-color: #dbe3ea;
+            font-size: 0.82rem;
+        }
+
+            .input-group-line .form-control:focus {
+                box-shadow: none;
+                border-color: #0f7ea8;
+            }
+
+        .input-group-line:focus-within .input-group-text {
+            border-color: #0f7ea8;
+        }
+
+        #selKhuVucThem {
+            font-size: 0.82rem;
+        }
+
+        .btn-line-primary {
+            background: linear-gradient(135deg, #16336b, #0f7ea8);
+            border: none;
+            color: #fff;
+            font-weight: 500;
+            padding: 0.45rem 1.1rem;
+            border-radius: 8px;
+            transition: filter 0.15s ease;
+        }
+
+            .btn-line-primary:hover {
+                filter: brightness(1.08);
+                color: #fff;
+            }
+
+        .col-header {
+            font-weight: 600;
+            background: #f1f3f5;
+        }
+
+        .btn-icon-only {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+            .btn-icon-only.disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+        .dx-datagrid-rowsview .dx-row {
+            border-top: 1px solid transparent;
+            border-bottom: 1px solid #ccc;
+            border-bottom-width: 1px !important;
+        }
+
+        .dx-datagrid-content .dx-datagrid-table [class*=column] + [class*=column]:last-child {
+            float: none;
+            display: none !important;
+        }
+
+        .dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > td, .dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > tr > td, .dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > td, .dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > tr > td {
+            background-color: #cff2f3 !important;
+            color: #333;
+        }
+
+        .dx-datagrid-rowsview td {
+            vertical-align: middle !important;
+        }
+
+            .dx-datagrid-rowsview td > div {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+            }
+
+        .btnSort {
+            background: #fd7e14;
+            color: white
+        }
+
+            .btnSort:hover:not(:disabled) {
+                background: #e06c00;
+                box-shadow: 0 2px 8px rgba(253, 126, 20, 0.3);
+            }
+
+            .btnSort:active:not(:disabled) {
+                box-shadow: 0 1px 3px rgba(253, 126, 20, 0.2);
+            }
+
+            .btnSort:disabled {
+                background: #ccc;
+                color: #999;
+                cursor: not-allowed;
+                opacity: 0.6;
+                box-shadow: none;
+            }
+
+        .confirmModal {
+            --confirm-color-start: #E24B4A;
+            --confirm-color-end: #ff6271;
+            --confirm-color-icon-bg: #FCEBEB;
+            --confirm-color-icon: #E24B4A;
+            --confirm-color-hover: #A32D2D;
+        }
+
+            .confirmModal.mConfirmtXacNhanKetThucSom {
+                --confirm-color-start: #ffa43c;
+                --confirm-color-end: #fac66d;
+                --confirm-color-icon-bg: #fffbeb;
+                --confirm-color-icon: #ffac6d;
+                --confirm-color-hover: #92400e;
+            }
+
+            .confirmModal .form-control-sm {
+                min-height: calc(1.5em + .5rem + calc(var(--bs-border-width) * 2));
+                padding: .25rem .5rem;
+                font-size: 12px !important;
+                border-radius: var(--bs-border-radius-sm);
+            }
+
+            .confirmModal .modal-dialog {
+                max-width: 360px;
+                margin: auto;
+            }
+
+            .confirmModal .modal-header {
+                background: linear-gradient(135deg, var(--confirm-color-start), var(--confirm-color-end));
+                border-radius: 0px;
+                font-size: 16px;
+                color: white
+            }
+
+            .confirmModal .danger {
+                background: linear-gradient(135deg, #E24B4A, #ff6271);
+            }
+
+            .confirmModal .reset {
+                background: linear-gradient(135deg, #24b359, #4ade80)
+            }
+
+            .confirmModal .modal-content {
+                border-radius: 12px;
+                border: none;
+                overflow: hidden;
+            }
+
+        #confirmModal .modal-icon-wrap {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--confirm-color-icon-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .confirmModal .modal-icon-wrap i {
+            font-size: 28px;
+            color: var(--confirm-color-icon);
+        }
+
+
+        .confirmModal .modal-body {
+            padding: 8px 14px 14px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .confirmModal .modal-title-text {
+            margin: 0 0 8px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .confirmModal .modal-sub-text {
+            margin: 0;
+            font-size: 13px;
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        .confirmModal .modal-footer {
+            display: flex;
+            gap: 10px;
+            padding: 16px 20px;
+            border: none;
+        }
+
+        .confirmModal .btn-cancel {
+            flex: 1;
+            padding: 10px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+        }
+
+            .confirmModal .btn-cancel:hover {
+                background: #e9ecef;
+            }
+
+        .confirmModal .btn-delete {
+            background: linear-gradient(135deg, var(--confirm-color-start), var(--confirm-color-end));
+            flex: 1;
+            padding: 10px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+            .confirmModal .btn-delete:hover {
+                background: var(--confirm-color-hover);
+            }
+
+        .modal-consequence {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            background: #fff8f0;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin: 12px 0 0;
+            font-size: 13px;
+            color: #92400e;
+            text-align: left;
+        }
+
+            .modal-consequence i {
+                font-size: 15px;
+                color: #f97316;
+                margin-top: 1px;
+                flex-shrink: 0;
+            }
+    </style>
+</head>
+
+<body>
+    <section>
+        <div class="title">
+            <div style="display: flex; align-items: center; width: 100%;justify-content:space-between">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 6px;">
+                    <i id="home" style="font-size: 21px; cursor: pointer; margin-right: 7px; color: #fff; margin-top: 2px;" class="fa-sharp fa-solid fa-house"></i>
+                    <span style="margin-top: 2px; color: white; font-size: 18px; padding: 4px 8px; font-weight: 700;">Khai Báo Chủng Loại Công Đoạn</span>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <div id="gridWrapper" style="padding: 3px;">
+        <div class=" row m-0 ">
+            <!-- Cột phải: Danh sách chuyền -->
+            <div class="col-12 col-lg-5 m-0 p-0">
+                <div class="page-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="page-title mb-0 pb-0 border-0">
+                            <i class="fa-solid fa-route"></i>Danh Sách Chủng Loại
+                        </div>
+                        <div>
+                            <button id="btnThemDong" class="btn btn-primary btn-sm toolbar-btn">
+                                <i class="fa-solid fa-plus"></i> Thêm Chủng Loại
+                            </button>
+                            <button id="btnLuuChungLoai" class="btn btn-success btn-sm toolbar-btn">
+                                <i class="fa-solid fa-floppy-disk"></i> Lưu
+                            </button>
+                        </div>
+                    </div>
+                    <div id="dxDataDSChungLoai" style=" max-height: calc(100vh - 105px); min-height: 300px;"></div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-2 m-0 p-0">
+                <div class="page-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="page-title mb-0 pb-0 border-0">
+                            <i class="fa-solid fa-map-pin"></i> Vị Trí
+                        </div>
+                        <div class="d-none">
+                            <button id="btnThemViTri" class="btn btn-primary btn-sm toolbar-btn">
+                                <i class="fa-solid fa-plus "></i> Thêm Vị Trí
+                            </button>
+                            <button id="btnLuuViTri" class="btn btn-success btn-sm toolbar-btn">
+                                <i class="fa-solid fa-floppy-disk"></i> Lưu
+                            </button>
+                        </div>
+                    </div>
+                    <div id="dxDataViTri" style=" max-height: calc(100vh - 105px); min-height: 300px;"></div>
+                </div>
+            </div>
+            <!-- Cột trái: Quản lý khu vực -->
+            <div class="col-12 col-lg-5 m-0 p-0">
+                <div class="page-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="page-title mb-0 pb-0 border-0">
+                            <i class="fa-solid fa-map-location-dot"></i>Quản Lý Công Đoạn
+                        </div>
+                        <div>
+                            <button onclick="handleSort(this)" data-target="up" class="btn  btn-sm btnSort">
+                                <i class="fa-solid fa-caret-up"></i>
+                            </button>
+                            <button onclick="handleSort(this)" data-target="down" class="btn  btn-sm btnSort">
+                                <i class="fa-solid fa-caret-down"></i>
+                            </button>
+                            <button id="btnThemCongDoan" class="btn btn-primary btn-sm">
+                                <i class="fa-solid fa-plus"></i> Thêm Công Đoạn
+                            </button>
+                            <button id="btnLuuCongDoan" class="btn btn-success btn-sm">
+                                <i class="fa-solid fa-floppy-disk"></i> Lưu
+                            </button>
+                        </div>
+                    </div>
+                    <div id="dxDataCongDoan" style=" max-height: calc(100vh - 105px); min-height: 300px;"></div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Modal xác nhận xóa (dùng chung) -->
+    <div class="modal fade confirmModal" id="modalXacNhanXoa" tabindex="-1" aria-hidden="true" style="z-index:9999;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <i class="fa-solid fa-trash "></i> <span id="lblTextTitleDelete">Xác nhận xóa</span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-icon-wrap">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <!-- Hậu quả -->
+                    <p class="modal-sub-text">
+                        Bạn có chắc chắn muốn xóa mục này không?
+                    </p>
+                </div>
+
+
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark" style="margin-right:4px;"></i>Hủy
+                    </button>
+                    <button id="btnXacNhanXoa" type="button" class="btn-delete">
+                        <i class="fa-solid fa-trash" style="margin-right:4px;"></i> Xóa
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận lưu thay đổi -->
+    <div class="modal fade confirmModal mConfirmtXacNhanKetThucSom" id="modalXacNhanLuu" tabindex="-1" aria-hidden="true" style="z-index:9999;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <i class="fa-solid fa-code-compare"></i> <span id="lblTextTitleDelete">Xác nhận lưu thay đổi</span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-icon-wrap">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <!-- Hậu quả -->
+                    <p class="modal-sub-text">
+                        Bạn có muốn lưu thay đổi này không?
+                    </p>
+                    <p class="modal-sub-text" style="margin-top: 8px;">
+                        Hành động này <strong>không thể hoàn tác.</strong>
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button id="btnXacNhanKhongLuu" type="button" class="btn-cancel" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark" style="margin-right:4px;"></i>Hủy
+                    </button>
+                    <button id="btnXacNhanLuu" type="button" class="btn-delete">
+                        <i class="fa-solid fa-trash" style="margin-right:4px;"></i>Xác nhận
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999999">
+        <div id="successToast" class="toast" role="alert">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Thành công</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="successMessage"></div>
+        </div>
+        <div id="errorToast" class="toast" role="alert">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong class="me-auto">Lỗi</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="errorMessage"></div>
+        </div>
+        <div id="warningToast" class="toast" role="alert">
+            <div class="toast-header bg-warning text-dark">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong class="me-auto">Cảnh báo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="warningMessage"></div>
+        </div>
+    </div>
+    <script src="~/Scripts/thuvienjs/jquery.js"></script>
+    <script src="~/Scripts/thuvienjs/bootstrap5.3.bundle.min.js"></script>
+    <script src="~/Scripts/thuvienjs/select2.js"></script>
+    <link href="~/DevExtreme/dx.light.css" rel="stylesheet" />
+    <link href="~/DevExtreme/dx.common.css" rel="stylesheet" />
+    <script src="~/DevExtreme/dx.all.js"></script>
+    <script src="~/DevExtreme/knockout-latest.min.js"></script>
+
+    <script src="~/Scripts/ThuVien/DicChungLoaiCongDoan.js?Ver=@ViewBag.Ver"></script>
+</body>
+</html>

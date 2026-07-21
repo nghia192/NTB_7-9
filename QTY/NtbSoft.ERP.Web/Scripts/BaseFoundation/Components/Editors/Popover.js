@@ -1,0 +1,558 @@
+﻿
+
+class BaseDevextremeGridPopover {
+    constructor(Container, Key, Datasource, Setting, Appearance, Events) {
+        this.Container = Container;
+        this.Key = Key;
+        this.Datasource = Datasource || [];
+        this.Appearance = {
+            popover: {
+                theme: Appearance?.theme ?? "primary",
+
+                classes: {
+                    lookup: Appearance?.classes?.lookup ?? "",
+                    header: Appearance?.classes?.header ?? "",
+                    body: Appearance?.classes?.body ?? "",
+                    footer: Appearance?.classes?.footer ?? ""
+                },
+
+                styles: {
+                    lookup: Appearance?.styles?.lookup ?? {},
+                    header: Appearance?.styles?.header ?? {},
+                    body: Appearance?.styles?.body ?? {},
+                    footer: Appearance?.styles?.footer ?? {}
+                }
+            },
+            grid: {
+                row: {
+                    header: {
+                        backgroundColor: Appearance?.row?.header?.backgroundColor || "#0d6efd",
+                        fontWeight: Appearance?.row?.header?.fontWeight || "bold",
+                        textAlign: Appearance?.row?.header?.textAlign || "center",
+                        color: Appearance?.row?.header?.color || "white"
+                    },
+                    data: {
+                        backgroundColor: Appearance?.row?.data?.backgroundColor || "#ffffff",
+                        fontWeight: Appearance?.row?.data?.fontWeight || "normal",
+                        textAlign: Appearance?.row?.data?.textAlign || "center",
+                        color: Appearance?.row?.data?.color || "black"
+                    }
+                },
+                cell: {
+                    header: {
+                        backgroundColor: Appearance?.cell?.header?.backgroundColor || "#0d6efd",
+                        fontWeight: Appearance?.cell?.header?.fontWeight || "bold",
+                        textAlign: Appearance?.cell?.header?.textAlign || "center",
+                        color: Appearance?.cell?.header?.color || "white"
+                    },
+                    data: {
+                        backgroundColor: Appearance?.cell?.data?.backgroundColor || "#ffffff",
+                        fontWeight: Appearance?.cell?.data?.fontWeight || "bold",
+                        textAlign: Appearance?.cell?.data?.textAlign || "center",
+                        color: Appearance?.cell?.data?.color || "black"
+                    }
+                }
+            }
+        };
+        this.Setting = {
+            popover: {
+                target: Container,
+
+                width: Setting?.popover?.width ?? "60vw",
+                height: Setting?.popover?.height ?? "auto",
+
+                maxWidth: Setting?.popover?.maxWidth ?? "1000px",
+                minWidth: Setting?.popover?.minWidth ?? "300px",
+
+                showTitle: Setting?.popover?.showTitle ?? false,
+                title: Setting?.popover?.title ?? "",
+
+                closeOnOutsideClick:
+                    Setting?.popover?.closeOnOutsideClick ?? true,
+
+                hideOnParentScroll:
+                    Setting?.popover?.hideOnParentScroll ?? true,
+
+                shading:
+                    Setting?.popover?.shading ?? false,
+
+                position: {
+                    my: Setting?.popover?.position?.my ?? "left top",
+                    at: Setting?.popover?.position?.at ?? "left bottom",
+                    of: Setting?.popover?.position?.of ?? Container,
+                    collision:
+                        Setting?.popover?.position?.collision ?? "flipfit"
+                },
+
+                wrapperAttr: {
+                    class: [
+                        "popover-no-padding",
+                        this.getThemeClass?.(),
+                        this.Appearance?.popover?.classes?.lookup
+                    ]
+                        .filter(Boolean)
+                        .join(" ")
+                },
+            },
+            grid: {
+                keyExpr: Key,
+                height: "100%",
+                wordWrapEnabled: true,
+                showBorders: true,
+                showRowLines: true,
+                showColumnLines: true,
+                rowAlternationEnabled: true,
+                paging: { pageSize: 10 },
+                pager: {
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [10, 20, 50],
+                    showInfo: true
+                },
+                scrolling: {
+                    mode: "standard",
+                    useNative: false
+                },
+                filterRow: {
+                    visible: true
+                },
+                selection: { mode: "single" },
+            }
+        };
+
+
+        this.Events = Events || {};
+
+        this.BaseData = {};
+        this.Columns = [];
+        this.ColumnFields = [];
+
+        this.Instance = null;
+        this.GridInstance = null;
+    }
+
+    init() {
+        const self = this;
+
+        this.Instance = $(self.Container).dxPopover({
+            ...self.Setting.popover,
+            
+            contentTemplate(content) {
+                $(content).css({
+                    height: "100%",
+                    overflow: "hidden",
+                    padding: 0
+                });
+
+                const $grid = $("<div>")
+                    .css({
+                        height: "100%",
+                        width: "100%"
+                    })
+                    .appendTo(content);
+
+                self.GridInstance = $grid.dxDataGrid({
+                    dataSource: self.Datasource,
+                    keyExpr: self.Key,
+
+                    ...self.Setting.grid,
+
+                    columns: self.buildDefaultColumns(),
+
+                    onSelectionChanged(e) {
+
+                        const row = e.selectedRowsData[0];
+
+                        if (!row) {
+                            return;
+                        }
+                        
+                        self.Events.onChange?.(row);
+
+                        self.hide();
+                    },
+
+                    onCellPrepared(e) {
+                        if (e.rowType === "header") {
+                            e.cellElement.css({
+                                ...self.Appearance.grid.cell.header
+                            });
+                        }
+                    },
+
+                    onRowPrepared(e) {
+                        if (e.rowType === "data") {
+                            e.rowElement.css({
+                                ...self.Appearance.grid.row.data
+                            });
+                        }
+                    }
+                }).dxDataGrid("instance");
+            },
+
+            onShown() {
+                setTimeout(() => {
+                    self.GridInstance?.updateDimensions();
+                    self.GridInstance?.repaint();
+                }, 0);
+            }
+        }).dxPopover("instance");
+    }
+
+    buildDisplayExpr(item) {
+        if (!item) return "";
+        const template = this.Setting.dropdown.display;
+        if (!template) {
+            return item[this.Key] ?? "";
+        }
+        return template.replace(
+            /\{(\w+)\}/g,
+            (match, field) => item[field] ?? ""
+        );
+    }
+    buildDefaultColumns() {
+        const self = this;
+        this.Columns = [
+            {
+                caption: "",
+                width: 50,
+                alignment: "center",
+                allowSorting: false,
+                allowFiltering: false,
+                allowResizing: false,
+                allowReordering: false,
+
+                headerCellTemplate: function (header, info) {
+                    $("<div>")
+                        .dxButton({
+                            icon: "refresh",
+                            hint: "Reload dữ liệu",
+                            stylingMode: "text",
+                            elementAttr: {
+                                class: "btn-reload-header"
+                            },
+                            onClick: () => {
+                                self.Events.onReload?.();
+                            }
+                        })
+                        .appendTo(header);
+                }
+            },
+            {
+                dataField: "Ten",
+                caption: "Tên",
+                width: 70
+            },
+            {
+                dataField: "MoTa",
+                caption: "Mô tả",
+                width: 70
+            },
+        ];
+        this.ColumnFields = this.Columns
+            .filter(col => col.dataField)
+            .map(col => col.dataField);
+        return this.Columns;
+    }
+    buildBaseData(data = {}, action = "create") {
+        if (!data || typeof data !== "object") return;
+        switch (action) {
+            case "create":
+                this.BaseData = { ...data };
+                break;
+            case "insert":
+                this.BaseData ??= {};
+                Object.assign(this.BaseData, data);
+                break;
+            case "delete":
+                this.BaseData ??= {};
+                Object.keys(data).forEach(key => {
+                    delete this.BaseData[key];
+                });
+                break;
+        }
+    }
+
+    getThemeClass() {
+        return `lookup-${this.Appearance.popover.theme}`;
+    }
+    getDataSource() {
+        return this.Datasource;
+    }
+    getBaseData() {
+        return this.BaseData;
+    }
+
+    setReferenceDataSource(data) {
+        if (!this.Instance) return;
+        this.Datasource = data || [];
+
+        if (this.GridInstance) {
+            this.GridInstance.option("dataSource", this.Datasource);
+            this.GridInstance.clearSelection();
+
+            this.GridInstance.option("focusedRowKey", null);
+            this.GridInstance.option("focusedRowIndex", -1);
+        }
+
+        this.Instance.option("value", null);
+    }
+    setDataSource(data) {
+        if (!this.Instance) return;
+        this.Datasource = data.map(x => ({ ...x }));
+
+        if (this.GridInstance) {
+            this.GridInstance.option("dataSource", this.Datasource);
+            this.GridInstance.clearSelection();
+
+            this.GridInstance.option("focusedRowKey", null);
+            this.GridInstance.option("focusedRowIndex", -1);
+        }
+
+        this.Instance.option("value", null);
+    }
+    setTarget(target) {
+        this.Instance.option("target", target);
+
+        this.Instance.option("position", {
+            my: "left top",
+            at: "left bottom",
+            of: target
+        });
+    }
+
+    show() {
+        this.Instance?.show();
+    }
+
+    hide() {
+        this.Instance?.hide();
+    }
+
+    toggle() {
+        if (!this.Instance) {
+            return;
+        }
+
+        if (this.Instance.option("visible")) {
+            this.Instance.hide();
+        }
+        else {
+            this.Instance.show();
+        }
+    }
+
+    dispose() {
+        this.Instance?.dispose();
+        this.Instance = null;
+    }
+}
+BaseFoundation.registerClass("BaseDevextremeGridPopover", BaseDevextremeGridPopover);
+
+class BaseDevextremeColorPopover {
+    constructor(Container, Key, Value, Setting, Appearance, Events) {
+        this.Container = Container;
+        this.Key = Key;
+        this.Value = Value || "#ffffff";
+        this.TempValue = this.Value;
+        this.InitialValue = this.Value;
+
+        this.Appearance = {
+            popover: {
+                theme: Appearance?.theme ?? "primary",
+                classes: {
+                    lookup: Appearance?.classes?.lookup ?? "",
+                    header: Appearance?.classes?.header ?? "",
+                    body: Appearance?.classes?.body ?? "",
+                    footer: Appearance?.classes?.footer ?? ""
+                }
+            }
+        };
+
+        this.Setting = {
+            popover: {
+                target: Container,
+                width: Setting?.popover?.width ?? "500px",
+                height: Setting?.popover?.height ?? "40vh",
+                closeOnOutsideClick: Setting?.popover?.closeOnOutsideClick ?? true,
+                hideOnParentScroll: Setting?.popover?.hideOnParentScroll ?? true,
+                shading: Setting?.popover?.shading ?? false,
+                position: {
+                    my: "left top",
+                    at: "left bottom",
+                    of: Container,
+                    collision: "flipfit"
+                },
+                wrapperAttr: {
+                    class: [
+                        "popover-no-padding",
+                        this.getThemeClass(),
+                        this.Appearance.popover.classes.lookup
+                    ]
+                        .filter(Boolean)
+                        .join(" ")
+                }
+            }
+        };
+
+        this.Events = Events || {};
+
+        this.Instance = null;
+        this.ColorView = null;
+    }
+
+    init() {
+        const self = this;
+
+        this.Instance = $(self.Container).dxPopover({
+            ...self.Setting.popover,
+
+            contentTemplate(content) {
+                const wrapper = $("<div>").css({
+                    padding: "10px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "10px"
+                });
+
+                const colorViewElement = $("<div>")
+                    .dxColorView({
+                        value: self.Value,
+                        editAlphaChannel: false,
+                        onValueChanged(e) {
+                            self.TempValue = e.value;
+                        }
+                    });
+
+                self.ColorView = colorViewElement.dxColorView("instance");
+                console.log(self.ColorView);
+                console.log(self.ColorView.option());
+                const buttons = $("<div>").css({
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: "8px"
+                });
+
+                $("<div>")
+                    .dxButton({
+                        text: "Hủy",
+                        stylingMode: "outlined",
+                        onClick() {
+                            self.TempValue = self.Value;
+
+                            self.ColorView?.option(
+                                "value",
+                                self.Value
+                            );
+
+                            self.hide();
+                        }
+                    })
+                    .appendTo(buttons);
+
+                $("<div>")
+                    .dxButton({
+                        text: "OK",
+                        type: "default",
+                        onClick() {
+                            self.Value = self.TempValue;
+
+                            self.Events.onChange?.({
+                                [self.Key]: self.Value
+                            });
+
+                            self.hide();
+                        }
+                    })
+                    .appendTo(buttons);
+
+                colorViewElement.appendTo(wrapper);
+                buttons.appendTo(wrapper);
+                wrapper.appendTo(content);
+            },
+
+            onShown() {
+                self.TempValue = self.Value;
+
+                setTimeout(() => {
+                    if (self.ColorView) {
+                        self.ColorView.option(
+                            "value",
+                            self.Value
+                        );
+
+                        self.ColorView.repaint();
+                    }
+                }, 50);
+            }
+
+        }).dxPopover("instance");
+    }
+
+    getThemeClass() {
+        return `lookup-${this.Appearance.popover.theme}`;
+    }
+
+    setValue(value) {
+        this.Value = value || "#ffffff";
+        this.TempValue = this.Value;
+        this.InitialValue = this.Value;
+
+        if (this.ColorView) {
+            this.ColorView.option(
+                "value",
+                this.Value
+            );
+
+            this.ColorView.repaint();
+        }
+    }
+    setOnChange(callback) {
+        this.Events["onChange"] = callback
+    }
+
+    getValue() {
+        return this.Value;
+    }
+
+    setTarget(target) {
+        this.Instance.option("target", target);
+
+        this.Instance.option("position", {
+            my: "left top",
+            at: "left bottom",
+            of: target
+        });
+    }
+
+    show(value) {
+        if (value) {
+            this.setValue(value);
+        }
+
+        this.Instance?.show();
+    }
+
+    hide() {
+        this.Instance?.hide();
+    }
+
+    toggle() {
+        if (!this.Instance) {
+            return;
+        }
+
+        if (this.Instance.option("visible")) {
+            this.Instance.hide();
+        }
+        else {
+            this.Instance.show();
+        }
+    }
+
+    dispose() {
+        this.Instance?.dispose();
+        this.Instance = null;
+        this.ColorView = null;
+    }
+}
+BaseFoundation.registerClass("BaseDevextremeColorPopover", BaseDevextremeColorPopover);

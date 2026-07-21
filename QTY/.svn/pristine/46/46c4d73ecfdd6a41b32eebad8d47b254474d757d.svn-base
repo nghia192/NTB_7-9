@@ -1,0 +1,2487 @@
+﻿
+
+class LoaiLoiModule {
+    constructor(Container) {
+        this.Name = this.constructor.name;
+        this.Container = Container;
+
+        this.helper = {
+            generate: new GenerateHelper(),
+            parse: new ParseHelper(),
+            excel: {
+                import: new BaseImportExcelHelper(),
+            } 
+        };
+        this.baseapi = new BaseFetchAPI("/api/Common");
+        //this.loailoiapi = new LoaiLoiFetchAPI("api/Common/Post");
+
+        this.module = {
+            toast: {
+                id: this.Name + "Toast",
+                instance: null
+            },
+            loading: {
+                id: this.Name + "Loading",
+                instance: null
+            },
+            tab: {
+                id: this.Name + "Tab",
+                instance: null,
+                list: {
+                    
+                    "phanloaimodule": {
+                        text: "Phân loại module", 
+                        instance: null,
+                        content: {
+                            id: "phanloaimoduleContent",
+                            instance: null
+                        },
+                        event: async () => await this.PhanLoaiModuleContent_OnRender(),
+                        splitter: {
+                            id: "phanloaimoduleSplitter",
+                            instance: null,
+                        },
+                        card: {
+                            phanloaimodule: {
+                                id: this.Name + "phanloaimoduleCard",
+                                instance: null
+                            },
+                            phanloailoi: {
+                                id: this.Name + "phanloailoiCard",
+                                instance: null
+                            }
+                        },
+                        grid: {
+                            phanloaimodule: {
+                                id: this.Name + "phanloaimoduleGrid",
+                                datasource: [],
+                                instance: null,
+                                dialog: {
+                                    id: this.Name + "phanloaimoduleDialog",
+                                    datasource: [],
+                                    instance: null
+                                }
+                            },
+                            phanloailoi: {
+                                id: this.Name + "phanloailoiGrid",
+                                datasource: [],
+                                instance: null,
+                                params: {
+                                    MaNhomLoi: null,
+                                    CodeNhomLoi: null,
+                                    ID: null
+                                },
+                                loading: {
+                                    id: this.Name + "phanloailoiLoading",
+                                    instance: null
+                                },
+                                dialog: {
+                                    id: this.Name + "phanloailoiDialog",
+                                    datasource: [],
+                                    instance: null
+                                }
+                            }
+                        },
+                        buttons: {
+                            phanloaimodule: {
+                                add: {
+                                    id: this.Name + "phanloaimoduleAddButton",
+                                    instance: null,
+                                },
+                                save: {
+                                    id: this.Name + "phanloaimoduleSaveButton",
+                                    instance: null,
+                                },
+                                import: {
+                                    id: this.Name + "phanloaimoduleImportButton",
+                                    instance: null,
+                                }
+                            },
+                            phanloailoi: {
+                                add: {
+                                    id: this.Name + "phanloailoiAddButton",
+                                    instance: null,
+                                },
+                                save: {
+                                    id: this.Name + "phanloailoiSaveButton",
+                                    instance: null,
+                                }
+                            }
+                        },
+                        popover: {
+                            hangmucloi: {
+                                id: this.Name + "phanloailoiPopover",
+                                datasource: [],
+                                instance: null,
+                                params: {
+                                    MaLoi: null,
+                                    Pid: null,
+                                }
+                            },
+                            maunensau: {
+                                id: this.Name + "maunensauPopover",
+                                instance: null,
+                                params: {
+                                    MaNhomLoi: null,
+                                }
+                            },
+                            maunentruoc: {
+                                id: this.Name + "maunentruocPopover",
+                                instance: null,
+                                params: {
+                                    MaNhomLoi: null,
+                                }
+                            }
+                        },
+                        loading: {
+                            id: this.Name + "phanloaimoduleLoading",
+                            instance:null
+                        }
+                    },
+                    "modulenhomloi": {
+                        text: "Module nhóm lỗi", 
+                        instance: null,
+                        content: {
+                            id: "modulenhomloiContent",
+                            instance: null
+                        },
+                        event: async () => await this.ModuleNhomLoiContent_OnRender(),
+                        grid: {
+                            id: this.Name + "modulenhomloiGrid",
+                            datasource: [],
+                            instance: null 
+                        },
+                    },
+                    "tlbophan": {
+                        text: "Thiết lập bộ phận", 
+                        instance: null,
+                        content: {
+                            id: "tlbophanContent",
+                            instance: null
+                        },
+                        event: async () => await this.TLBophanContent_OnRender(),
+                        grid: {
+                            tlbophan: {
+                                id: this.Name + "tlbophanGrid",
+                                datasource: [],
+                                instance: null
+                            },
+                            dsnhomloi: {
+                                id: this.Name + "dsnhomloiGrid",
+                                datasource: [],
+                                instance: null,
+                                params: {
+                                    MaBoPhan: null
+                                }
+                            },
+                            tlkcsqa: {
+                                id: this.Name + "tlkcsqaGrid",
+                                datasource: [],
+                                instance: null
+                            },
+                            tlhangmucloi: {
+                                id: this.Name + "tlhangmucloiGrid",
+                                datasource: [],
+                                instance: null
+                            }
+                        },
+                        card: {
+                            tlbophan: {
+                                id: this.Name + "tlbophanCard",
+                                instance: null
+                            },
+                            dsnhomloi: {
+                                id: this.Name + "dsnhomloiCard",
+                                instance: null
+                            },
+                            tlkcsqa: {
+                                id: this.Name + "tlkcsqaCard",
+                                instance: null
+                            },
+                            tlhangmucloi: {
+                                id: this.Name + "tlhangmucloiCard",
+                                instance: null
+                            }
+                        },
+                        buttons: {
+                            tlbophan: {
+                                add: {
+                                    id: this.Name + "tlbophanAddButton",
+                                    instance: null,
+                                },
+                                save: {
+                                    id: this.Name + "tlbophanSaveButton",
+                                    instance: null,
+                                }
+                            },
+                            tlkcsqa: {
+                                add: {
+                                    id: this.Name + "tlkcsqaAddButton",
+                                    instance: null,
+                                },
+                                save: {
+                                    id: this.Name + "tlkcsqaSaveButton",
+                                    instance: null,
+                                }
+                            },
+                            tlhangmucloi: {
+                                add: {
+                                    id: this.Name + "tlhangmucloiAddButton",
+                                    instance: null,
+                                },
+                                save: {
+                                    id: this.Name + "tlhangmucloiSaveButton",
+                                    instance: null,
+                                }
+                            }
+                        },
+                        dialog: {
+                            tlbophan: {
+                                id: this.Name + "tlbophanDialog",
+                                datasource: [],
+                                instance: null
+                            },
+                            tlkcsqa: {
+                                id: this.Name + "tlkcsqaDialog",
+                                datasource: [],
+                                instance: null
+                            },
+                            tlhangmucloi: {
+                                id: this.Name + "tlhangmucloiDialog",
+                                datasource: [],
+                                instance: null
+                            }
+                        }
+                    },                   
+            },
+                
+            }
+        }
+
+        this.Instance = null;
+    }
+
+    async render() {
+        this.Instance = $(this.Container).html(`
+            <div id="${this.module.tab.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+        `);
+        this.Toast_OnRender();
+        this.Loading_OnRender();
+        this.Tab_OnRender();
+    }
+
+    Toast_OnRender() {
+        this.module.toast.instance = new BaseDevextremeToast(
+            "#" + this.module.toast.id,
+            {},
+            {}
+        );
+        this.module.toast.instance.init();
+    }
+
+    Loading_OnRender() {
+        this.module.loading.instance = new BaseDevextremeLoading(
+            "#" + this.module.loading.id,
+            {},
+            {}
+        );
+        this.module.loading.instance.init();
+    }
+
+    Tab_OnRender() {
+        this.module.tab.instance = new BaseDevextremeTab(
+            "#" + this.module.tab.id,
+            {},
+            {},
+            {}
+        );
+        Object.keys(this.module.tab.list).forEach(key => {
+            const item = this.module.tab.list[key];
+            this.module.tab.instance.addItem(key, item.text, item.event);
+        });
+        this.module.tab.instance.render();
+    }
+
+    // tab module nhóm lỗi
+    async ModuleNhomLoiContent_OnRender() {
+        const content = this.module.tab.list.modulenhomloi.content;
+        const grid = this.module.tab.list.modulenhomloi.grid;
+        if (content.instance) {
+            return;
+        }
+        content.instance = new BaseContent(
+            "#" + this.module.tab.id + "_" + content.id,
+            `
+                <div id="${grid.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+            `,
+            {}
+        );
+        content.instance.render();
+
+        if (!grid.instance) {
+            await this.ModuleNhomLoiGrid_OnRender();
+        }
+    }
+    async ModuleNhomLoiGrid_OnRender() {
+        const grid = this.module.tab.list.modulenhomloi.grid;
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_PHANLOAIKCSQA",
+            ProcedureName: "SP_QTY_QA_PHANLOAIKCSQA",
+            Action: "getphanloaikcsqa",
+        })
+        const data = await this.baseapi.post();
+        let loiGroup = [];
+        if (data.length > 0) {
+            loiGroup = Object.keys(data[0]).filter(key => key.includes("_k_")).map(key => {
+                const [id, name] = key.split("_k_");
+                return {
+                    MaModule: id,
+                    TenModule: name,
+                    Key: key
+                };
+            });
+        }
+        grid.instance = new ModuleNhomLoiGrid(
+            "#" + grid.id,
+            data,
+            {
+                keyExpr: "MaNhomLoi",
+                editing: {
+                    allowUpdating: false
+                },
+                
+            },
+            {
+                cell: {
+                    header: {
+                        backgroundColor: "#17a2b8",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        color: "#ffffff"
+                    }
+                }
+            },
+            {
+                onReload: async () => {
+                    //await this.PhanLoaiModuleGrid_OnReload();
+                },
+                onFocusedRowChanged: async (data) => {
+                    //await this.PhanLoaiModuleGrid_OnFocusedRowChange(data);
+                }
+            }
+        );
+        grid.instance.render();
+        const self = this;
+        if (loiGroup.length > 0) {
+            grid.instance.addGroup("User");
+            loiGroup.forEach(group => {
+                grid.instance.addGroupColumn("User", {
+                    dataField: group.MaModule,
+                    caption: group.TenModule,
+                    alignment: "center",
+                    width: 120,
+                    allowSorting: false, 
+                    allowFiltering: false,
+                    allowEditing: false,
+                    cellTemplate: (container, options) => {
+                        $("<div>")
+                            .dxCheckBox({
+                                value: Number(options.data[group.Key]) === 1,
+
+                                onValueChanged: (e) => {
+                                    this.PhanLoaiModuleGrid_OnCheck(
+                                        options.data,
+                                        group,
+                                        e.value
+                                    );
+                                }
+                            })
+                            .appendTo(container);
+                    }
+                });
+            });
+        }
+    }
+    
+
+    // tab phân loại module
+    async PhanLoaiModuleContent_OnRender() {
+        const content = this.module.tab.list.phanloaimodule.content;
+        if (content.instance) {
+            return;
+        }
+        content.instance = new BaseContent(
+            "#" + this.module.tab.id + "_" + content.id,
+            `
+
+            <div id="${this.module.tab.list.phanloaimodule.splitter.id}"
+            style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+            `,
+            {}
+        );
+        content.instance.render();
+
+        if (!this.module.tab.list.phanloaimodule.splitter.instance) {
+            await this.PhanLoaiModuleSplitter_OnRender();
+        }
+    }
+    async PhanLoaiModuleSplitter_OnRender() {
+        const splitter = this.module.tab.list.phanloaimodule.splitter;
+        if (splitter.instance) {
+            return;
+        }
+        splitter.instance = new BaseSplitter(
+            "#" + splitter.id,
+            {
+                direction: "horizontal",
+
+                first: {
+                    size: "50%"
+                },
+
+                second: {
+                    size: "50%"
+                }
+            },
+            {},
+            {}
+        );
+        splitter.instance.setPanel({
+            first: `
+                <div id="${this.module.tab.list.phanloaimodule.card.phanloaimodule.id}"
+                style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+            `,
+
+            second: `
+                <div id="${this.module.tab.list.phanloaimodule.card.phanloailoi.id}"
+                style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+            `
+        });
+        splitter.instance.render();
+
+        if (!this.module.tab.list.phanloaimodule.card.phanloaimodule.instance) {
+            await this.PhanLoaiModuleCard_OnRender();
+        }
+        if (!this.module.tab.list.phanloaimodule.card.phanloailoi.instance) {
+            await this.PhanLoaiLoiCard_OnRender();
+        }
+    }
+
+    async PhanLoaiModuleCard_OnRender() {
+        const card = this.module.tab.list.phanloaimodule.card.phanloaimodule;
+        const addbtn = this.module.tab.list.phanloaimodule.buttons.phanloaimodule.add;
+        const savebtn = this.module.tab.list.phanloaimodule.buttons.phanloaimodule.save;
+        const importbtn = this.module.tab.list.phanloaimodule.buttons.phanloaimodule.import;
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloaimodule;
+        const dialog = this.module.tab.list.phanloaimodule.grid.phanloaimodule.dialog;
+        const backpopover = this.module.tab.list.phanloaimodule.popover.maunensau;
+        const forpopover = this.module.tab.list.phanloaimodule.popover.maunentruoc;
+        const loading = this.module.tab.list.phanloaimodule.loading;
+        card.instance = new BaseBootstrapCard(
+            "#" + card.id,
+            {
+                title: "Danh sách nhóm lỗi",
+                icon: "fas fa-list"
+            }
+        );
+        card.instance.setBody(`
+            <div style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <div id="${addbtn.id}"></div>
+                    <div id="${savebtn.id}"></div>
+                    <div id="${importbtn.id}"></div>
+                </div>
+                <div class="mt-1" id="${grid.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+                <div id="${dialog.id}"></div>
+                <div id="${backpopover.id}"></div>
+                <div id="${forpopover.id}"></div>
+            </div>
+            
+        `);
+        card.instance.render();
+        
+        if (!addbtn.instance) {
+            await this.PhanLoaiModuleAddButton_OnRender();
+        }
+        if (!savebtn.instance) {
+            await this.PhanLoaiModuleSaveButton_OnRender();
+        }
+        if (!importbtn.instance) {
+            await this.PhanLoaiModuleImportButton_OnRender();
+        }
+        if (!grid.instance) {
+            await this.PhanLoaiModuleGrid_OnRender();
+        }  
+        if (!dialog.instance) {
+            await this.PhanLoaiModuleDialog_OnRender();
+        } 
+        if (!backpopover.instance) {
+            await this.PhanLoaiModuleBackPopover_OnRender();
+        } 
+        if (!forpopover.instance) {
+            await this.PhanLoaiModuleForPopover_OnRender();
+        }  
+        if (!loading.instance) {
+            await this.PhanLoaiModuleLoading_OnRender();
+        }       
+    }
+    async PhanLoaiModuleLoading_OnRender() {
+        const loading = this.module.tab.list.phanloaimodule.loading;
+        loading.instance = new ProcessBootstrapLoading(
+            "#" + loading.id,
+            {},
+            {}
+        );
+        loading.instance.init();
+    }
+    async PhanLoaiModuleDialog_OnRender() {
+        const dialog = this.module.tab.list.phanloaimodule.grid.phanloaimodule.dialog;
+        if (dialog.instance) {
+            return;
+        }
+        dialog.instance = new ConfirmDevExtremeDialog(
+            "#" + dialog.id,
+            "Cảnh báo",
+            "Bạn có chắc chắn muốn xóa dữ liệu này không?",
+            {
+                showCloseButton: true,
+            },
+            {},
+            {
+                onConfirm: async () => {
+                    const grid = this.module.tab.list.phanloaimodule.grid.phanloaimodule;
+                    grid.instance.closeEdit();                   
+                    this.baseapi.buildPayload({
+                        TableName: "QTY_QA_NHOMLOI",
+                        ProcedureName: "SP_QTY_QA_NHOMLOI",
+                        Action: "deletenhomloi",
+                        TypeTable: [dialog.datasource]
+                    }, "Post");                    
+                    await this.baseapi.post();
+                    grid.instance.buildRows([dialog.datasource], 0, "delete", "MaNhomLoi", "Sort");
+                    grid.instance.closeEdit();
+                    const data = grid.instance.getDataSource();
+                    let payload = [];   
+                    data.forEach(row => {
+                        payload.push({
+                            ID: row.MaNhomLoi,
+                            Name: row.TenNhomLoi,
+                            BackColor: row.BackColor,
+                            ForColor: row.ForColor,
+                            Sort: row.Sort,
+                            CodeNhomLoi: row.CodeNhomLoi
+                        });
+                    }); 
+                    this.baseapi.buildPayload({
+                        TableName: "QTY_QA_NHOMLOI",
+                        ProcedureName: "SP_QTY_QA_NHOMLOI",
+                        Action: "upsertnhomloi",
+                        TypeTable: payload
+                    }, "Post");
+                    await this.baseapi.post();
+                    this.module.toast.instance.show("Xóa thành công", "success");
+                    dialog.instance.hide();
+                    await this.PhanLoaiModuleGrid_OnReload();
+                }
+            }
+        )
+        dialog.instance.init();
+    }
+    async PhanLoaiModuleAddButton_OnRender() {
+        const button = this.module.tab.list.phanloaimodule.buttons.phanloaimodule.add;
+        button.instance = new BaseDevextremeButton(
+            "#" + button.id,
+            {
+                Base: "Thêm",
+                Pending: "Đang thêm...",
+            },
+            {
+                icon: "add",
+                width: "100px"
+            },
+            {}
+        ); 
+        button.instance.setEvent(async () => {
+            await this.PhanLoaiModuleAddButton_OnClick();
+        });
+        button.instance.render();
+    }
+    async PhanLoaiModuleAddButton_OnClick() {
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloaimodule;
+        const columnlist = grid.instance.getColumnFields();
+        const newid = this.helper.generate.generatedTimeKey("manhomloi");
+        const newintid = this.helper.generate.generatedIntKey();
+        let newrow = {};
+        columnlist.forEach(col => {
+            newrow[col] = null;
+        });
+        newrow["MaNhomLoi"] = newid;
+        newrow["ID"] = newintid;
+        newrow["Sort"] = 1;
+        grid.instance.buildRows([newrow], null, "insert", "", "Sort");
+    }
+    async PhanLoaiModuleSaveButton_OnRender() {
+        const button = this.module.tab.list.phanloaimodule.buttons.phanloaimodule.save;
+        button.instance = new BaseDevextremeButton(
+            "#" + button.id,
+            {
+                Base: "Lưu",
+                Pending: "Đang lưu...",
+            },
+            {
+                type: "success",
+                icon: "save",
+                width: "100px"
+            },
+            {}
+        );
+        button.instance.setEvent(async () => {
+            await this.PhanLoaiModuleSaveButton_OnClick();
+        });
+        button.instance.render();
+    }
+    async PhanLoaiModuleSaveButton_OnClick() {
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloaimodule;
+        grid.instance.closeEdit();
+        const data = grid.instance.getDataSource();
+        let payload = [];   
+        data.forEach(row => {
+            payload.push({
+                ID: row.ID,
+                MaNhomLoi: row.MaNhomLoi,
+                Name: row.TenNhomLoi,
+                BackColor: row.BackColor,
+                ForColor: row.ForColor,
+                Sort: row.Sort,
+                CodeNhomLoi: row.CodeNhomLoi
+            });
+        }); 
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_NHOMLOI",
+            ProcedureName: "SP_QTY_QA_NHOMLOI",
+            Action: "upsertnhomloi",
+            TypeTable: payload
+        }, "Post");
+        await this.baseapi.post();
+        this.module.toast.instance.show("Lưu thành công", "success");
+        await this.PhanLoaiModuleGrid_OnReload();
+    }
+    async PhanLoaiModuleImportButton_OnRender() {
+        const button = this.module.tab.list.phanloaimodule.buttons.phanloaimodule.import;
+        button.instance = new BaseBootstrapButton(
+            "#" + button.id,
+            {
+                Base: "Import Excel",
+                Pending: "Import...",
+            },
+            {
+                type: "warning",
+                icon: "fa-regular fa-file-excel",
+                width: "150px"
+            },
+            {}
+        );
+        button.instance.setEvent(async () => {
+            await this.PhanLoaiModuleImportButton_OnClick();
+        });
+        button.instance.render();
+    }
+    async PhanLoaiModuleImportButton_OnClick() {
+        const loading = this.module.tab.list.phanloaimodule.loading;
+        const nhomloigrid = this.module.tab.list.phanloaimodule.grid.phanloaimodule;
+        const file = this.helper.excel.import;
+        const self = this;
+        file.chooseAndOpen().then(async (workbook) => {
+            if (!workbook) return;
+            this.baseapi.buildPayload({
+                TableName: "QTY_QA_PHANLOAILOI",
+                ProcedureName: "SP_QTY_QA_PHANLOAILOI",
+                Action: "getloailoi",
+            })
+            let loailoidata = await this.baseapi.post();
+            let nhomloidata = [];
+            let loidata = [];
+            let loailoicolumns = loailoidata.map(item => {
+                return {
+                    caption: [self.helper.parse.cleanText(item.TenLoaiLoi)],
+                    dataField: self.helper.parse.parseCaptionToField(item.TenLoaiLoi),
+                    position: null,
+                    type: "value",
+                    isMerge: 0,
+                    top: 1,
+                    right: 1,
+                    bottom: 1,
+                    left: 1,
+                    data: {
+                        type: "value",
+                        format: "string",
+                        formulas: null,
+                        isNull: true,
+                        staticValue: "X"
+                    }
+                }
+            })
+            console.log(loailoicolumns)
+            const sheet = file.getWorksheet();
+            file.clearDataTable();
+            file.addDataTable([
+                {
+                    name: "LoiChiTiet",
+                    type: "a",
+                    direction: "vertical"
+                }
+            ]);
+            file.buildColumns("LoiChiTiet", [
+                {
+                    caption: ["bộ phận /", "bộ phận", "bộ phận / nhóm lỗi", "nhóm lỗi", "bo phan", "bo phan / nhom loi", "nhom loi"],
+                    dataField: "BoPhan",
+                    position: null,
+                    type: "richtext",
+                    isMerge: 1,
+                    top: 1,
+                    right: 1,
+                    bottom: 2,
+                    left: 1,
+                    data: {
+                        type: "richtext", 
+                        format: "string",
+                        formulas: null,
+                        isNull: false,
+                        staticValue: null
+                    }
+                },
+                {
+                    caption: ["mã số lỗi", "ma so loi"],
+                    dataField: "MaLoi",
+                    position: null,
+                    type: "value",
+                    isMerge: 0,
+                    top: 1,
+                    right: 1,
+                    bottom: 2,
+                    left: 1,
+                    data: {
+                        type: "value",
+                        format: "string",
+                        formulas: null,
+                        isNull: false,
+                        staticValue: null
+                    }
+                },
+                {
+                    caption: ["tên lỗi", "ten loi"],
+                    dataField: "TenLoi",
+                    position: null,
+                    type: "value",
+                    isMerge: 0,
+                    top: 1,
+                    right: 1,
+                    bottom: 2,
+                    left: 1,
+                    data: {
+                        type: "value",
+                        format: "string",
+                        formulas: null,
+                        isNull: false,
+                        staticValue: null
+                    }
+                },
+                {
+                    caption: ["hạng mục lỗi", "hang muc loi"],
+                    dataField: "TenHangMucLoi",
+                    position: null,
+                    type: "value",
+                    isMerge: 0,
+                    top: 1,
+                    right: 1,
+                    bottom: 2,
+                    left: 1,
+                    data: {
+                        type: "value",
+                        format: "string",
+                        formulas: null,
+                        isNull: true,
+                        staticValue: null
+                    }
+                },
+                ...loailoicolumns,
+                // {
+                //     caption: ["nghiêm trọng", "nt", "lỗi nt"],
+                //     dataField: "NghiemTrong",
+                //     position: null,
+                //     type: "value",
+                //     isMerge: 0,
+                //     top: 1,
+                //     right: 1,
+                //     bottom: 1,
+                //     left: 1,
+                //     data: {
+                //         type: "value",
+                //         format: "string",
+                //         formulas: null,
+                //         isNull: true,
+                //         staticValue: "X"
+                //     }
+                // },
+                // {
+                //     caption: ["nặng", "nang", "lỗi nặng"],
+                //     dataField: "Nang",
+                //     position: null,
+                //     type: "value",
+                //     isMerge: 0,
+                //     top: 1,
+                //     right: 1,
+                //     bottom: 1,
+                //     left: 1,
+                //     data: {
+                //         type: "value",
+                //         format: "string",
+                //         formulas: null,
+                //         isNull: true,
+                //         staticValue: "X"
+                //     }
+                // },
+                // {
+                //     caption: ["nhẹ", "nhe", "lỗi nhẹ"],
+                //     dataField: "Nhe",
+                //     position: null,
+                //     type: "value",
+                //     isMerge: 0,
+                //     top: 1,
+                //     right: 1,
+                //     bottom: 1,
+                //     left: 1,
+                //     data: {
+                //         type: "value",
+                //         format: "string",
+                //         formulas: null,
+                //         isNull: true,
+                //         staticValue: "X"
+                //     }
+                // },
+                {
+                    caption: ["ghi chú", "ghi chu"],
+                    dataField: "GhiChu",
+                    position: null,
+                    type: "value",
+                    isMerge: 0,
+                    top: 1,
+                    right: 1,
+                    bottom: 2,
+                    left: 1,
+                    data: {
+                        type: "value",
+                        format: "string",
+                        formulas: null,
+                        isNull: true,
+                        staticValue: null
+                    }
+                },
+            ])
+            loading.instance.show("Bắt đầu");
+            await loading.instance.step("Đang đọc file...", 10, 1000, async () => {
+                file.readDataTable("LoiChiTiet");
+            })
+            await loading.instance.step("Đang xử lý...", 40, 1000, async () => {
+                loidata = file.getResultDataTable("LoiChiTiet");
+                let nhomloi = loidata.filter((row, index, s) => {
+                    return !s.some((other, otherIndex) => other?.BoPhan?.value === row?.BoPhan?.value && otherIndex < index);
+                })
+                const loiChiTietPipeline = [
+                    self.helper.parse.stepSanitize(), 
+                    self.helper.parse.stepExtractAndConsume("MaNhomLoi", { type: "between", start: "(", end: ")" }),
+                    self.helper.parse.stepSplitByNewLine("BoPhan", "TenNhomLoi"),
+                    self.helper.parse.stepCleanEdgeJunk(["BoPhan", "TenNhomLoi", "MaNhomLoi"]) 
+                ];
+                nhomloidata = nhomloi.map(item => {
+                    return self.helper.parse.executePipeline(item?.BoPhan?.value, loiChiTietPipeline);
+                })        
+            }) 
+            await loading.instance.step("Đang lưu...", 95, 1000, async () => {
+                this.baseapi.buildPayload({
+                    TableName: "QTY_QA_PHANLOAILOI",
+                    ProcedureName: "SP_QTY_QA_PHANLOAILOI",
+                    Action: "getloailoi",
+                })
+                const loailoi = await this.baseapi.post();
+                this.baseapi.buildPayload({
+                    TableName: "QTY_QA_HANGMUCLOI",
+                    ProcedureName: "SP_QTY_QA_HANGMUCLOI",
+                    Action: "gethangmucloi",
+                })
+                const hangmucloi = await this.baseapi.post();
+                let nhomloidatasource = nhomloigrid.instance.getDataSource();
+                let startSort = nhomloidatasource.length > 0 ? Math.max(...nhomloidatasource.map(item => item.Sort)) + 1 : 1;
+                let nhomloipayload = [];
+                nhomloidata.forEach((row, index) => {
+                    if (!row.MaNhomLoi) {
+                        loading.instance.hide("");
+                        this.module.toast.instance.show("Không tìm thấy Mã nhóm lỗi", "warning");
+                        return;
+                    }
+                    let havemanhomloi = nhomloidatasource.find(item => row.CodeNhomLoi === item.MaNhomLoi.replace(/\s+/g, "").trim()) || "";
+                    let key = havemanhomloi ? havemanhomloi.MaNhomLoi : self.helper.generate.generatedTimeKey("manhomloi");
+                    let id = havemanhomloi ? havemanhomloi.ID : self.helper.generate.generatedIntKey();
+                    let sort = havemanhomloi ? havemanhomloi.Sort : startSort + index;
+                    nhomloipayload.push({
+                        ID: id,
+                        MaNhomLoi: key,
+                        Name: row.TenNhomLoi,
+                        BackColor: "#FFFFFF",
+                        ForColor: "#000000",
+                        Sort: sort,
+                        CodeNhomLoi: row.MaNhomLoi.replace(/\s+/g, "").trim()
+                    });
+                }); 
+                
+                let loipayload = [];
+                let loailoipayload = [];
+                let nhomloicheck = "";
+                let startSortLoi = 1;
+                loidata.forEach((row, index) => {                   
+                    let nhomloidangcheck = nhomloipayload.find(item => row?.BoPhan?.value?.replace(/\s+/g, "").trim().includes(item.CodeNhomLoi)) || "";
+                    if (!nhomloidangcheck || !nhomloidangcheck?.CodeNhomLoi) {
+                        loading.instance.hide("");
+                        this.module.toast.instance.show("Không tìm thấy Mã nhóm lỗi", "warning");
+                        return;
+                    }
+                    let mahangmucloi = hangmucloi.find(item => 
+                        self.helper.parse.cleanText(item.TenHangMucLoi) === self.helper.parse.cleanText(row?.TenHangMucLoi?.value?.trim())
+                    );
+                    if (nhomloidangcheck?.CodeNhomLoi != nhomloicheck) {
+                        startSortLoi = 1;
+                        nhomloicheck = nhomloidangcheck.CodeNhomLoi;
+                    }
+                    loipayload.push({
+                        NhomLoi: nhomloidangcheck.ID,
+                        MaNhomLoi: nhomloidangcheck.MaNhomLoi,
+                        MaLoi: row.MaLoi?.value?.trim() || null,
+                        TenLoi: row.TenLoi?.value?.trim() || null,
+                        GhiChu: row.GhiChu?.value?.trim() || null,
+                        MaHangMuc: mahangmucloi ? mahangmucloi.MaHangMucLoi : null,
+                        Sort: startSortLoi,
+                    })
+                    loailoidata.forEach(ll => {
+                        let coloi = null;
+                        for (const [key, data] of Object.entries(row)) {
+                        if (data.caption.includes(self.helper.parse.cleanText(ll.TenLoaiLoi))) {
+                            coloi = {MaLoaiLoi: ll.MaLoaiLoi, value: data.value};
+                            if (data.value != null) {
+                                loailoipayload.push({
+                                    MaLoi: row.MaLoi?.value?.trim(),
+                                    MaLoaiLoi: coloi.MaLoaiLoi,
+                                    TrangThai: 1
+                                })
+                            }
+                            break;
+                        }
+                        }
+                    })
+                    
+                    startSortLoi++;
+                })
+                this.baseapi.buildPayload({
+                    TableName: "QTY_QA_NHOMLOI",
+                    ProcedureName: "SP_QTY_QA_NHOMLOI",
+                    Action: "upsertnhomloi",
+                    TypeTable: nhomloipayload
+                }, "Post");
+                //console.log(nhomloipayload);
+                await this.baseapi.post();
+
+                this.baseapi.buildPayload({
+                    TableName: "QTY_QA_NHOMLOI",
+                    ProcedureName: "SP_QTY_QA_NHOMLOI",
+                    Action: "upsertnhomloichitiet",
+                    TypeTable: loipayload
+                }, "Post");
+                //console.log(loipayload);
+                await this.baseapi.post();
+
+                this.baseapi.buildPayload({
+                    TableName: "QTY_QA_PHANLOAILOI",
+                    ProcedureName: "SP_QTY_QA_PHANLOAILOI",
+                    Action: "upsertphanloailoi",
+                    TypeTable: loailoipayload
+                }, "Post");
+                //console.log(loailoipayload);
+                await this.baseapi.post();
+            })
+            await loading.instance.step("", 100, 500, async () => {
+                this.module.toast.instance.show("Lưu thành công", "success");
+                await self.PhanLoaiModuleGrid_OnReload();
+                await self.PhanLoaiLoiGrid_OnReload();
+            })            
+        });
+    }
+    async PhanLoaiModuleGrid_OnRender() {
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloaimodule;
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_PHANLOAIKCSQA",
+            ProcedureName: "SP_QTY_QA_PHANLOAIKCSQA",
+            Action: "getphanloaikcsqa",
+        })
+        const data = await this.baseapi.post();
+        
+        
+        grid.instance = new PhanLoaiModuleGrid(
+            "#" + grid.id,
+            data,
+            {
+                keyExpr: "MaNhomLoi",
+                editing: {
+                    allowUpdating: true
+                },
+                rowDragging: {
+                    allowReordering: true,
+                    showDragIcons: true,
+                    sortField: "Sort"
+                }
+            },
+            {
+                cell: {
+                    header: {
+                        backgroundColor: "#17a2b8",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        color: "#ffffff"
+                    }
+                }
+            },
+            {
+                onReload: async () => {
+                    await this.PhanLoaiModuleGrid_OnReload();
+                },
+                onFocusedRowChanged: async (data) => {
+                    await this.PhanLoaiModuleGrid_OnFocusedRowChange(data);
+                }
+            }
+        );
+        grid.instance.render();
+        const self = this;
+        grid.instance.addColumn({
+            dataField: "BackColor",
+            caption: "Màu nền",
+            allowEditing: false,
+            allowSorting: false,
+            width: 150,
+            cellTemplate: (container, options) => {
+                const data = options.data;
+                const color = data.BackColor || "#ffffff";
+                const popover = self.module.tab.list.phanloaimodule.popover.maunensau;
+
+                const wrapper = $("<div>").css({
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%"
+                });
+
+                $("<div>")
+                    .css({
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "90px",
+                        height: "28px",
+                        borderRadius: "4px",
+                        border: "1px solid #ccc",
+                        backgroundColor: color,
+                        color: "#ffffff",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        textShadow: "0 1px 2px #000"
+                    })
+                    .text(color.toUpperCase())
+                    .appendTo(wrapper);
+
+                const btnId = `${popover.id}_${data.MaNhomLoi}`;
+
+                $("<div>")
+                    .attr("id", btnId)
+                    .dxButton({
+                        icon: "palette",
+                        stylingMode: "text",
+                        hint: "Chọn màu",
+                        onClick: () => {
+                            popover.params.MaNhomLoi = data.MaNhomLoi;
+                            popover.instance.setTarget(`#${btnId}`);
+                            popover.instance.show(color);
+                        }
+                    })
+                    .appendTo(wrapper);
+
+                $(container).append(wrapper);
+            }
+        });
+        grid.instance.addColumn({
+            dataField: "ForColor",
+            caption: "Màu chữ",
+            allowEditing: false,
+            allowSorting: false,
+            width: 150,
+            cellTemplate: (container, options) => {
+                const data = options.data;
+                const color = data.ForColor || "#ffffff";
+                const popover = self.module.tab.list.phanloaimodule.popover.maunentruoc;
+
+                const wrapper = $("<div>").css({
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%"
+                });
+
+                $("<div>")
+                    .css({
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "90px",
+                        height: "28px",
+                        borderRadius: "4px",
+                        border: "1px solid #ccc",
+                        backgroundColor: color,
+                        color: "#ffffff",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        textShadow: "0 1px 2px #000"
+                    })
+                    .text(color.toUpperCase())
+                    .appendTo(wrapper);
+
+                const btnId = `${popover.id}_${data.MaNhomLoi}`;
+
+                $("<div>")
+                    .attr("id", btnId)
+                    .dxButton({
+                        icon: "palette",
+                        stylingMode: "text",
+                        hint: "Chọn màu",
+                        onClick: () => {
+                            popover.params.MaNhomLoi = data.MaNhomLoi;
+                            popover.instance.setTarget(`#${btnId}`);                      
+                            popover.instance.show(color);
+                        }
+                    })
+                    .appendTo(wrapper);
+
+                $(container).append(wrapper);
+            }
+        });
+        
+        
+        grid.instance.addColumn({
+            caption: "",
+            width: 120,
+            alignment: "center",
+            cellTemplate(container, options) {
+
+                const createButton = (text, className, onClick) => {
+                    $("<button>")
+                        .addClass(`btn btn-sm ${className} w-100 d-flex align-items-center justify-content-center`)
+                        .css({
+                            height: "32px"
+                        })
+                        .text(text)
+                        .on("click", onClick)
+                        .appendTo(container);
+                };
+
+                if (options.data.TrangThai != 1) {
+                    createButton("Xoá", "btn-danger", async (data) => {
+                        await self.PhanLoaiModuleGrid_OnDelete(options.data);                        
+                    });
+                }                        
+            }
+        });
+        
+    }
+    async PhanLoaiModuleGrid_OnReload() {
+        this.module.loading.instance.show();
+        try {
+            const grid = this.module.tab.list.phanloaimodule.grid.phanloaimodule;
+            this.baseapi.buildPayload({
+                TableName: "QTY_QA_PHANLOAIKCSQA",
+                ProcedureName: "SP_QTY_QA_PHANLOAIKCSQA",
+                Action: "getphanloaikcsqa",
+            })
+            const data = await this.baseapi.post();
+            grid.instance.setDataSource(data);
+        }
+        finally { 
+            this.module.loading.instance.hide();
+        }
+    }
+    async PhanLoaiModuleGrid_OnCheck(data, group, value) {
+        
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_PHANLOAIKCSQA",
+            ProcedureName: "SP_QTY_QA_PHANLOAIKCSQA",
+            Action: "upsertphanloaikcsqa",
+            TypeTable: [{
+                MaNhomLoi: data.MaNhomLoi,
+                MaModule: group.MaModule,
+                TrangThai: value ? 1 : 0
+            }]
+        }, "Post");
+        await this.baseapi.post();
+        this.module.toast.instance.show("Cập nhật thành công", "success");
+    }
+    async PhanLoaiModuleGrid_OnFocusedRowChange(data) {
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloailoi;
+            grid.params.MaNhomLoi = data.MaNhomLoi;
+            grid.params.CodeNhomLoi = data.CodeNhomLoi;
+            grid.params.ID = data.ID;
+            console.log(grid.params, data)
+            if (!grid.instance) {
+                await this.PhanLoaiLoiGrid_OnRender();
+            }
+            else {
+                await this.PhanLoaiLoiGrid_OnReload();
+            }
+        // this.module.loading.instance.show();
+        // try {
+            
+        // }
+        // finally {
+        //     this.module.loading.instance.hide();
+        // }
+    }
+    async PhanLoaiModuleGrid_OnDelete(data) {
+        const dialog = this.module.tab.list.phanloaimodule.grid.phanloaimodule.dialog;
+        const removedata = { ...data, ID: data.MaNhomLoi}
+        dialog.datasource = removedata;
+        await dialog.instance.show();  
+    }
+    async PhanLoaiModuleBackPopover_OnRender() {
+        const popover = this.module.tab.list.phanloaimodule.popover.maunensau;
+
+        popover.instance =new BaseDevextremeColorPopover(
+            "#" + popover.id,
+            "BackColor",
+            "#ffffff",
+            {},
+            {},
+            {
+                onChange: async (data) => {
+                   await this.PhanLoaiModuleBackPopover_OnChange(data);
+                }
+            }
+        );
+        popover.instance.init();
+    }
+    async PhanLoaiModuleBackPopover_OnChange(data) {
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloaimodule;
+        const popover = this.module.tab.list.phanloaimodule.popover.maunensau;
+        grid.instance.setCellValue(popover.params.MaNhomLoi, "BackColor", data.BackColor);
+    }
+    async PhanLoaiModuleForPopover_OnRender() {
+        const popover = this.module.tab.list.phanloaimodule.popover.maunentruoc;
+
+        popover.instance =new BaseDevextremeColorPopover(
+            "#" + popover.id,
+            "ForColor",
+            "#ffffff",
+            {},
+            {},
+            {
+                onChange: async (data) => {
+                   await this.PhanLoaiModuleForPopover_OnChange(data);
+                }
+            }
+        );
+        popover.instance.init();
+    }
+    async PhanLoaiModuleForPopover_OnChange(data) {
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloaimodule;
+        const popover = this.module.tab.list.phanloaimodule.popover.maunentruoc;
+        grid.instance.setCellValue(popover.params.MaNhomLoi, "ForColor", data.ForColor);
+    }
+
+    async PhanLoaiLoiCard_OnRender() {
+        const card = this.module.tab.list.phanloaimodule.card.phanloailoi;
+        const addbtn = this.module.tab.list.phanloaimodule.buttons.phanloailoi.add;
+        const savebtn = this.module.tab.list.phanloaimodule.buttons.phanloailoi.save;
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloailoi;
+        const loading = this.module.tab.list.phanloaimodule.grid.phanloailoi.loading;
+        const popover = this.module.tab.list.phanloaimodule.popover.hangmucloi;
+        const dialog = this.module.tab.list.phanloaimodule.grid.phanloailoi.dialog;
+        card.instance = new BaseBootstrapCard(
+            "#" + card.id,
+            {
+                title: "Danh sách lỗi chi tiết",
+                icon: "fas fa-list"
+            }
+        );
+        card.instance.setBody(`
+            <div style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <div id="${addbtn.id}"></div>
+                    <div id="${savebtn.id}"></div>
+                </div>
+                <div class="mt-1" id="${grid.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+                <div id="${loading.id}"></div>
+                <div id="${popover.id}"></div>
+                <div id="${dialog.id}"></div>
+            </div>
+        `);
+        card.instance.render();
+        
+        if (!addbtn.instance) {
+            await this.PhanLoaiLoiAddButton_OnRender();
+        }
+        if (!savebtn.instance) {
+            await this.PhanLoaiLoiSaveButton_OnRender();
+        } 
+        if (!loading.instance) {
+            await this.PhanLoaiLoiLoading_OnRender();
+        }    
+        if (!popover.instance) {
+            await this.PhanLoaiLoiPopover_OnRender();
+        }  
+        if (!dialog.instance) {
+            await this.PhanLoaiLoiDialog_OnRender();
+        }  
+    }
+    async PhanLoaiLoiDialog_OnRender() {
+        const dialog = this.module.tab.list.phanloaimodule.grid.phanloailoi.dialog;
+        if (dialog.instance) {
+            return;
+        }
+        dialog.instance = new ConfirmDevExtremeDialog(
+            "#" + dialog.id,
+            "Cảnh báo",
+            "Bạn có chắc chắn muốn xóa dữ liệu này không?",
+            {
+                showCloseButton: true,
+            },
+            {},
+            {
+                onConfirm: async () => {
+                    const grid = this.module.tab.list.phanloaimodule.grid.phanloailoi;
+                    grid.instance.closeEdit();                   
+                    this.baseapi.buildPayload({
+                        TableName: "QTY_QA_NHOMLOI",
+                        ProcedureName: "SP_QTY_QA_NHOMLOI",
+                        Action: "deletenhomloichitiet",
+                        TypeTable: [dialog.datasource]
+                    }, "Post");                    
+                    await this.baseapi.post();
+                    grid.instance.buildRows([dialog.datasource], 0, "delete", "MaLoiChiTiet", "Sort");
+                    grid.instance.updateKeySort("MaLoiChiTiet", grid.params.CodeNhomLoi);
+                    grid.instance.closeEdit();
+                    const data = grid.instance.getDataSource();
+                    let payload = [];   
+                    data.forEach(row => {
+                        payload.push({
+                            MaLoi: row.MaLoiChiTiet,
+                            NhomLoi: grid.params.MaNhomLoi,
+                            TenLoi: row.TenLoi,
+                            GhiChu: row.GhiChu,
+                            Sort: row.Sort,
+                        });
+                    }); 
+                    this.baseapi.buildPayload({
+                        TableName: "QTY_QA_NHOMLOI",
+                        ProcedureName: "SP_QTY_QA_NHOMLOI",
+                        Action: "upsertnhomloichitiet",
+                        TypeTable: payload
+                    }, "Post");
+                    await this.baseapi.post();
+                    this.module.toast.instance.show("Xóa thành công", "success");
+                    dialog.instance.hide();
+                    await this.PhanLoaiLoiGrid_OnReload();
+                }
+            }
+        )
+        dialog.instance.init();
+    }
+    async PhanLoaiLoiLoading_OnRender() {
+        const loading = this.module.tab.list.phanloaimodule.grid.phanloailoi.loading;
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloailoi;
+        loading.instance = new BaseDevextremeLoading(
+            "#" + loading.id,
+            {
+                position: {
+                    of: "#" + grid.id
+                }
+            },
+            {}
+        );
+
+        loading.instance.init();
+    }
+    async PhanLoaiLoiAddButton_OnRender() {
+        const button = this.module.tab.list.phanloaimodule.buttons.phanloailoi.add;
+        button.instance = new BaseDevextremeButton(
+            "#" + button.id,
+            {
+                Base: "Thêm",
+                Pending: "Đang thêm...",
+            },
+            {
+                icon: "add",
+                width: "100px"
+            },
+            {}
+        ); 
+        button.instance.setEvent(async () => {
+            await this.PhanLoaiLoiAddButton_OnClick();
+        });
+        button.instance.render();
+    }
+    async PhanLoaiLoiAddButton_OnClick() {
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloailoi;
+        if (grid.params.CodeNhomLoi == null 
+            || (typeof grid.params.CodeNhomLoi === 'string' && grid.params.CodeNhomLoi.trim().length === 0)) {
+                this.module.toast.instance.show("Mã nhóm lỗi đang để trống", "warning");
+                return;
+            }
+        const columnlist = grid.instance.getColumnFields();
+        const newid = this.helper.generate.generatedTimeKey("maloi");
+        const newintid = this.helper.generate.generatedIntKey();
+        let newrow = {};
+        columnlist.forEach(col => {
+            newrow[col] = null;
+        });
+        newrow["MaLoiChiTiet"] = newid;
+        newrow["Sort"] = 1;
+        grid.instance.buildRows([newrow], null, "insert", "", "Sort");
+        grid.instance.updateKeySort("MaLoiChiTiet", grid.params.CodeNhomLoi);
+    }
+    async PhanLoaiLoiSaveButton_OnRender() {
+        const button = this.module.tab.list.phanloaimodule.buttons.phanloailoi.save;
+        button.instance = new BaseDevextremeButton(
+            "#" + button.id,
+            {
+                Base: "Lưu",
+                Pending: "Đang lưu...",
+            },
+            {
+                type: "success",
+                icon: "save",
+                width: "100px"
+            },
+            {}
+        );
+        button.instance.setEvent(async () => {
+            await this.PhanLoaiLoiSaveButton_OnClick();
+        });
+        button.instance.render();
+    }
+    async PhanLoaiLoiSaveButton_OnClick() {
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloailoi;
+        grid.instance.closeEdit();
+        const data = grid.instance.getDataSource(); 
+        let payload = [];
+        data.forEach(row => {
+            payload.push({
+                ...row,
+                NhomLoi: grid.params.ID,
+                MaNhomLoi: grid.params.MaNhomLoi,
+                MaLoi: row.MaLoiChiTiet
+            })
+        })     
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_NHOMLOI",
+            ProcedureName: "SP_QTY_QA_NHOMLOI",
+            Action: "upsertnhomloichitiet",
+            TypeTable: payload
+        }, "Post");
+        console.log(payload)
+        await this.baseapi.post();
+        this.module.toast.instance.show("Lưu thành công", "success");
+        await this.PhanLoaiLoiGrid_OnReload();
+    }
+    async PhanLoaiLoiGrid_OnRender() {
+        const grid = this.module.tab.list.phanloaimodule.grid.phanloailoi;
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_PHANLOAILOI",
+            ProcedureName: "SP_QTY_QA_PHANLOAILOI",
+            Action: "getphanloailoi",
+            Parameter: grid.params.MaNhomLoi
+        })
+        const data = await this.baseapi.post();
+        let loiGroup = [];
+        if (data.length > 0) {
+            loiGroup = Object.keys(data[0]).filter(key => key.includes("_k_")).map(key => {
+                const [id, name] = key.split("_k_");
+                return {
+                    MaLoaiLoi: id,
+                    TenLoaiLoi: name,
+                    Key: key
+                };
+            });
+        }
+        else {
+            this.baseapi.buildPayload({
+                TableName: "QTY_QA_PHANLOAILOI",
+                ProcedureName: "SP_QTY_QA_PHANLOAILOI",
+                Action: "getloailoi",
+                Parameter: grid.params.MaNhomLoi
+            })
+            const title = await this.baseapi.post();
+            title.forEach(item => {
+                loiGroup.push({
+                    MaLoaiLoi: item.MaLoaiLoi,
+                    TenLoaiLoi: item.TenLoaiLoi,
+                    Key: item._key
+                })
+            })
+        }
+        
+        grid.instance = new PhanLoaiLoiGrid(
+            "#" + grid.id,
+            data,
+            {
+                keyExpr: "MaLoiChiTiet",
+                editing: {
+                    allowUpdating: true
+                },
+                rowDragging: {
+                    allowReordering: true,
+                    showDragIcons: true,
+                    sortField: "Sort"
+                }
+            },
+            {
+                cell: {
+                    header: {
+                        backgroundColor: "#17a2b8",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        color: "#ffffff"
+                    }
+                }
+            },
+            {
+                onReload: async () => {
+                    await this.PhanLoaiLoiGrid_OnReload();
+                }
+            }
+        );
+        
+
+        grid.instance.render();
+        
+        grid.instance.addColumn({
+            dataField: "HangMucLoi",
+            caption: "Hạng mục lỗi",
+            allowEditing: false,
+            allowSorting: false,
+            width: 200,
+            cellTemplate: (container, options) => {
+                const data = options.data;
+                const popover = this.module.tab.list.phanloaimodule.popover.hangmucloi;
+                const wrapper = $("<div>").css({
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    
+                });
+                $("<span>")
+                    .text(data.TenHangMucLoi ?? "")
+                    .appendTo(wrapper);
+
+                const btnId = `${popover.id}_${data.MaLoi}`;
+
+                $("<div>")
+                    .attr("id", btnId)
+                    .dxButton({
+                        icon: "more",
+                        stylingMode: "text",
+                        onClick: async () => {
+                            popover.instance.setTarget(`#${btnId}`);
+                            popover.params.MaLoi = data.MaLoiChiTiet;
+                            popover.params.Pid = data.Pid;
+                            await this.PhanLoaiLoiPopover_OnReload();
+                            popover.instance.show();
+                        }
+                    })
+                    .appendTo(wrapper);
+                
+                $(container).append(wrapper);
+            }
+        });
+        if (loiGroup.length > 0) {
+            grid.instance.addGroup("Mức độ lỗi");
+            
+            loiGroup.forEach(group => {
+                grid.instance.addGroupColumn("Mức độ lỗi", {
+                    dataField: group.MaLoaiLoi,
+                    caption: group.TenLoaiLoi,
+                    alignment: "center",
+                    width: 80,
+                    allowSorting: false, 
+                    allowFiltering: false,
+                    allowEditing: false,
+                    cellTemplate: (container, options) => {
+                        $("<div>")
+                            .dxCheckBox({
+                                value: Number(options.data[group.Key]) === 1,
+
+                                onValueChanged: (e) => {
+                                    this.PhanLoaiLoiGrid_OnCheck(
+                                        options.data,
+                                        group,
+                                        e.value
+                                    );
+                                }
+                            })
+                            .appendTo(container);
+                    }
+                });
+            });
+        }
+
+        grid.instance.addColumn({
+            dataField: "GhiChu",
+            caption: "Ghi chú",
+            allowSorting: false,
+            allowEditing: true,
+            width: 300
+        });
+        const self = this;
+        grid.instance.addColumn({
+            caption: "",
+            width: 120,
+            alignment: "center",
+            cellTemplate(container, options) {
+
+                const createButton = (text, className, onClick) => {
+                    $("<button>")
+                        .addClass(`btn btn-sm ${className} w-100 d-flex align-items-center justify-content-center`)
+                        .css({
+                            height: "32px"
+                        })
+                        .text(text)
+                        .on("click", onClick)
+                        .appendTo(container);
+                };
+
+                if (options.data.TrangThai != 1) {
+                    createButton("Xoá", "btn-danger", async (data) => {
+                        await self.PhanLoaiLoiGrid_OnDelete(options.data);
+                    });
+                }                        
+            }
+        });
+    }
+    async PhanLoaiLoiGrid_OnReload() {
+        const loading = this.module.tab.list.phanloaimodule.grid.phanloailoi.loading;
+        loading.instance.show();
+        try {
+            const grid = this.module.tab.list.phanloaimodule.grid.phanloailoi;
+            this.baseapi.buildPayload({
+                TableName: "QTY_QA_PHANLOAILOI",
+                ProcedureName: "SP_QTY_QA_PHANLOAILOI",
+                Action: "getphanloailoi",
+                Parameter: grid.params.MaNhomLoi
+            })
+            const data = await this.baseapi.post();
+            grid.instance.setDataSource(data);
+        }
+        finally { 
+            loading.instance.hide();
+        }
+    }
+    async PhanLoaiLoiGrid_OnCheck(data, group, value) {
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_PHANLOAILOI",
+            ProcedureName: "SP_QTY_QA_PHANLOAILOI",
+            Action: "upsertphanloailoi",
+            TypeTable: [{
+                MaLoi: data.MaLoiChiTiet,
+                MaLoaiLoi: group.MaLoaiLoi,
+                TrangThai: value ? 1 : 0
+            }]
+        }, "Post");
+        await this.baseapi.post();
+        this.module.toast.instance.show("Cập nhật thành công", "success");
+    }
+    async PhanLoaiLoiGrid_OnDelete(data) {
+        const dialog = this.module.tab.list.phanloaimodule.grid.phanloailoi.dialog;
+        const removedata = { ...data, MaLoi: data.MaLoiChiTiet}
+        dialog.datasource = removedata;
+        await dialog.instance.show();  
+    }
+    async PhanLoaiLoiPopover_OnRender() {
+        const popover = this.module.tab.list.phanloaimodule.popover.hangmucloi;
+        popover.instance = new PhanLoaiLoiPopover(
+            "#" + popover.id,
+            "MaHangMucLoi",
+            [],
+            {},
+            {},
+            {
+                onChange: async (data) => {
+                    await this.PhanLoaiLoiPopover_OnChange(data);
+                }
+            }
+        );
+        popover.instance.init();
+    }
+    async PhanLoaiLoiPopover_OnReload() {
+        const popover = this.module.tab.list.phanloaimodule.popover.hangmucloi;
+            this.baseapi.buildPayload({
+                TableName: "QTY_QA_HANGMUCLOI",
+                ProcedureName: "SP_QTY_QA_HANGMUCLOI",
+                Action: "gethangmucloi"
+            });
+            const data = await this.baseapi.post();
+            popover.instance.setDataSource(data);
+    }
+    async PhanLoaiLoiPopover_OnChange(data) {
+        const popover = this.module.tab.list.phanloaimodule.popover.hangmucloi;
+        this.baseapi.buildPayload({
+                TableName: "QTY_QA_HANGMUCLOI",
+                ProcedureName: "SP_QTY_QA_HANGMUCLOI",
+                Action: "updatehangmucnhomloi",
+                TypeTable: [{
+                    MaHangMucLoi: data.MaHangMucLoi,
+                    MaLoaiHangMucLoi: popover.params.MaLoi
+                }]
+            }, "Post");
+            console.log(data.MaHangMucLoi, popover.params.MaLoi)
+            await this.baseapi.post();
+            this.module.toast.instance.show("Cập nhật thành công", "success");
+            await this.PhanLoaiLoiGrid_OnReload();
+    }
+
+    // tab thiết lập bộ phận
+    async TLBophanContent_OnRender() {
+        const content = this.module.tab.list.tlbophan.content;
+        const tlbophancard = this.module.tab.list.tlbophan.card.tlbophan;
+        const dsnhomloicard = this.module.tab.list.tlbophan.card.dsnhomloi;
+        const tlkcsqacard = this.module.tab.list.tlbophan.card.tlkcsqa;
+        const tlhangmucloicard = this.module.tab.list.tlbophan.card.tlhangmucloi;
+        if (content.instance) {
+            return;
+        }
+        content.instance = new BaseContent(
+            "#" + this.module.tab.id + "_" + content.id,
+            `
+                <div class="row g-2" style="height:100%;margin:0 !important;">
+
+                    <div class="col-12 col-lg-6 dashboard-col" style="padding:0 !important;margin:0 !important;height:50%;min-height:0;overflow:auto;display:flex;flex-direction:column;">
+                        <div id="${tlbophancard.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+                    </div>
+
+                    <div class="col-12 col-lg-6 dashboard-col" style="padding:0 !important;margin:0 !important;height:50%;min-height:0;overflow:auto;display:flex;flex-direction:column;">
+                        <div id="${dsnhomloicard.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+                    </div>
+
+                    <div class="col-12 col-lg-6 dashboard-col" style="padding:0 !important;margin:0 !important;height:50%;min-height:0;overflow:auto;display:flex;flex-direction:column;">
+                        <div id="${tlkcsqacard.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+                    </div>
+
+                    <div class="col-12 col-lg-6 dashboard-col" style="padding:0 !important;margin:0 !important;height:50%;min-height:0;overflow:auto;display:flex;flex-direction:column;">
+                        <div id="${tlhangmucloicard.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+                    </div>
+
+                </div>
+            `,
+            {}
+        );
+        content.instance.render();
+        if (!tlbophancard.instance) {
+            await this.TLBophanCard_OnRender();
+        }
+        if (!dsnhomloicard.instance) {
+            await this.DSNhomLoiCard_OnRender();
+        }
+        if (!tlkcsqacard.instance) {
+            await this.TLKCSQACard_OnRender();
+        }
+        if (!tlhangmucloicard.instance) {
+            await this.TLHangMucLoiCard_OnRender();
+        }
+    }
+
+    async TLBophanCard_OnRender() {
+        const card = this.module.tab.list.tlbophan.card.tlbophan;
+        const addbtn = this.module.tab.list.tlbophan.buttons.tlbophan.add;
+        const savebtn = this.module.tab.list.tlbophan.buttons.tlbophan.save;
+        const grid = this.module.tab.list.tlbophan.grid.tlbophan;
+        const dialog = this.module.tab.list.tlbophan.dialog.tlbophan;
+        card.instance = new BaseBootstrapCard(
+            "#" + card.id,
+            {
+                title: "Thiết lập bộ phận",
+                icon: "fas fa-list"
+            },
+            {
+                fillParent: true,
+                bodyScroll: true
+            }
+        );
+        card.instance.setBody(`
+            <div style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <div id="${addbtn.id}"></div>
+                    <div id="${savebtn.id}"></div>
+                </div>
+                <div class="mt-1" id="${grid.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+                <div id="${dialog.id}"></div>
+            </div>
+        `);
+        card.instance.render();
+        
+        if (!addbtn.instance) {
+            await this.TLBophanAddButton_OnRender();
+        }
+        if (!savebtn.instance) {
+            await this.TLBophanSaveButton_OnRender();
+        }
+        if (!grid.instance) {
+            await this.TLBophanGrid_OnRender();
+        }
+        if (!dialog.instance) {
+            await this.TLBophanDialog_OnRender();
+        }
+    }
+    async TLBophanDialog_OnRender() {
+        const dialog = this.module.tab.list.tlbophan.dialog.tlbophan;
+        if (dialog.instance) {
+            return;
+        }
+        dialog.instance = new ConfirmDevExtremeDialog(
+            "#" + dialog.id,
+            "Cảnh báo",
+            "Bạn có chắc chắn muốn xóa dữ liệu này không?",
+            {
+                showCloseButton: true,
+            },
+            {},
+            {
+                onConfirm: async () => {
+                    const grid = this.module.tab.list.tlbophan.grid.tlbophan;
+                    grid.instance.closeEdit();                   
+                    this.baseapi.buildPayload({
+                        TableName: "QTY_QA_BOPHAN",
+                        ProcedureName: "SP_QTY_QA_BOPHAN",
+                        Action: "deletebophan",
+                        TypeTable: [dialog.datasource]
+                    }, "Post");
+                    await this.baseapi.post();
+                    this.module.toast.instance.show("Xóa thành công", "success");
+                    dialog.instance.hide();
+                    await this.TLBophanGrid_OnReload();
+                }
+            }
+        )
+        dialog.instance.init();
+    }
+    async TLBophanAddButton_OnRender() {
+        const button = this.module.tab.list.tlbophan.buttons.tlbophan.add;
+        button.instance = new BaseDevextremeButton(
+            "#" + button.id,
+            {
+                Base: "Thêm",
+                Pending: "Đang thêm...",
+            },
+            {
+                icon: "add",
+                width: "100px"
+            },
+            {}
+        ); 
+        button.instance.setEvent(async () => {
+            await this.TLBophanAddButton_OnClick();
+        });
+        button.instance.render();
+    }
+    async TLBophanAddButton_OnClick() {
+        const grid = this.module.tab.list.tlbophan.grid.tlbophan;
+        const newid = this.helper.generate.generatedTimeKey("Bophan");
+        grid.instance.buildRows(
+            [
+                {
+                    MaBoPhan: newid,
+                    TenBoPhan: "",
+                    CodeBoPhan: "",
+                    GhiChu: "",
+                }
+            ]
+        );
+    }
+    async TLBophanSaveButton_OnRender() {
+        const button = this.module.tab.list.tlbophan.buttons.tlbophan.save;
+        button.instance = new BaseDevextremeButton(
+            "#" + button.id,
+            {
+                Base: "Lưu",
+                Pending: "Đang lưu...",
+            },
+            {
+                type: "success",
+                icon: "save",
+                width: "100px"
+            },
+            {}
+        );
+        button.instance.setEvent(async () => {
+            await this.TLBophanSaveButton_OnClick();
+        });
+        button.instance.render();
+    }
+    async TLBophanSaveButton_OnClick() {
+        const grid = this.module.tab.list.tlbophan.grid.tlbophan;
+        grid.instance.closeEdit();
+        const data = grid.instance.getDataSource();        
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_BOPHAN",
+            ProcedureName: "SP_QTY_QA_BOPHAN",
+            Action: "upsertbophan",
+            TypeTable: data
+        }, "Post");
+        await this.baseapi.post();
+        this.module.toast.instance.show("Lưu thành công", "success");
+        await this.TLBophanGrid_OnReload();
+    }
+    async TLBophanGrid_OnRender() {
+        const grid = this.module.tab.list.tlbophan.grid.tlbophan;
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_BOPHAN",
+            ProcedureName: "SP_QTY_QA_BOPHAN",
+            Action: "getbophan"
+        });
+        const data = await this.baseapi.post();
+        grid.instance = new BoPhanGrid(
+            "#" + grid.id,
+            data,
+            {
+                keyExpr: "MaBoPhan"
+            },
+            {
+                cell: {
+                    header: {
+                        backgroundColor: "#17a2b8",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        color: "#ffffff"
+                    }
+                }
+            },
+            {
+                onReload: async () => {
+                    await this.TLBophanGrid_OnReload();
+                },
+                onDelete: async (data) => {
+                    await this.TLBophanGrid_OnDelete(data);
+                },
+                onFocusedRowChanged: async (data) => {
+                    await this.TLBophanGrid_OnFocusedRowChange(data);
+                },
+            }
+        );
+        grid.instance.render();
+    }
+    async TLBophanGrid_OnReload() {
+        this.module.loading.instance.show();
+        try {
+            const grid = this.module.tab.list.tlbophan.grid.tlbophan;
+            this.baseapi.buildPayload({
+                TableName: "QTY_QA_BOPHAN",
+                ProcedureName: "SP_QTY_QA_BOPHAN",
+                Action: "getbophan"
+            });
+            const data = await this.baseapi.post();
+            grid.instance.setDataSource(data);
+        }
+        finally { 
+            this.module.loading.instance.hide();
+        }
+    }
+    async TLBophanGrid_OnDelete(data) { 
+        const dialog = this.module.tab.list.tlbophan.dialog;
+        dialog.datasource = data;
+        await dialog.instance.show();       
+    }
+    async TLBophanGrid_OnFocusedRowChange(data) {
+        const grid = this.module.tab.list.tlbophan.grid.dsnhomloi;
+        grid.params.MaBoPhan = data.MaBoPhan;
+        await this.DSNhomLoiGrid_OnReload();
+    }
+
+    async DSNhomLoiCard_OnRender() {
+        const card = this.module.tab.list.tlbophan.card.dsnhomloi;
+        const grid = this.module.tab.list.tlbophan.grid.dsnhomloi;
+        card.instance = new BaseBootstrapCard(
+            "#" + card.id,
+            {
+                title: "Danh sách nhóm lỗi",
+                icon: "fas fa-list"
+            },
+            {
+                fillParent: true,
+                bodyScroll: true
+            }
+        );
+        card.instance.setBody(`
+            <div id="${grid.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+        `);
+        card.instance.render();
+        
+        if (!grid.instance) {
+            await this.DSNhomLoiGrid_OnRender();
+        }
+    }
+    async DSNhomLoiGrid_OnRender() {
+        const grid = this.module.tab.list.tlbophan.grid.dsnhomloi;
+        grid.instance = new PhanLoaiBoPhanGrid(
+            "#" + grid.id,
+            [],
+            {
+                keyExpr: "MaNhomLoi"
+            },
+            {
+                cell: {
+                    header: {
+                        backgroundColor: "#17a2b8",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        color: "#ffffff"
+                    }
+                }
+            },
+            {
+                onReload: async () => {
+                    await this.DSNhomLoiGrid_OnReload();
+                },
+                onChange: async (data, value) => {
+                    await this.DSNhomLoiGrid_OnChange(data, value);
+                },
+            }
+        );
+        grid.instance.render();
+    }
+    async DSNhomLoiGrid_OnReload() {
+        const grid = this.module.tab.list.tlbophan.grid.dsnhomloi;
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_PHANLOAIBOPHAN",
+            ProcedureName: "SP_QTY_QA_PHANLOAIBOPHAN",
+            Action: "getphanloaibophan",
+            Parameter: grid.params.MaBoPhan
+        });
+        grid.datasource = await this.baseapi.post();
+        console.log(grid.datasource, grid.params.MaBoPhan)
+        grid.instance.setDataSource(grid.datasource);
+    }
+    async DSNhomLoiGrid_OnChange(data, value) {
+        const grid = this.module.tab.list.tlbophan.grid.dsnhomloi;
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_PHANLOAIBOPHAN",
+            ProcedureName: "SP_QTY_QA_PHANLOAIBOPHAN",
+            Action: "upsertphanloaibophan",
+            TypeTable: [{
+                MaBoPhan: grid.params.MaBoPhan,
+                MaNhomLoi: data.MaNhomLoi,
+                TrangThai: value
+            }]
+        }, "Post");
+        await this.baseapi.post();
+        this.module.toast.instance.show("Cập nhật thành công", "success");
+        await this.DSNhomLoiGrid_OnReload();
+    }
+
+    async TLKCSQACard_OnRender() {
+        const card = this.module.tab.list.tlbophan.card.tlkcsqa;
+        const addbtn = this.module.tab.list.tlbophan.buttons.tlkcsqa.add;
+        const savebtn = this.module.tab.list.tlbophan.buttons.tlkcsqa.save;
+        const grid = this.module.tab.list.tlbophan.grid.tlkcsqa;
+        const dialog = this.module.tab.list.tlbophan.dialog.tlkcsqa;
+        card.instance = new BaseBootstrapCard(
+            "#" + card.id,
+            {
+                title: "Thiết lập module",
+                icon: "fas fa-list"
+            },
+            {
+                fillParent: true,
+                bodyScroll: true
+            }
+        );
+        card.instance.setBody(`
+            <div style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <div id="${addbtn.id}"></div>
+                    <div id="${savebtn.id}"></div>
+                </div>
+                <div class="mt-1" id="${grid.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+                <div id="${dialog.id}"></div>
+            </div>
+        `);
+        card.instance.render();
+        
+        if (!addbtn.instance) {
+            await this.TLKCSQAAddButton_OnRender();
+        }
+        if (!savebtn.instance) {
+            await this.TLKCSQASaveButton_OnRender();
+        }
+        if (!grid.instance) {
+            await this.TLKCSQAGrid_OnRender();
+        }
+        if (!dialog.instance) {
+            await this.TLKCSQADialog_OnRender();
+        }
+    }
+    async TLKCSQADialog_OnRender() {
+        const dialog = this.module.tab.list.tlbophan.dialog.tlkcsqa;
+        if (dialog.instance) {
+            return;
+        }
+        dialog.instance = new ConfirmDevExtremeDialog(
+            "#" + dialog.id,
+            "Cảnh báo",
+            "Bạn có chắc chắn muốn xóa dữ liệu này không?",
+            {
+                showCloseButton: true,
+            },
+            {},
+            {
+                onConfirm: async () => {
+                    const grid = this.module.tab.list.tlbophan.grid.tlkcsqa;
+                    grid.instance.closeEdit();                   
+                    this.baseapi.buildPayload({
+                        TableName: "QTY_QA_KCSQA",
+                        ProcedureName: "SP_QTY_QA_KCSQA",
+                        Action: "deletekcsqa",
+                        TypeTable: [dialog.datasource]
+                    }, "Post");
+                    await this.baseapi.post();
+                    this.module.toast.instance.show("Xóa thành công", "success");
+                    dialog.instance.hide();
+                    await this.TLKCSQAGrid_OnReload();
+                }
+            }
+        )
+        dialog.instance.init();
+    }
+    async TLKCSQAAddButton_OnRender() {
+        const button = this.module.tab.list.tlbophan.buttons.tlkcsqa.add;
+        button.instance = new BaseDevextremeButton(
+            "#" + button.id,
+            {
+                Base: "Thêm",
+                Pending: "Đang thêm...",
+            },
+            {
+                icon: "add",
+                width: "100px"
+            },
+            {}
+        ); 
+        button.instance.setEvent(async () => {
+            await this.TLKCSQAAddButton_OnClick();
+        });
+        button.instance.render();
+    }
+    async TLKCSQAAddButton_OnClick() {
+        const grid = this.module.tab.list.tlbophan.grid.tlkcsqa;
+        const newid = this.helper.generate.generatedTimeKey("KCSQA");
+        grid.instance.buildRows(
+            [
+                {
+                    MaModule: newid,
+                    TenModule: "",
+                    CodeModule: "",
+                    GhiChu: "",
+                }
+            ]
+        );
+    }
+    async TLKCSQASaveButton_OnRender() {
+        const button = this.module.tab.list.tlbophan.buttons.tlkcsqa.save;
+        button.instance = new BaseDevextremeButton(
+            "#" + button.id,
+            {
+                Base: "Lưu",
+                Pending: "Đang lưu...",
+            },
+            {
+                type: "success",
+                icon: "save",
+                width: "100px"
+            },
+            {}
+        );
+        button.instance.setEvent(async () => {
+            await this.TLKCSQASaveButton_OnClick();
+        });
+        button.instance.render();
+    }
+    async TLKCSQASaveButton_OnClick() {
+        const grid = this.module.tab.list.tlbophan.grid.tlkcsqa;
+        grid.instance.closeEdit();
+        const data = grid.instance.getDataSource();       
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_KCSQA",
+            ProcedureName: "SP_QTY_QA_KCSQA",
+            Action: "upsertkcsqa",
+            TypeTable: data
+        }, "Post");
+        await this.baseapi.post();
+        this.module.toast.instance.show("Lưu thành công", "success");
+        await this.TLKCSQAGrid_OnReload();
+    }
+    async TLKCSQAGrid_OnRender() {
+        const grid = this.module.tab.list.tlbophan.grid.tlkcsqa;
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_KCSQA",
+            ProcedureName: "SP_QTY_QA_KCSQA",
+            Action: "getkcsqa"
+        });
+        const data = await this.baseapi.post();
+        grid.instance = new KCSQAGrid(
+            "#" + grid.id,
+            data,
+            {
+                keyExpr: "MaModule"
+            },
+            {
+                cell: {
+                    header: {
+                        backgroundColor: "#17a2b8",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        color: "#ffffff"
+                    }
+                }
+            },
+            {
+                onReload: async () => {
+                    await this.TLKCSQAGrid_OnReload();
+                },
+                onDelete: async (data) => {
+                    await this.TLKCSQAGrid_OnDelete(data);
+                }
+            }
+        );
+        grid.instance.render();
+    }
+    async TLKCSQAGrid_OnReload() {
+        this.module.loading.instance.show();
+        try {
+            const grid = this.module.tab.list.tlbophan.grid.tlkcsqa;
+            this.baseapi.buildPayload({
+                TableName: "QTY_QA_KCSQA",
+                ProcedureName: "SP_QTY_QA_KCSQA",
+                Action: "getkcsqa"
+            });
+            const data = await this.baseapi.post();
+            grid.instance.setDataSource(data);
+        }
+        finally { 
+            this.module.loading.instance.hide();
+        }
+    }
+    async TLKCSQAGrid_OnDelete(data) { 
+        const dialog = this.module.tab.list.tlbophan.dialog.tlkcsqa;
+        dialog.datasource = data;
+        await dialog.instance.show();       
+    }
+
+    async TLHangMucLoiCard_OnRender() {
+        const card = this.module.tab.list.tlbophan.card.tlhangmucloi;
+        const addbtn = this.module.tab.list.tlbophan.buttons.tlhangmucloi.add;
+        const savebtn = this.module.tab.list.tlbophan.buttons.tlhangmucloi.save;
+        const grid = this.module.tab.list.tlbophan.grid.tlhangmucloi;
+        const dialog = this.module.tab.list.tlbophan.dialog.tlhangmucloi;
+        card.instance = new BaseBootstrapCard(
+            "#" + card.id,
+            {
+                title: "Thiết lập hạng mục lỗi",
+                icon: "fas fa-list"
+            },
+            {
+                fillParent: true,
+                bodyScroll: true
+            }
+        );
+        card.instance.setBody(`
+            <div style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <div id="${addbtn.id}"></div>
+                    <div id="${savebtn.id}"></div>
+                </div>
+                <div class="mt-1" id="${grid.id}" style="height:100%;min-height:0;overflow:auto;display:flex;flex-direction:column;"></div>
+                <div id="${dialog.id}"></div>
+            </div>
+        `);
+        card.instance.render();
+        
+        if (!addbtn.instance) {
+            await this.TLHangMucLoiAddButton_OnRender();
+        }
+        if (!savebtn.instance) {
+            await this.TLHangMucLoiSaveButton_OnRender();
+        }
+        if (!grid.instance) {
+            await this.TLHangMucLoiGrid_OnRender();
+        }
+        if (!dialog.instance) {
+            await this.TLHangMucLoiDialog_OnRender();
+        }
+    }
+    async TLHangMucLoiDialog_OnRender() {
+        const dialog = this.module.tab.list.tlbophan.dialog.tlhangmucloi;
+        if (dialog.instance) {
+            return;
+        }
+        dialog.instance = new ConfirmDevExtremeDialog(
+            "#" + dialog.id,
+            "Cảnh báo",
+            "Bạn có chắc chắn muốn xóa dữ liệu này không?",
+            {
+                showCloseButton: true,
+            },
+            {},
+            {
+                onConfirm: async () => {
+                    const grid = this.module.tab.list.tlbophan.grid.tlhangmucloi;
+                    grid.instance.closeEdit();                   
+                    this.baseapi.buildPayload({
+                        TableName: "QTY_QA_HANGMUCLOI",
+                        ProcedureName: "SP_QTY_QA_HANGMUCLOI",
+                        Action: "deletehangmucloi",
+                        TypeTable: [dialog.datasource]
+                    }, "Post");
+                    await this.baseapi.post();
+                    this.module.toast.instance.show("Xóa thành công", "success");
+                    dialog.instance.hide();
+                    await this.TLHangMucLoiGrid_OnReload();
+                }
+            }
+        )
+        dialog.instance.init();
+    }
+    async TLHangMucLoiAddButton_OnRender() {
+        const button = this.module.tab.list.tlbophan.buttons.tlhangmucloi.add;
+        button.instance = new BaseDevextremeButton(
+            "#" + button.id,
+            {
+                Base: "Thêm",
+                Pending: "Đang thêm...",
+            },
+            {               
+                icon: "add",
+                width: "100px"
+            },
+            {}
+        ); 
+        button.instance.setEvent(async () => {
+            await this.TLHangMucLoiAddButton_OnClick();
+        });
+        button.instance.render();
+    }
+    async TLHangMucLoiAddButton_OnClick() {
+        const grid = this.module.tab.list.tlbophan.grid.tlhangmucloi;
+        const newid = this.helper.generate.generatedTimeKey("hangmucloi");
+        grid.instance.buildRows(
+            [
+                {
+                    MaHangMucLoi: newid,
+                    TenHangMucLoi: "",
+                    CodeHangMucLoi: "",
+                    GhiChu: "",
+                }
+            ]
+        );
+    }
+    async TLHangMucLoiSaveButton_OnRender() {
+        const button = this.module.tab.list.tlbophan.buttons.tlhangmucloi.save;
+        button.instance = new BaseDevextremeButton(
+            "#" + button.id,
+            {
+                Base: "Lưu",
+                Pending: "Đang lưu...",
+            },
+            {
+                type: "success",
+                icon: "save",
+                width: "100px"
+            },
+            {}
+        );
+        button.instance.setEvent(async () => {
+            await this.TLHangMucLoiSaveButton_OnClick();
+        });
+        button.instance.render();
+    }
+    async TLHangMucLoiSaveButton_OnClick() {
+        const grid = this.module.tab.list.tlbophan.grid.tlhangmucloi;
+        grid.instance.closeEdit();
+        const data = grid.instance.getDataSource();        
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_HANGMUCLOI",
+            ProcedureName: "SP_QTY_QA_HANGMUCLOI",
+            Action: "upserthangmucloi",
+            TypeTable: data
+        }, "Post");
+        await this.baseapi.post();
+        this.module.toast.instance.show("Lưu thành công", "success");
+        await this.TLHangMucLoiGrid_OnReload();
+    }
+    async TLHangMucLoiGrid_OnRender() {
+        const grid = this.module.tab.list.tlbophan.grid.tlhangmucloi;
+        this.baseapi.buildPayload({
+            TableName: "QTY_QA_HANGMUCLOI",
+            ProcedureName: "SP_QTY_QA_HANGMUCLOI",
+            Action: "gethangmucloi"
+        });
+        const data = await this.baseapi.post();
+        grid.instance = new HangMucLoiGrid(
+            "#" + grid.id,
+            data,
+            {
+                keyExpr: "MaHangMucLoi"
+            },
+            {
+                cell: {
+                    header: {
+                        backgroundColor: "#17a2b8",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        color: "#ffffff"
+                    }
+                }
+            },
+            {
+                onReload: async () => {
+                    await this.TLHangMucLoiGrid_OnReload();
+                },
+                onDelete: async (data) => {
+                    await this.TLHangMucLoiGrid_OnDelete(data);
+                }
+            }
+        );
+        grid.instance.render();
+    }
+    async TLHangMucLoiGrid_OnReload() {
+        this.module.loading.instance.show();
+        try {
+            const grid = this.module.tab.list.tlbophan.grid.tlhangmucloi;
+            this.baseapi.buildPayload({
+                TableName: "QTY_QA_HANGMUCLOI",
+                ProcedureName: "SP_QTY_QA_HANGMUCLOI",
+                Action: "gethangmucloi"
+            });
+            const data = await this.baseapi.post();
+            grid.instance.setDataSource(data);
+        }
+        finally { 
+            this.module.loading.instance.hide();
+        }
+    }
+    async TLHangMucLoiGrid_OnDelete(data) { 
+        const dialog = this.module.tab.list.tlbophan.dialog.tlhangmucloi;
+        dialog.datasource = data;
+        await dialog.instance.show();       
+    }
+}
+
+BaseFoundation.registerClass("LoaiLoiModule", LoaiLoiModule);

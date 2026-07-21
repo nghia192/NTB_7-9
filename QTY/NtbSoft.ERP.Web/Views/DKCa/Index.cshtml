@@ -1,0 +1,598 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý ca làm việc</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link href="~/css/thuviencss/bootstrap5.3.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.0/dist/sweetalert2.min.css" rel="stylesheet" />
+    <style>
+        .swal2-container,
+        .swal2-backdrop,
+        .swal2-popup {
+            z-index: 20050 !important;
+        }
+
+        :root {
+            --dkca-primary: #1a1a2e;
+            --dkca-accent: #4361ee;
+            --dkca-bg: #f0f2f5;
+            --dkca-border: #e2e8f0;
+        }
+
+        /*================ ADD SHIFT POPUP ================*/
+
+        .addshift-popup {
+            border-radius: 16px !important;
+            padding: 0 !important;
+        }
+
+        .addshift-title {
+            display: none !important; /* dùng title tự vẽ trong html thay vì title mặc định */
+        }
+
+        .addshift-form {
+            text-align: left;
+            padding: 8px 4px 0;
+        }
+
+        .addshift-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+            .addshift-header .icon-badge {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                background: linear-gradient(135deg, var(--dkca-accent), #6d8bff);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+                font-size: 18px;
+                flex-shrink: 0;
+            }
+
+            .addshift-header .title-text {
+                font-size: 19px;
+                font-weight: 700;
+                color: var(--dkca-primary);
+            }
+
+        .addshift-field {
+            margin-bottom: 16px;
+        }
+
+            .addshift-field label {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                color: #475569;
+                margin-bottom: 6px;
+            }
+
+                .addshift-field label i {
+                    color: var(--dkca-accent);
+                    font-size: 14px;
+                }
+
+        .addshift-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 14px;
+            border: 1.5px solid var(--dkca-border);
+            border-radius: 10px;
+            font-size: 14px;
+            color: #1e293b;
+            background: #f8fafc;
+            transition: border-color .15s, background .15s, box-shadow .15s;
+        }
+
+            .addshift-input:focus {
+                outline: none;
+                border-color: var(--dkca-accent);
+                background: #fff;
+                box-shadow: 0 0 0 3px rgba(67,97,238,.12);
+            }
+
+        .addshift-row2 {
+            display: flex;
+            gap: 12px;
+        }
+
+            .addshift-row2 .addshift-field {
+                flex: 1;
+            }
+
+        .addshift-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid var(--dkca-border);
+        }
+
+        .addshift-btn {
+            flex: 1;
+            padding: 11px 0;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: transform .1s, opacity .15s;
+        }
+
+            .addshift-btn:active {
+                transform: scale(0.98);
+            }
+
+        .addshift-btn-cancel {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+            .addshift-btn-cancel:hover {
+                background: #e2e8f0;
+            }
+
+        .addshift-btn-confirm {
+            background: linear-gradient(135deg, var(--dkca-accent), #6d8bff);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(67,97,238,.3);
+        }
+
+            .addshift-btn-confirm:hover {
+                opacity: .92;
+            }
+
+        /*================ BODY ================*/
+
+        body {
+            margin: 0;
+            padding: 16px;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI',Tahoma,Arial,sans-serif;
+            background: var(--dkca-bg);
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        /*================ CARD ================*/
+
+        .page-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border: 1px solid var(--dkca-border);
+            border-radius: 10px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /*================ TITLE ================*/
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dkca-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        /*================ FORM ================*/
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+            padding: 16px;
+            margin-bottom: 18px;
+            background: #f8fafc;
+            border: 1px solid var(--dkca-border);
+            border-radius: 8px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+            .form-group label {
+                font-weight: 600;
+                margin-bottom: 4px;
+            }
+
+        .clock-icon {
+            cursor: pointer;
+            background: #fff;
+        }
+
+            .clock-icon:hover {
+                background: #eef2ff;
+            }
+
+        .time-picker {
+            text-align: center;
+        }
+        /*================ LAYOUT ================*/
+
+        .layout-container {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        .left-panel,
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        .input-group-text {
+            cursor: pointer;
+            background: #fff;
+        }
+
+            .input-group-text:hover {
+                background: #eef2ff;
+            }
+
+        .time-picker {
+            text-align: center;
+        }
+
+        /*================ TOOLBAR ================*/
+
+        .panel-toolbar {
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        /*================ TABLE WRAP ================*/
+
+        .table-wrap {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid var(--dkca-border);
+            border-radius: 8px;
+            background: #fff;
+        }
+
+            /*================ SCROLLBAR ================*/
+
+            .table-wrap::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            .table-wrap::-webkit-scrollbar-thumb {
+                background: #b9c3d2;
+                border-radius: 20px;
+            }
+
+                .table-wrap::-webkit-scrollbar-thumb:hover {
+                    background: #97a4b8;
+                }
+
+        /*================ TABLE ================*/
+
+        .dkca-table {
+            width: 100%;
+            margin: 0;
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+            /*================ HEADER ================*/
+
+            .dkca-table thead th {
+                position: sticky;
+                top: 0;
+                z-index: 20;
+                background: var(--dkca-primary);
+                color: #fff;
+                text-align: center;
+                vertical-align: middle;
+                padding: 12px;
+                border: none;
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+            /*================ BODY ================*/
+
+            .dkca-table tbody td {
+                background: #fff;
+                color: #1e293b;
+                text-align: center;
+                vertical-align: middle;
+                padding: 10px 12px;
+                border-color: var(--dkca-border);
+            }
+
+            .dkca-table tbody tr:hover td {
+                background: #f8fafc;
+            }
+
+            .dkca-table tbody tr.active-row td {
+                background: #eef2ff !important;
+            }
+
+        /*================ BADGE ================*/
+
+        .badge-ca {
+            background: var(--dkca-accent);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /*================ TIME CELL ================*/
+
+        .time-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .time-display {
+            min-width: 48px;
+            font-weight: 600;
+            text-align: center;
+            color: var(--dkca-primary);
+        }
+
+        /*================ CLOCK BUTTON ================*/
+
+        .btn-clock {
+            border: 1px solid var(--dkca-border);
+            background: #fff;
+            color: var(--dkca-accent);
+            border-radius: 6px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+
+            .btn-clock:hover {
+                background: #eef2ff;
+                border-color: var(--dkca-accent);
+            }
+
+        /*================ ACTION BUTTONS ================*/
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+            .action-buttons .btn {
+                width: 110px;
+            }
+
+        /*================ INPUT MINUTES ================*/
+
+        .input-minutes {
+            width: 70px;
+            margin: auto;
+            text-align: center;
+            border: 1px solid var(--dkca-border);
+            border-radius: 6px;
+        }
+
+            .input-minutes:focus {
+                outline: none;
+                border-color: var(--dkca-accent);
+                box-shadow: 0 0 0 2px rgba(67,97,238,.15);
+            }
+
+        /*================ CELL STYLE ================*/
+
+        .id-cell {
+            font-weight: 700;
+            color: var(--dkca-accent);
+        }
+
+        .desc-cell {
+            font-family: Consolas,"Courier New",monospace;
+            font-weight: 500;
+        }
+
+        /*================ EMPTY ================*/
+
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: #94a3b8;
+        }
+
+            .empty-state i {
+                display: block;
+                font-size: 32px;
+                margin-bottom: 10px;
+            }
+
+        /*================ BUTTON ================*/
+
+        .btn-action {
+            font-size: 13px;
+            padding: 5px 12px;
+        }
+
+        .shift-row {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-card">
+        <div class="page-title">
+            <i class="bi bi-clock-history"></i> Quản lý ca làm việc
+        </div>
+
+        <!-- Form nhập liệu cũ: đã ẩn, các input bên trong vẫn được popup "Thêm ca" tái sử dụng -->
+        <div class="form-row" style="display:none">
+            <div class="form-group">
+                <label for="inpCaLV">Mã ca làm việc</label>
+                <input id="inpCaLV" type="number" class="form-control" min="1" placeholder="VD: 1" />
+            </div>
+            <div class="form-group">
+                <label for="inpTGBatDau">Thời gian bắt đầu</label>
+
+                <div class="input-group">
+
+                    <div class="form-control d-flex justify-content-between align-items-center">
+
+                        <span id="txtTGBatDau" class="time-display">0:00</span>
+
+                        <button type="button"
+                                id="btnClockStart"
+                                class="btn btn-sm btn-light border-0 p-1">
+                            <i class="bi bi-clock"></i>
+                        </button>
+
+                    </div>
+
+                    <input id="inpTGBatDau"
+                           type="time"
+                           style="display:none">
+
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inpTGKetThuc">Thời gian kết thúc</label>
+
+                <div class="input-group">
+
+                    <div class="form-control d-flex justify-content-between align-items-center">
+
+                        <span id="txtTGKetThuc" class="time-display">0:00</span>
+
+                        <button type="button"
+                                id="btnClockEnd"
+                                class="btn btn-sm btn-light border-0 p-1">
+                            <i class="bi bi-clock"></i>
+                        </button>
+
+                    </div>
+
+                    <input id="inpTGKetThuc"
+                           type="time"
+                           style="display:none">
+
+                </div>
+            </div>
+            <div style="display:flex;align-items:end;gap:8px">
+                <button id="btnCreateShift" type="button" class="btn btn-primary btn-action">
+                    <i class="bi bi-plus-circle"></i> Tạo ca
+                </button>
+                <button id="btnRefresh" type="button" class="btn btn-outline-secondary btn-action">
+                    <i class="bi bi-arrow-clockwise"></i> Làm mới
+                </button>
+            </div>
+        </div>
+
+        <!-- BỐ CỤC 2 CỘT -->
+        <div class="layout-container">
+
+            <!-- CỘT TRÁI: Danh sách ca -->
+            <div id="viewShifts" class="left-panel">
+                <div class="panel-toolbar" style="justify-content:space-between">
+                    <h6 class="m-0" style="font-weight:700; color:var(--dkca-primary)"><i class="bi bi-list-task"></i> Danh sách ca</h6>
+                    <button id="btnOpenAddShift" type="button" class="btn btn-primary btn-action btn-sm">
+                        <i class="bi bi-plus-circle"></i> Thêm ca
+                    </button>
+                </div>
+                <div class="table-wrap">
+                    <table class="table dkca-table" id="tblShifts">
+                        <thead>
+                            <tr>
+                                <th style="width:80px">Ca làm</th>
+                                <th>Thời gian bắt đầu</th>
+                                <th>Thời gian kết thúc</th>
+                                <th style="width:130px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblShiftsBody">
+                            <tr><td colspan="4" class="empty-state"><i class="bi bi-inbox"></i>Đang tải...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CỘT PHẢI: Chi tiết TimeShift -->
+            <div id="viewTimeShift" class="right-panel">
+                <div class="panel-toolbar" style="justify-content:space-between">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <span class="badge-ca" id="shiftHeader">Ca 1</span>
+                        <div class="input-group input-group-sm" style="width:180px">
+                            <input type="text" id="searchDetails" class="form-control" placeholder="Tìm kiếm..." />
+                            <button id="btnSearchDetails" class="btn btn-outline-secondary" type="button"><i class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+                    <button id="btnAddRow" type="button" class="btn btn-success btn-action btn-sm">
+                        <i class="bi bi-plus-lg"></i> Thêm khoảng
+                    </button>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="table dkca-table" id="tblTimeShift">
+                        <thead>
+                            <tr>
+                                <th style="width:60px">ID</th>
+                                <th style="width:140px">Thời gian</th>
+                                <th>Descriptions</th>
+                                <th style="width:100px">Số phút</th>
+                                <th style="width:110px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblTimeShiftBody">
+                            <tr><td colspan="5" class="empty-state"><i class="bi bi-hourglass-split"></i>Đang tải...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> <!-- KẾT THÚC BỐ CỤC -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.0/dist/sweetalert2.all.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="~/Scripts/DKCa/shifts.js?v=20260721-1"></script>
+</body>
+</html>
