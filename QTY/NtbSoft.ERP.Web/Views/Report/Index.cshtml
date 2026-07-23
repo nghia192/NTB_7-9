@@ -1,0 +1,192 @@
+@model NtbSoft.ERP.Web.Models.ReportViewModel
+@{
+    ViewBag.Title = "Rework and Checklist Report";
+}
+
+<!-- Nhúng thư viện icon (giống như trang kia của bạn) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+<style>
+    /* Kế thừa bảng màu từ giao diện mẫu của bạn */
+    :root {
+        --dkca-primary: #1a1a2e;
+        --dkca-accent: #4361ee;
+        --dkca-bg: #f0f2f5;
+        --dkca-border: #e2e8f0;
+    }
+
+    body {
+        background-color: var(--dkca-bg);
+    }
+
+    .report-card {
+        background: #fff;
+        border: 1px solid var(--dkca-border);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        margin: 15px;
+    }
+
+    .page-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--dkca-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    /* Vùng chứa các control tìm kiếm */
+    .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: flex-end;
+        padding: 16px;
+        margin-bottom: 20px;
+        background: #f8fafc;
+        border: 1px solid var(--dkca-border);
+        border-radius: 8px;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #475569;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+    .action-group {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+
+    /* Đưa thanh bộ lọc (Filter Row) về lại nền trắng */
+    .dx-datagrid-headers .dx-datagrid-filter-row,
+    .dx-datagrid-headers .dx-datagrid-filter-row td {
+        background-color: #fff !important;
+    }
+
+    /* Chỉnh lại màu chữ và ô input trong bộ lọc cho dễ nhìn */
+    .dx-datagrid-filter-row .dx-texteditor {
+        background-color: #fff !important;
+    }
+
+    .dx-datagrid-filter-row .dx-texteditor-input {
+        color: #1e293b !important;
+    }
+
+    /* Chỉnh màu các icon (kính lúp, lịch, bộ lọc) về màu xám tối */
+    .dx-datagrid-filter-row .dx-icon {
+        color: #475569 !important;
+    }
+
+    /* Làm mềm các input */
+    .dx-texteditor.dx-editor-outlined {
+        border-radius: 6px;
+        border-color: var(--dkca-border);
+    }
+
+    /* Nút Search màu xanh dương */
+    #btnSearch .dx-button-content {
+        background: linear-gradient(135deg, var(--dkca-accent), #6d8bff) !important;
+        color: #fff !important;
+        border-radius: 6px;
+    }
+
+    /* Nút Excel màu xanh lá */
+    #btnExport .dx-button-content {
+        background: linear-gradient(135deg, #10b981, #34d399) !important;
+        color: #fff !important;
+        border-radius: 6px;
+    }
+
+    /* Tiêu đề cột DataGrid theo tone màu chính */
+    .dx-datagrid-headers {
+        background-color: var(--dkca-primary) !important;
+    }
+
+        .dx-datagrid-headers .dx-datagrid-text-content {
+            color: #fff !important;
+            font-weight: 600;
+        }
+
+    .dx-datagrid-borders > .dx-datagrid-headers {
+        border-bottom: none;
+    }
+</style>
+
+<div class="report-card">
+    <div class="page-title">
+        <i class="bi bi-bar-chart-line-fill"></i> Báo cáo Rework & Checklist
+    </div>
+
+    <!-- Vùng Bộ lọc (Filter) -->
+    <!-- Vùng Bộ lọc (Filter) -->
+    <div class="filter-row">
+        <!-- Input Từ Ngày -->
+        <div class="filter-group" style="flex: 0.4; min-width: 130px;">
+            <label><i class="bi bi-calendar-event"></i> Từ ngày</label>
+            <div id="txtFromDate"></div>
+        </div>
+
+        <!-- Input Đến Ngày -->
+        <div class="filter-group" style="flex: 0.4; min-width: 130px;">
+            <label><i class="bi bi-calendar-check"></i> Đến ngày</label>
+            <div id="txtToDate"></div>
+        </div>
+
+        <!-- Input Chuyền -->
+        <div class="filter-group" style="flex: 1; min-width: 160px;">
+            <label><i class="bi bi-diagram-3-fill"></i> Line ID</label>
+            <div id="tagLine"></div>
+        </div>
+
+        <!-- Input PCO -->
+        <div class="filter-group" style="flex: 1; min-width: 160px;">
+            <label><i class="bi bi-tags-fill"></i> PCO Number</label>
+            <div id="tagPCO"></div>
+        </div>
+
+        <!-- Các Nút Thao Tác -->
+        <div class="action-group">
+            <div id="btnSearch"></div>
+            <div id="btnExport"></div>
+        </div>
+    </div>
+
+    <!-- Vùng hiển thị Tab Panel và Grid -->
+    <div id="tabReport"></div>
+</div>
+
+<!-- Thành phần Load Panel chờ xử lý -->
+<div id="loadPanel"></div>
+
+@section scripts {
+    <!-- 1. JQUERY BẮT BUỘC ĐẦU TIÊN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 2. DEVEXTREME CSS/JS -->
+    <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/21.2.7/css/dx.light.css">
+    <script src="https://cdn3.devexpress.com/jslib/21.2.7/js/dx.all.js"></script>
+
+    <!-- 3. DỮ LIỆU TỪ SERVER -->
+    <script>
+        var lineData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.LineList));
+        var pcoData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.PCOList));
+    </script>
+
+    <!-- 4. FILE LOGIC BÁO CÁO -->
+    <script src="~/Scripts/report/report.js"></script>
+}

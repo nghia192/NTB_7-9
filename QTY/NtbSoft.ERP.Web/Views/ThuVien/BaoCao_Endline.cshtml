@@ -1,0 +1,308 @@
+@{
+    ViewBag.Title = "Báo cáo Endline - Checklist & Defect";
+    Layout = null; // Xem trước độc lập. Khi đã ưng giao diện, đổi lại Layout = "~/Views/Shared/_Layout.cshtml" và bỏ phần <html><head><body> bên dưới cho khớp layout chung của NtbSoft.ERP.Web
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>@ViewBag.Title</title>
+<style>
+  :root{
+    --forest:#1F4A3D;
+    --forest-dark:#153730;
+    --cream:#F7F8F3;
+    --sage:#E4EFE6;
+    --sage-line:#BFD8C6;
+    --ink:#1C2420;
+    --muted:#6B7A72;
+    --red:#C0392B;
+    --red-bg:#FCE4E1;
+    --amber:#C98A2C;
+    --white:#FFFFFF;
+    font-family:'IBM Plex Sans',Arial,sans-serif;
+  }
+  @@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@@400;500;600;700&family=IBM+Plex+Mono:wght@@400;500;600&display=swap');
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);}
+  .wrap{max-width:1320px;margin:0 auto;padding:28px 24px 60px;}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:14px;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-mark{width:38px;height:38px;border-radius:9px;background:var(--forest);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;letter-spacing:.5px;}
+  .brand h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.2px;}
+  .brand p{margin:1px 0 0;font-size:12px;color:var(--muted);}
+  .tabs{display:flex;background:var(--sage);border-radius:10px;padding:3px;gap:2px;}
+  .tab-btn{border:none;background:transparent;padding:9px 18px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--forest-dark);cursor:pointer;font-family:inherit;}
+  .tab-btn.active{background:var(--forest);color:#fff;}
+
+  .banner{background:#FBEED9;border:1px solid #E9CE9B;color:#7A5615;font-size:12.5px;padding:10px 14px;border-radius:10px;margin:0 0 20px;line-height:1.5;}
+
+  .filters{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+  .filter-card{background:#fff;border:1px solid var(--sage-line);border-radius:12px;padding:14px 16px;}
+  .filter-card h3{margin:0 0 10px;font-size:11.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:600;}
+  .chip-row{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{border:1px solid var(--sage-line);background:var(--sage);color:var(--forest-dark);padding:6px 12px;border-radius:999px;font-size:12.5px;cursor:pointer;font-weight:500;font-family:inherit;transition:.12s;}
+  .chip.selected{background:var(--forest);border-color:var(--forest);color:#fff;}
+  .chip:hover{border-color:var(--forest);}
+
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+  .stat{background:#fff;border:1px solid var(--sage-line);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;}
+  .stat .n{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;color:var(--forest-dark);}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:3px;}
+  .stat.alert .n{color:var(--red);}
+  .stat::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--forest);}
+  .stat.alert::before{background:var(--red);}
+
+  .table-card{background:#fff;border:1px solid var(--sage-line);border-radius:12px;overflow:hidden;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{background:var(--forest);color:#fff;text-align:left;padding:11px 12px;font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0;white-space:nowrap;}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--sage);white-space:nowrap;}
+  tbody tr:hover{background:var(--sage);}
+  tbody tr:nth-child(even){background:#FBFCFA;}
+  tbody tr:nth-child(even):hover{background:var(--sage);}
+  .mono{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--forest-dark);}
+  .swatch{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid rgba(0,0,0,.15);}
+  .count-cell{text-align:center;font-family:'IBM Plex Mono',monospace;font-weight:600;}
+  .count-zero{background:var(--red-bg);color:var(--red);border-radius:6px;display:inline-block;min-width:26px;padding:2px 0;}
+  .count-ok{color:var(--forest-dark);}
+  .table-scroll{overflow-x:auto;max-height:520px;overflow-y:auto;}
+  .empty{padding:40px;text-align:center;color:var(--muted);font-size:13px;}
+  .note{font-size:12px;color:var(--muted);padding:10px 16px;border-top:1px solid var(--sage);background:var(--sage);}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">QC</div>
+      <div>
+        <h1>Báo cáo Endline</h1>
+        <p>An Giang · ThuVienController / BaoCao_Endline</p>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="checklist">Checklist Report</button>
+      <button class="tab-btn" data-tab="defect">Defect Report</button>
+    </div>
+  </div>
+
+  <div class="banner">
+    Đây là bản <b>xem trước (preview)</b> dùng dữ liệu mẫu giống 2 báo cáo Excel gốc. Action <code>BaoCao_Endline()</code> hiện chưa truyền Model — khi bạn nối dữ liệu thật từ DB, thay khối <code>checklistData</code> / <code>defectData</code> trong &lt;script&gt; bằng dữ liệu đổ từ Controller (xem ghi chú cuối file).
+  </div>
+
+  <div class="filters">
+    <div class="filter-card">
+      <h3>Date</h3>
+      <div class="chip-row" id="f-date"></div>
+    </div>
+    <div class="filter-card">
+      <h3>line_id</h3>
+      <div class="chip-row" id="f-line"></div>
+    </div>
+    <div class="filter-card">
+      <h3>PCO Number</h3>
+      <div class="chip-row" id="f-pco"></div>
+    </div>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div id="panel-checklist">
+    <div class="table-card">
+      <div class="table-scroll">
+        <table id="tbl-checklist">
+          <thead>
+            <tr>
+              <th>Date</th><th>Location</th><th>line_id</th><th>QC name</th><th>Buyer.Season</th>
+              <th>PCO Number</th><th>Style</th><th>Color</th><th>Order quantity</th>
+              <th>Check list time</th><th>Check list names</th><th>Check list count</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="note">Ô đỏ = hạng mục checklist chưa được kiểm (Check list count = 0).</div>
+    </div>
+  </div>
+
+  <div id="panel-defect" class="hidden">
+    <div class="table-card">
+      <div class="table-scroll">
+        <table id="tbl-defect">
+          <thead>
+            <tr>
+              <th>Date</th><th>Location</th><th>line_id</th><th>QC name</th><th>Buyer.Season</th>
+              <th>PCO Number</th><th>Style</th><th>Color</th><th>Oerder quantity</th>
+              <th>Defect codes</th><th>Defect code VN</th><th>Defect code END</th><th>Số lần xuất hiện</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="note">Số dòng của báo cáo này thể hiện "Actual Defect Piece" (mỗi phiếu = 1 lỗi); để xem tổng số lần xuất hiện thực tế, xem sheet "Report Hourly (Every Info)".</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const COLOR_HEX = { Black:'#2b2b2b', Blue:'#2f5fa8', Red:'#b23b3b' };
+
+// === DỮ LIỆU MẪU — lấy đúng theo 2 ảnh báo cáo bạn gửi ===
+const checklistData = [
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Black',qty:2000,time:'07:30',item:'Thước',count:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Black',qty:2000,time:'07:30',item:'Kéo',count:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Blue',qty:1600,time:'14:20',item:'Thước',count:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Blue',qty:1600,time:'14:20',item:'Kéo',count:0},
+ {date:'04/06/2026',location:'An Giang',line:'Line 02',qc:'Hoa',bs:'PA-F28',pco:'PCO110096',style:'WOODLAND-FULL-ZIP-HOODED-RECYCLED-POLAR-FLEECE',color:'Red',qty:3908,time:'07:45',item:'Thước',count:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 02',qc:'Hoa',bs:'PA-F28',pco:'PCO110096',style:'WOODLAND-FULL-ZIP-HOODED-RECYCLED-POLAR-FLEECE',color:'Red',qty:3908,time:'07:45',item:'Kéo',count:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 02',qc:'Hoa',bs:'PA-F28',pco:'PCO110096',style:'WOODLAND-FULL-ZIP-HOODED-RECYCLED-POLAR-FLEECE',color:'Red',qty:3908,time:'07:45',item:'SOP',count:1},
+];
+
+const defectData = [
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Black',qty:2000,code:'06042026_001',vn:'Chưa cắt chỉ',end:'WMS02-Thread ends',n:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Black',qty:2000,code:'06042026_001',vn:'Cổ meo',end:'WMS11-Collar shape',n:2},
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Black',qty:2000,code:'06042026_002',vn:'Chưa cắt chỉ',end:'WMS02-Thread ends',n:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Black',qty:2000,code:'06042026_002',vn:'Lỗ kim',end:'WMS17-Needle hole/material damage',n:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Blue',qty:1600,code:'06042026_003',vn:'Chưa cắt chỉ',end:'WMS02-Thread ends',n:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Blue',qty:1600,code:'06042026_004',vn:'Không đối xứng',end:'WMS07-Assymmetry',n:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Blue',qty:1600,code:'06042026_005',vn:'Dài ngắn',end:'WMS12-Different length',n:2},
+ {date:'04/06/2026',location:'An Giang',line:'Line 01',qc:'Nga',bs:'SF-F26',pco:'PCO107620',style:'OAKHAM-FLEECE-GILET',color:'Blue',qty:1600,code:'06042026_006',vn:'Xếp ly',end:'WMS06-Pleats',n:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 02',qc:'Hoa',bs:'PA-F26',pco:'PCO110096',style:'WOODLAND-FULL-ZIP-HOODED-RECYCLED-POLAR-FLEECE',color:'Red',qty:3906,code:'06042026_007',vn:'Cổ meo',end:'WMS11-Collar shape',n:1},
+ {date:'04/06/2026',location:'An Giang',line:'Line 02',qc:'Hoa',bs:'PA-F26',pco:'PCO110096',style:'WOODLAND-FULL-ZIP-HOODED-RECYCLED-POLAR-FLEECE',color:'Red',qty:3906,code:'06042026_008',vn:'Gấu xấu',end:'WMS04-Hem shape',n:3},
+ {date:'04/06/2026',location:'An Giang',line:'Line 02',qc:'Hoa',bs:'PA-F27',pco:'PCO110096',style:'WOODLAND-FULL-ZIP-HOODED-RECYCLED-POLAR-FLEECE',color:'Red',qty:3907,code:'06042026_009',vn:'Mí to bé',end:'WMS13-Uneven stitching',n:3},
+ {date:'04/06/2026',location:'An Giang',line:'Line 02',qc:'Hoa',bs:'PA-F28',pco:'PCO110096',style:'WOODLAND-FULL-ZIP-HOODED-RECYCLED-POLAR-FLEECE',color:'Red',qty:3908,code:'06042026_010',vn:'Gấu xấu',end:'WMS04-Hem shape',n:1},
+];
+
+const state = { tab:'checklist', date:new Set(), line:new Set(), pco:new Set() };
+
+function uniq(arr){ return [...new Set(arr)]; }
+
+function buildChips(){
+  const dates = uniq(checklistData.concat(defectData).map(d=>d.date));
+  const lines = uniq(checklistData.concat(defectData).map(d=>d.line));
+  const pcos  = uniq(checklistData.concat(defectData).map(d=>d.pco));
+  dates.forEach(v=>state.date.add(v));
+  lines.forEach(v=>state.line.add(v));
+  pcos.forEach(v=>state.pco.add(v));
+  renderChipGroup('f-date', dates, state.date);
+  renderChipGroup('f-line', lines, state.line);
+  renderChipGroup('f-pco', pcos, state.pco);
+}
+
+function renderChipGroup(elId, values, selSet){
+  const el = document.getElementById(elId);
+  el.innerHTML='';
+  values.forEach(v=>{
+    const b=document.createElement('button');
+    b.className='chip'+(selSet.has(v)?' selected':'');
+    b.textContent=v;
+    b.onclick=()=>{ if(selSet.has(v)) selSet.delete(v); else selSet.add(v); render(); };
+    el.appendChild(b);
+  });
+}
+
+function passFilter(row){
+  return state.date.has(row.date) && state.line.has(row.line) && state.pco.has(row.pco);
+}
+
+function renderChecklist(){
+  const rows = checklistData.filter(passFilter);
+  const tbody = document.querySelector('#tbl-checklist tbody');
+  tbody.innerHTML='';
+  if(!rows.length){ tbody.innerHTML='<tr><td colspan="12" class="empty">Không có dữ liệu phù hợp bộ lọc</td></tr>'; return; }
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${r.date}</td><td>${r.location}</td><td>${r.line}</td><td>${r.qc}</td><td>${r.bs}</td>
+      <td class="mono">${r.pco}</td><td>${r.style}</td>
+      <td><span class="swatch" style="background:${COLOR_HEX[r.color]||'#999'}"></span>${r.color}</td>
+      <td>${r.qty.toLocaleString()}</td><td class="mono">${r.time}</td><td>${r.item}</td>
+      <td class="count-cell"><span class="${r.count===0?'count-zero':'count-ok'}">${r.count}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderDefect(){
+  const rows = defectData.filter(passFilter);
+  const tbody = document.querySelector('#tbl-defect tbody');
+  tbody.innerHTML='';
+  if(!rows.length){ tbody.innerHTML='<tr><td colspan="13" class="empty">Không có dữ liệu phù hợp bộ lọc</td></tr>'; return; }
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${r.date}</td><td>${r.location}</td><td>${r.line}</td><td>${r.qc}</td><td>${r.bs}</td>
+      <td class="mono">${r.pco}</td><td>${r.style}</td>
+      <td><span class="swatch" style="background:${COLOR_HEX[r.color]||'#999'}"></span>${r.color}</td>
+      <td>${r.qty.toLocaleString()}</td><td class="mono">${r.code}</td><td>${r.vn}</td>
+      <td class="mono">${r.end}</td><td class="count-cell">${r.n}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderSummary(){
+  const cl = checklistData.filter(passFilter);
+  const df = defectData.filter(passFilter);
+  const missing = cl.filter(r=>r.count===0).length;
+  const totalDefectPieces = df.length;
+  const topDefect = (()=>{
+    const m={};
+    df.forEach(r=>{ m[r.end]=(m[r.end]||0)+1; });
+    const arr=Object.entries(m).sort((a,b)=>b[1]-a[1]);
+    return arr.length? arr[0][0].split('-')[0] : '—';
+  })();
+  const stats = [
+    {n:cl.length, l:'Lượt kiểm checklist', alert:false},
+    {n:missing, l:'Hạng mục chưa kiểm (count=0)', alert:missing>0},
+    {n:totalDefectPieces, l:'Phiếu lỗi (Actual Defect Piece)', alert:false},
+    {n:topDefect, l:'Mã lỗi xuất hiện nhiều nhất', alert:false},
+  ];
+  const el=document.getElementById('summary');
+  el.innerHTML='';
+  stats.forEach(s=>{
+    const d=document.createElement('div');
+    d.className='stat'+(s.alert?' alert':'');
+    d.innerHTML=`<div class="n">${s.n}</div><div class="l">${s.l}</div>`;
+    el.appendChild(d);
+  });
+}
+
+function render(){
+  renderSummary();
+  if(state.tab==='checklist'){ renderChecklist(); } else { renderDefect(); }
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.tab = btn.dataset.tab;
+    document.getElementById('panel-checklist').classList.toggle('hidden', state.tab!=='checklist');
+    document.getElementById('panel-defect').classList.toggle('hidden', state.tab!=='defect');
+    render();
+  };
+});
+
+buildChips();
+render();
+</script>
+</body>
+</html>
+
+@*
+=== KHI SẴN SÀNG NỐI DỮ LIỆU THẬT ===
+1) Đổi action trong ThuVienController.cs:
+     public ActionResult BaoCao_Endline()
+     {
+         var model = new QcReportViewModel { ... đổ dữ liệu từ SQL Server ... };
+         return View(model);
+     }
+2) Thêm @model NtbSoft.ERP.Web.Models.QcReportViewModel ở dòng đầu file này
+3) Thay khối "const checklistData = [...]" và "const defectData = [...]"
+   bằng: const checklistData = @Html.Raw(Json.Serialize(Model.ChecklistData));
+         const defectData = @Html.Raw(Json.Serialize(Model.DefectData));
+   (cần @using System.Text.Json ở đầu file)
+*@

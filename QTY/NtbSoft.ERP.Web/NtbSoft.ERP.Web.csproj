@@ -169,8 +169,6 @@
   <ItemGroup>
     <Folder Include="Api\ApiGetData\" />
     <Folder Include="App_Data\" />
-    <Folder Include="Content\Templates\" />
-    <Folder Include="Models\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Scripts\Settings\LoiQA\Api\" />
   </ItemGroup>
@@ -182,6 +180,7 @@
     <Compile Include="Api\ThuVien\Dic_ChungLoaiCongDoanController.cs" />
     <Compile Include="Api\ThuVien\Dic_PBan_ChucVuController.cs" />
     <Compile Include="Api\ThuVien\ERP_DicUserController.cs" />
+    <Compile Include="Api\ThuVien\ReportController.cs" />
     <Compile Include="Api\ThuVien\SYS_LanguageController.cs" />
     <Compile Include="Api\ThuVien\SYS_LoginController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -197,6 +196,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ReportViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Date\bootstrap5.3.bundle.min.js" />
@@ -253,6 +253,7 @@
     <Content Include="Scripts\Dashboard\Dashboard.js" />
     <Content Include="Scripts\DKCa\shifts.js" />
     <Content Include="Scripts\Language\ResourceMananger.js" />
+    <Content Include="Scripts\report\report.js" />
     <Content Include="Scripts\Settings\LoiQA\Components\Grid.js" />
     <Content Include="Scripts\Settings\LoiQA\Components\Popover.js" />
     <Content Include="Scripts\Settings\LoiQA\LoaiLoi.js" />
@@ -351,6 +352,7 @@
     <Content Include="DevExtreme\icons\dxiconsmaterial.ttf" />
     <Content Include="DevExtreme\icons\dxiconsmaterial.woff" />
     <Content Include="DevExtreme\icons\dxiconsmaterial.woff2" />
+    <Content Include="Content\Templates\Template_CheckList.xlsx" />
     <None Include="Project_Readme.html" />
     <Content Include="Views\Login\Index.cshtml" />
     <Content Include="Views\ThuVien\DicChungLoaiCongDoan.cshtml" />
@@ -363,6 +365,7 @@
     <Content Include="Views\Settings\PCO.cshtml" />
     <Content Include="Views\Language\Index.cshtml" />
     <Content Include="Views\DKCa\Index.cshtml" />
+    <Content Include="Views\Report\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

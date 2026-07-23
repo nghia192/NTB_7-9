@@ -337,3 +337,12 @@ C:\Users\Public\Downloads\QTY1\QTY\NtbSoft.ERP.Entity\obj\Debug\NtbSoft.ERP.Enti
 C:\Users\Public\Downloads\QTY1\QTY\NtbSoft.ERP.Entity\obj\Debug\NtbSoft..831C60B8.Up2Date
 C:\Users\Public\Downloads\QTY1\QTY\NtbSoft.ERP.Entity\obj\Debug\NtbSoft.ERP.Entity.dll
 C:\Users\Public\Downloads\QTY1\QTY\NtbSoft.ERP.Entity\obj\Debug\NtbSoft.ERP.Entity.pdb
+C:\Users\NguyễnTrọngNghĩa\Documents\GitHub\NTB_7-9\QTY\NtbSoft.ERP.Entity\bin\Debug\NtbSoft.ERP.Entity.dll
+C:\Users\NguyễnTrọngNghĩa\Documents\GitHub\NTB_7-9\QTY\NtbSoft.ERP.Entity\bin\Debug\NtbSoft.ERP.Entity.pdb
+C:\Users\NguyễnTrọngNghĩa\Documents\GitHub\NTB_7-9\QTY\NtbSoft.ERP.Entity\bin\Debug\Ghostscript.NET.dll
+C:\Users\NguyễnTrọngNghĩa\Documents\GitHub\NTB_7-9\QTY\NtbSoft.ERP.Entity\bin\Debug\Ghostscript.NET.xml
+C:\Users\NguyễnTrọngNghĩa\Documents\GitHub\NTB_7-9\QTY\NtbSoft.ERP.Entity\obj\Debug\NtbSoft.ERP.Entity.csproj.AssemblyReference.cache
+C:\Users\NguyễnTrọngNghĩa\Documents\GitHub\NTB_7-9\QTY\NtbSoft.ERP.Entity\obj\Debug\NtbSoft.ERP.Entity.csproj.CoreCompileInputs.cache
+C:\Users\NguyễnTrọngNghĩa\Documents\GitHub\NTB_7-9\QTY\NtbSoft.ERP.Entity\obj\Debug\NtbSoft..831C60B8.Up2Date
+C:\Users\NguyễnTrọngNghĩa\Documents\GitHub\NTB_7-9\QTY\NtbSoft.ERP.Entity\obj\Debug\NtbSoft.ERP.Entity.dll
+C:\Users\NguyễnTrọngNghĩa\Documents\GitHub\NTB_7-9\QTY\NtbSoft.ERP.Entity\obj\Debug\NtbSoft.ERP.Entity.pdb
