@@ -3,23 +3,23 @@
   "WorkspaceRootPath": "C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|c:\\users\\nguy\u1EC5ntr\u1ECDngngh\u0129a\\documents\\github\\ntb_7-9\\qty\\ntbsoft.erp.entity\\system\\reportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BE1D348-E3BC-4EEB-AEE6-FE39FACB9CAB}|NtbSoft.ERP.Entity\\NtbSoft.ERP.Entity.csproj|solutionrelative:ntbsoft.erp.entity\\system\\reportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\ntbsoft.erp.web\\scripts\\report\\report.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|solutionrelative:ntbsoft.erp.web\\scripts\\report\\report.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\ntbsoft.erp.web\\views\\report\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|solutionrelative:ntbsoft.erp.web\\views\\report\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|c:\\users\\nguy\u1EC5ntr\u1ECDngngh\u0129a\\documents\\github\\ntb_7-9\\qty\\ntbsoft.erp.web\\api\\thuvien\\reportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|solutionrelative:ntbsoft.erp.web\\api\\thuvien\\reportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|c:\\users\\nguy\u1EC5ntr\u1ECDngngh\u0129a\\documents\\github\\ntb_7-9\\qty\\ntbsoft.erp.web\\models\\reportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|solutionrelative:ntbsoft.erp.web\\models\\reportviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|c:\\users\\nguy\u1EC5ntr\u1ECDngngh\u0129a\\documents\\github\\ntb_7-9\\qty\\ntbsoft.erp.web\\scripts\\report\\report.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
-      "RelativeMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|solutionrelative:ntbsoft.erp.web\\scripts\\report\\report.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|c:\\users\\nguy\u1EC5ntr\u1ECDngngh\u0129a\\documents\\github\\ntb_7-9\\qty\\ntbsoft.erp.web\\views\\report\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|solutionrelative:ntbsoft.erp.web\\views\\report\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|c:\\users\\nguy\u1EC5ntr\u1ECDngngh\u0129a\\documents\\github\\ntb_7-9\\qty\\ntbsoft.erp.web\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "AbsoluteMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\ntbsoft.erp.web\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{122E8215-1F72-4C1E-B198-A9CED47A4916}|NtbSoft.ERP.Web\\NtbSoft.ERP.Web.csproj|solutionrelative:ntbsoft.erp.web\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
@@ -30,8 +30,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ReportViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\ReportViewModel.cs",
+              "RelativeDocumentMoniker": "NtbSoft.ERP.Entity\\SYSTEM\\ReportViewModel.cs",
+              "ToolTip": "C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\NtbSoft.ERP.Entity\\SYSTEM\\ReportViewModel.cs",
+              "RelativeToolTip": "NtbSoft.ERP.Entity\\SYSTEM\\ReportViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T06:18:54.25Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 4,
@@ -47,54 +60,41 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "report.js",
               "DocumentMoniker": "C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\NtbSoft.ERP.Web\\Scripts\\report\\report.js",
               "RelativeDocumentMoniker": "NtbSoft.ERP.Web\\Scripts\\report\\report.js",
               "ToolTip": "C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\NtbSoft.ERP.Web\\Scripts\\report\\report.js",
               "RelativeToolTip": "NtbSoft.ERP.Web\\Scripts\\report\\report.js",
-              "ViewState": "AgIAAAAAAAAAmZmZmZkmwH8AAAAhAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
               "WhenOpened": "2026-07-23T04:18:26.514Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\NtbSoft.ERP.Web\\Views\\Report\\Index.cshtml",
               "RelativeDocumentMoniker": "NtbSoft.ERP.Web\\Views\\Report\\Index.cshtml",
               "ToolTip": "C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\NtbSoft.ERP.Web\\Views\\Report\\Index.cshtml",
               "RelativeToolTip": "NtbSoft.ERP.Web\\Views\\Report\\Index.cshtml",
-              "ViewState": "AgIAAJ4AAAAAAAAAAAAAAL4AAAA2AAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-07-23T04:00:45.481Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "ReportController.cs",
               "DocumentMoniker": "C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\NtbSoft.ERP.Web\\Api\\ThuVien\\ReportController.cs",
               "RelativeDocumentMoniker": "NtbSoft.ERP.Web\\Api\\ThuVien\\ReportController.cs",
               "ToolTip": "C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\NtbSoft.ERP.Web\\Api\\ThuVien\\ReportController.cs",
               "RelativeToolTip": "NtbSoft.ERP.Web\\Api\\ThuVien\\ReportController.cs",
-              "ViewState": "AgIAAIkAAAAAMjMzMzMKwJwAAABsAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-07-23T03:59:41.783Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ReportViewModel.cs",
-              "DocumentMoniker": "C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\NtbSoft.ERP.Web\\Models\\ReportViewModel.cs",
-              "RelativeDocumentMoniker": "NtbSoft.ERP.Web\\Models\\ReportViewModel.cs",
-              "ToolTip": "C:\\Users\\Nguy\u1EC5nTr\u1ECDngNgh\u0129a\\Documents\\GitHub\\NTB_7-9\\QTY\\NtbSoft.ERP.Web\\Models\\ReportViewModel.cs",
-              "RelativeToolTip": "NtbSoft.ERP.Web\\Models\\ReportViewModel.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAYwBAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-23T03:58:30.807Z",
               "EditorCaption": ""
             }
           ]

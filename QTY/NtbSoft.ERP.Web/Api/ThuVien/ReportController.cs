@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Web.Mvc;
-using NtbSoft.ERP.Web.Models;
+using NtbSoft.ERP.Entity.SYSTEM;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;

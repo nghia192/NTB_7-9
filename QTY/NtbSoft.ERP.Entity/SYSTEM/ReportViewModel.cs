@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NtbSoft.ERP.Web.Models
+namespace NtbSoft.ERP.Entity.SYSTEM
 {
     public class SelectItem
     {

@@ -1,53 +1,106 @@
-@model NtbSoft.ERP.Web.Models.ReportViewModel
+@model NtbSoft.ERP.Entity.SYSTEM.ReportViewModel
 @{
     ViewBag.Title = "Rework and Checklist Report";
 }
 
-<!-- Nhúng thư viện icon (giống như trang kia của bạn) -->
+<!-- Icon + font -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 
 <style>
-    /* Kế thừa bảng màu từ giao diện mẫu của bạn */
+    /* ================================================================
+       Bảng màu & kiểu chữ riêng cho trang Báo cáo QC (nhà máy may):
+       tông than chì công nghiệp + điểm nhấn hổ phách (màu tag QC/an
+       toàn), font mono cho các cột mã (PCO, Defect code, giờ) để
+       phân biệt "dữ liệu/mã" với văn bản thường.
+       ================================================================ */
     :root {
-        --dkca-primary: #1a1a2e;
-        --dkca-accent: #4361ee;
-        --dkca-bg: #f0f2f5;
-        --dkca-border: #e2e8f0;
+        --qc-ink: #1c2128;
+        --qc-graphite: #333c47;
+        --qc-graphite-2: #454f5e;
+        --qc-canvas: #f2f3ef;
+        --qc-card: #ffffff;
+        --qc-line: #e3e5df;
+        --qc-line-strong: #cfd2c9;
+        --qc-text: #1c2128;
+        --qc-text-muted: #6b7280;
+        --qc-accent: #b45309;
+        --qc-accent-soft: #fbf0e0;
+        --qc-accent-strong: #92400e;
+        --qc-danger: #b91c1c;
+        --qc-danger-soft: #fbe7e7;
+        --qc-success: #15803d;
+        --qc-success-soft: #e7f4ec;
+        --qc-font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+        --qc-font-body: 'Inter', 'Segoe UI', sans-serif;
+        --qc-font-mono: 'IBM Plex Mono', 'Consolas', monospace;
     }
 
     body {
-        background-color: var(--dkca-bg);
+        background-color: var(--qc-canvas);
+        font-family: var(--qc-font-body);
+        color: var(--qc-text);
     }
 
+    /* ---------------------------------------------------------------
+       Thẻ báo cáo chính: viền hổ phách bên trái làm "đường ray kiểm
+       tra" — dấu hiệu nhận diện xuyên suốt trang.
+       --------------------------------------------------------------- */
     .report-card {
-        background: #fff;
-        border: 1px solid var(--dkca-border);
+        background: var(--qc-card);
+        border: 1px solid var(--qc-line);
+        border-left: 4px solid var(--qc-accent);
         border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-        margin: 15px;
+        padding: 24px 28px 28px;
+        box-shadow: 0 1px 2px rgba(28, 33, 40, 0.04), 0 8px 24px rgba(28, 33, 40, 0.05);
+        margin: 20px;
     }
 
     .page-title {
-        font-size: 20px;
+        font-family: var(--qc-font-display);
+        font-size: 21px;
         font-weight: 700;
-        color: var(--dkca-primary);
+        color: var(--qc-ink);
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 20px;
+        gap: 12px;
+        margin-bottom: 4px;
+        letter-spacing: -0.01em;
     }
 
-    /* Vùng chứa các control tìm kiếm */
+        .page-title .title-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--qc-ink);
+            color: var(--qc-accent);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+    .page-subtitle {
+        font-size: 13px;
+        color: var(--qc-text-muted);
+        margin: 0 0 20px 46px;
+        letter-spacing: 0.01em;
+    }
+
+    /* ---------------------------------------------------------------
+       Vùng bộ lọc
+       --------------------------------------------------------------- */
     .filter-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 15px;
+        gap: 16px;
         align-items: flex-end;
-        padding: 16px;
-        margin-bottom: 20px;
-        background: #f8fafc;
-        border: 1px solid var(--dkca-border);
+        padding: 18px 20px;
+        margin-bottom: 22px;
+        background: var(--qc-canvas);
+        border: 1px solid var(--qc-line);
         border-radius: 8px;
     }
 
@@ -57,14 +110,22 @@
     }
 
         .filter-group label {
+            font-family: var(--qc-font-body);
             font-weight: 600;
-            margin-bottom: 6px;
-            color: #475569;
-            font-size: 13px;
+            margin-bottom: 7px;
+            color: var(--qc-graphite-2);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
+
+            .filter-group label i {
+                color: var(--qc-accent);
+                font-size: 13px;
+            }
 
     .action-group {
         display: flex;
@@ -72,94 +133,353 @@
         align-items: flex-end;
     }
 
-    /* Đưa thanh bộ lọc (Filter Row) về lại nền trắng */
-    .dx-datagrid-headers .dx-datagrid-filter-row,
-    .dx-datagrid-headers .dx-datagrid-filter-row td {
-        background-color: #fff !important;
-    }
-
-    /* Chỉnh lại màu chữ và ô input trong bộ lọc cho dễ nhìn */
-    .dx-datagrid-filter-row .dx-texteditor {
-        background-color: #fff !important;
-    }
-
-    .dx-datagrid-filter-row .dx-texteditor-input {
-        color: #1e293b !important;
-    }
-
-    /* Chỉnh màu các icon (kính lúp, lịch, bộ lọc) về màu xám tối */
-    .dx-datagrid-filter-row .dx-icon {
-        color: #475569 !important;
-    }
-
-    /* Làm mềm các input */
+    /* ---------------------------------------------------------------
+       Input / TagBox / DateBox — bo góc mềm, viền than chì nhạt
+       --------------------------------------------------------------- */
     .dx-texteditor.dx-editor-outlined {
         border-radius: 6px;
-        border-color: var(--dkca-border);
+        border-color: var(--qc-line-strong);
+        background: var(--qc-card);
+        font-family: var(--qc-font-body);
     }
 
-    /* Nút Search màu xanh dương */
+        .dx-texteditor.dx-editor-outlined.dx-state-focused {
+            border-color: var(--qc-accent);
+            box-shadow: 0 0 0 3px var(--qc-accent-soft);
+        }
+
+    .dx-tag-container .dx-tag {
+        background: var(--qc-accent-soft) !important;
+        color: var(--qc-accent-strong) !important;
+        border-radius: 5px;
+        font-family: var(--qc-font-mono);
+        font-size: 12px;
+    }
+
+    .dx-tag-remove-button::before {
+        color: var(--qc-accent-strong) !important;
+    }
+
+    /* ---------------------------------------------------------------
+       Nút Search — solid than chì đậm, chữ trắng, KHÔNG gradient
+       (tránh mô-típ "nút gradient xanh dương" mặc định của admin
+       panel AI-generated).
+       --------------------------------------------------------------- */
     #btnSearch .dx-button-content {
-        background: linear-gradient(135deg, var(--dkca-accent), #6d8bff) !important;
+        background: var(--qc-ink) !important;
         color: #fff !important;
         border-radius: 6px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        padding: 10px 18px;
+        transition: background-color 0.15s ease;
     }
 
-    /* Nút Excel màu xanh lá */
+        #btnSearch .dx-button-content:hover {
+            background: var(--qc-graphite) !important;
+        }
+
+    #btnSearch .dx-icon {
+        color: var(--qc-accent) !important;
+    }
+
+    /* ---------------------------------------------------------------
+       Nút Excel — viền xanh lá, nền trắng (kiểu "secondary" thay vì
+       gradient) để tách biệt rõ khỏi nút Search chính.
+       --------------------------------------------------------------- */
     #btnExport .dx-button-content {
-        background: linear-gradient(135deg, #10b981, #34d399) !important;
-        color: #fff !important;
+        background: var(--qc-success-soft) !important;
+        color: var(--qc-success) !important;
+        border: 1px solid var(--qc-success);
         border-radius: 6px;
+        font-weight: 600;
+        padding: 9px 17px;
+        transition: background-color 0.15s ease;
     }
 
-    /* Tiêu đề cột DataGrid theo tone màu chính */
+        #btnExport .dx-button-content:hover {
+            background: #d5efdd !important;
+        }
+
+    #btnExport .dx-icon {
+        color: var(--qc-success) !important;
+    }
+
+    /* ---------------------------------------------------------------
+       Tab Panel (Defect / Checklist) — gạch chân hổ phách thay vì
+       khối nền mặc định, chữ hoa cách chữ nhẹ giống nhãn phân loại
+       trên xưởng.
+       --------------------------------------------------------------- */
+    #tabReport .dx-tabpanel-tabs {
+        border-bottom: 1px solid var(--qc-line);
+        background: transparent;
+    }
+
+    #tabReport .dx-tab {
+        background: transparent !important;
+        border: none !important;
+        padding: 10px 18px;
+        margin-right: 6px;
+        border-radius: 8px 8px 0 0;
+        font-family: var(--qc-font-display);
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--qc-text-muted) !important;
+        position: relative;
+        transition: color 0.15s ease, background-color 0.15s ease;
+    }
+
+        #tabReport .dx-tab::after {
+            content: "";
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            bottom: -1px;
+            height: 2px;
+            background: transparent;
+            transition: background-color 0.15s ease, height 0.15s ease;
+        }
+
+        #tabReport .dx-tab:not(.dx-tab-selected):hover {
+            color: var(--qc-graphite) !important;
+            background: #f4f5f2 !important;
+        }
+
+        /* Tab đang chọn: nền pill hổ phách nhạt + chữ đậm + gạch chân
+       dày hơn hẳn tab thường — nổi bật rõ đang xem báo cáo nào. */
+        #tabReport .dx-tab.dx-tab-selected {
+            color: var(--qc-ink) !important;
+            background: var(--qc-accent-soft) !important;
+            font-weight: 700;
+        }
+
+            #tabReport .dx-tab.dx-tab-selected::after {
+                background: var(--qc-accent);
+                height: 3px;
+            }
+
+    #tabReport .dx-tabs-wrapper {
+        padding: 0;
+    }
+
+    /* ---------------------------------------------------------------
+       DataGrid — header than chì (không phải xanh navy phẳng), viền
+       dưới hổ phách 2px như nhãn thông số kỹ thuật; hàng so le nhẹ;
+       cột mã dùng font mono.
+       --------------------------------------------------------------- */
+    .dx-datagrid {
+        font-family: var(--qc-font-body);
+        border: 1px solid var(--qc-line);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
     .dx-datagrid-headers {
-        background-color: var(--dkca-primary) !important;
+        background: linear-gradient(180deg, var(--qc-graphite) 0%, var(--qc-graphite-2) 100%) !important;
+        border-bottom: 2px solid var(--qc-accent) !important;
     }
 
         .dx-datagrid-headers .dx-datagrid-text-content {
             color: #fff !important;
             font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.01em;
+            white-space: normal;
+            line-height: 1.25;
         }
 
     .dx-datagrid-borders > .dx-datagrid-headers {
         border-bottom: none;
     }
+
+    /* Header cao hơn 1 chút để chỗ cho tiêu đề 2 dòng khi cần
+       (wordWrapEnabled bật trong report.js) */
+    .dx-datagrid-headers .dx-datagrid-table .dx-row > td {
+        vertical-align: middle;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    /* Icon lọc (phễu) trên mỗi tiêu đề cột — tách riêng khỏi class
+       font-mono, canh gọn bên phải, màu hổ phách dịu, rõ hơn khi
+       hover thay vì mờ nhạt trên nền than chì. */
+    .dx-datagrid-headers .dx-header-filter {
+        color: var(--qc-accent) !important;
+        opacity: 0.85;
+        font-size: 12px;
+    }
+
+        .dx-datagrid-headers .dx-header-filter:hover {
+            color: #fff !important;
+            opacity: 1;
+        }
+
+    .dx-datagrid-headers .dx-column-indicators {
+        margin-left: 6px;
+        flex-shrink: 0;
+    }
+
+    .dx-datagrid-rowsview .dx-row {
+        font-size: 13.5px;
+    }
+
+        .dx-datagrid-rowsview .dx-row.dx-data-row:not(.dx-row-alt) {
+            background-color: var(--qc-card);
+        }
+
+        .dx-datagrid-rowsview .dx-row.dx-row-alt {
+            background-color: #fafaf8;
+        }
+
+        .dx-datagrid-rowsview .dx-row.dx-data-row:hover {
+            background-color: var(--qc-accent-soft) !important;
+        }
+
+    /* ---------------------------------------------------------------
+       Căn giữa toàn bộ nội dung cột: tiêu đề, dữ liệu, và ô lọc.
+       --------------------------------------------------------------- */
+    .dx-datagrid-headers .dx-datagrid-table .dx-row > td {
+        text-align: center;
+    }
+
+    .dx-datagrid-headers .dx-datagrid-text-content {
+        text-align: center;
+        width: 100%;
+    }
+
+    .dx-datagrid-rowsview .dx-datagrid-table .dx-row > td {
+        text-align: center !important;
+    }
+
+        .dx-datagrid-rowsview .dx-datagrid-table .dx-row > td .dx-datagrid-text-content {
+            text-align: center !important;
+            width: 100%;
+        }
+
+    .dx-datagrid-filter-row .dx-texteditor-input {
+        text-align: center !important;
+
+    }
+
+    /* Cột mã / thời gian: PCO Number, Defect code, Check list time —
+       gán qua cssClass "qc-mono-col" trên từng cột trong report.js */
+    .qc-mono-col {
+        font-family: var(--qc-font-mono) !important;
+        font-size: 12.5px !important;
+    }
+
+    /* Ô "PCO Number" rút gọn + icon copy — canh giữa theo cùng quy
+       tắc căn giữa chung của grid. */
+    .qc-pco-cell {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+    }
+
+    .qc-pco-text {
+        white-space: nowrap;
+    }
+
+    .qc-copy-icon {
+        color: var(--qc-text-muted);
+        font-size: 13px;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: color 0.15s ease;
+    }
+
+        .qc-copy-icon:hover {
+            color: var(--qc-accent);
+        }
+
+    /* Thanh bộ lọc (Filter Row) nền trắng, chữ dễ đọc */
+    .dx-datagrid-headers .dx-datagrid-filter-row,
+    .dx-datagrid-headers .dx-datagrid-filter-row td {
+        background-color: #fff !important;
+    }
+
+    .dx-datagrid-filter-row .dx-texteditor {
+        background-color: #fff !important;
+    }
+
+    .dx-datagrid-filter-row .dx-texteditor-input {
+        color: var(--qc-text) !important;
+        font-size: 13px;
+    }
+
+    .dx-datagrid-filter-row .dx-icon {
+        color: var(--qc-graphite-2) !important;
+    }
+
+    /* Badge trạng thái checklist = 0 (thiếu kiểm tra) — dùng cùng
+       với onCellPrepared trong report.js */
+    .qc-badge-fail {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 20px;
+        background: var(--qc-danger-soft);
+        color: var(--qc-danger);
+        font-weight: 700;
+        font-size: 12.5px;
+        font-family: var(--qc-font-mono);
+    }
+
+    .qc-badge-warn {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 20px;
+        background: var(--qc-accent-soft);
+        color: var(--qc-accent-strong);
+        font-weight: 700;
+        font-size: 12.5px;
+        font-family: var(--qc-font-mono);
+    }
+
+    /* ---------------------------------------------------------------
+       Load Panel
+       --------------------------------------------------------------- */
+    .dx-loadpanel-content {
+        border-radius: 10px;
+        font-family: var(--qc-font-body);
+    }
+
+    .dx-loadpanel-indicator {
+        color: var(--qc-accent) !important;
+    }
 </style>
 
 <div class="report-card">
     <div class="page-title">
-        <i class="bi bi-bar-chart-line-fill"></i> Báo cáo Rework & Checklist
+        <span class="title-tag"><i class="bi bi-clipboard2-pulse-fill"></i></span>
+        Báo cáo Rework &amp; Checklist
     </div>
+    <div class="page-subtitle">Theo dõi lỗi may (rework) và checklist kiểm tra công cụ theo chuyền / PCO</div>
 
     <!-- Vùng Bộ lọc (Filter) -->
-    <!-- Vùng Bộ lọc (Filter) -->
     <div class="filter-row">
-        <!-- Input Từ Ngày -->
         <div class="filter-group" style="flex: 0.4; min-width: 130px;">
             <label><i class="bi bi-calendar-event"></i> Từ ngày</label>
             <div id="txtFromDate"></div>
         </div>
 
-        <!-- Input Đến Ngày -->
         <div class="filter-group" style="flex: 0.4; min-width: 130px;">
             <label><i class="bi bi-calendar-check"></i> Đến ngày</label>
             <div id="txtToDate"></div>
         </div>
 
-        <!-- Input Chuyền -->
         <div class="filter-group" style="flex: 1; min-width: 160px;">
             <label><i class="bi bi-diagram-3-fill"></i> Line ID</label>
             <div id="tagLine"></div>
         </div>
 
-        <!-- Input PCO -->
         <div class="filter-group" style="flex: 1; min-width: 160px;">
             <label><i class="bi bi-tags-fill"></i> PCO Number</label>
             <div id="tagPCO"></div>
         </div>
 
-        <!-- Các Nút Thao Tác -->
         <div class="action-group">
             <div id="btnSearch"></div>
             <div id="btnExport"></div>

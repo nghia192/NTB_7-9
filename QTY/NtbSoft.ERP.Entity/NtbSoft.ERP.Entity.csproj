@@ -72,6 +72,7 @@
     <Compile Include="SYSTEM\DeleteShiftDetailRequest.cs" />
     <Compile Include="SYSTEM\LanguageResourceEntity.cs" />
     <Compile Include="SYSTEM\MD5StringCrypt.cs" />
+    <Compile Include="SYSTEM\ReportViewModel.cs" />
     <Compile Include="SYSTEM\ShiftDetailModel.cs" />
     <Compile Include="SYSTEM\ShiftModel.cs" />
     <Compile Include="SYSTEM\SystemUserCostingEntity.cs" />

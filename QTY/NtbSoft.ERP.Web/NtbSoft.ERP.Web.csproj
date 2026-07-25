@@ -169,6 +169,7 @@
   <ItemGroup>
     <Folder Include="Api\ApiGetData\" />
     <Folder Include="App_Data\" />
+    <Folder Include="Models\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Scripts\Settings\LoiQA\Api\" />
   </ItemGroup>
@@ -196,7 +197,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\ReportViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Date\bootstrap5.3.bundle.min.js" />
